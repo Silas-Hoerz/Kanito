@@ -3,16 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Space Dithering | Soft Borders</title>
+    <title>KANITO | The Audiophile Cassette</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --c-bg: #050a05;
+            --c-mid: rgba(0, 140, 165, 0.9);
+            --c-mid-transparent: rgba(0, 140, 165, 0.1);
+            --c-high: #d9f2ff;
+            --c-accent: #ff0055;
+            --font-mono: 'Space Mono', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
         body, html { 
             margin: 0; 
             padding: 0; 
             width: 100%; 
             height: 100%; 
-            overflow: hidden; 
-            background: #050a05; 
+            background: var(--c-bg);
+            color: var(--c-high);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
         }
+
+        /* Canvas Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
         canvas { 
             display: block; 
             width: 100%; 
@@ -20,10 +44,348 @@
             image-rendering: pixelated; 
             image-rendering: crisp-edges;
         }
+
+        /* Layout */
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        nav a {
+            color: var(--c-high);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin: 4rem 0 6rem;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            line-height: 0.9;
+            font-weight: 800;
+            margin: 0 0 1.5rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(180deg, #fff, var(--c-mid));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--c-high);
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Cassette CSS Art */
+        .cassette-container {
+            margin: 3rem auto;
+            perspective: 1000px;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .cassette {
+            width: 300px;
+            max-width: 100%;
+            height: 190px;
+            background: #222;
+            border-radius: 10px;
+            position: relative;
+            border: 2px solid #444;
+            box-shadow:
+                0 0 20px rgba(0,0,0,0.5),
+                0 0 50px rgba(0, 140, 165, 0.2);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            box-sizing: border-box;
+            transition: transform 0.5s ease;
+        }
+
+        .cassette:hover {
+            transform: rotateY(10deg) rotateX(5deg);
+        }
+
+        .cassette-label {
+            background: #eee;
+            flex: 1;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .label-top {
+            height: 30px;
+            background: var(--c-mid);
+            margin: -10px -10px 5px -10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .window {
+            width: 180px;
+            height: 50px;
+            background: #333;
+            border-radius: 20px;
+            margin: 10px auto;
+            position: relative;
+            border: 2px solid #999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+        }
+
+        .reel {
+            width: 35px;
+            height: 35px;
+            background: #fff;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .reel::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #333; /* Spindle */
+            border-radius: 50%;
+        }
+
+        .tape-details {
+            text-align: center;
+            color: #222;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            margin-top: auto;
+        }
+
+        .screws {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .screw {
+            width: 6px;
+            height: 6px;
+            background: #555;
+            border-radius: 50%;
+            position: absolute;
+        }
+        .screw.tl { top: 5px; left: 5px; }
+        .screw.tr { top: 5px; right: 5px; }
+        .screw.bl { bottom: 5px; left: 5px; }
+        .screw.br { bottom: 5px; right: 5px; }
+        .screw.bm { bottom: 5px; left: 50%; transform: translateX(-50%); }
+
+
+        /* Feature Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--c-mid);
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-mono);
+            margin-top: 0;
+            color: var(--c-mid);
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--c-high);
+            color: var(--c-bg);
+            padding: 1rem 2rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 2rem;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: var(--c-mid);
+            color: #fff;
+            box-shadow: 0 0 20px var(--c-mid);
+        }
+
+        footer {
+            padding: 2rem;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        @media (min-width: 768px) {
+            .cassette {
+                width: 400px;
+                height: 250px;
+            }
+            .window {
+                width: 240px;
+                height: 60px;
+            }
+            .reel {
+                width: 45px;
+                height: 45px;
+            }
+        }
     </style>
 </head>
 <body>
-    <canvas id="glcanvas"></canvas>
+    <div id="canvas-container">
+        <canvas id="glcanvas"></canvas>
+    </div>
+
+    <div class="wrapper">
+        <header>
+            <div class="logo">Kanito</div>
+            <nav>
+                <a href="#specs">Specs</a>
+                <a href="#about">Story</a>
+                <a href="#order">Buy</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="hero">
+                <div class="tagline">The Cassette Reinvented</div>
+                <h1>ANALOG SOUL.<br>DIGITAL HEART.</h1>
+                <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto 2rem; line-height: 1.6;">
+                    Experience high-fidelity audio in a classic form factor.
+                    Kanito combines the tactile joy of a cassette with state-of-the-art audiophile technology.
+                </p>
+                <a href="#order" class="btn">Pre-Order Now</a>
+            </section>
+
+            <div class="cassette-container">
+                <div class="cassette">
+                    <div class="screws">
+                        <div class="screw tl"></div>
+                        <div class="screw tr"></div>
+                        <div class="screw bl"></div>
+                        <div class="screw br"></div>
+                        <div class="screw bm"></div>
+                    </div>
+                    <div class="cassette-label">
+                        <div class="label-top">KANITO HI-RES</div>
+                        <div class="window">
+                            <div class="reel"></div>
+                            <div class="reel"></div>
+                        </div>
+                        <div class="tape-details">
+                            <p>MP3 / FLAC / WAV PLAYER</p>
+                            <p>SIDE A: THE FUTURE</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="features" id="specs">
+                <div class="feature-card">
+                    <h3>Audiophile DAC</h3>
+                    <p>Equipped with a premium 32-bit DAC for crystal clear sound reproduction that rivals high-end desktop setups.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Retina Display</h3>
+                    <p>Hidden behind the "tape window" is a sharp OLED display showing track info and visualizations.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Tactile Controls</h3>
+                    <p>Physical buttons for play, pause, and rewind. Feel the click. Connect via Bluetooth 5.2 or 3.5mm jack.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            &copy; 2023 Kanito Audio Lab. Designed for the Retro Future.
+        </footer>
+    </div>
 
     <script id="fragShader" type="x-shader/x-fragment">
         precision mediump float;
