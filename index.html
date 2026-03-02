@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KANITO | The Audiophile Cassette</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Silas Hoerz | Portfolio</title>
     <style>
         :root {
             --c-bg: #050a05;
             --c-mid: rgba(0, 140, 165, 0.9);
-            --c-mid-transparent: rgba(0, 140, 165, 0.1);
             --c-high: #d9f2ff;
-            --c-accent: #ff0055;
-            --font-mono: 'Space Mono', monospace;
-            --font-sans: 'Inter', sans-serif;
+            /* System Fonts statt Google Fonts für 100% DSGVO-Sicherheit */
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         body, html { 
@@ -24,6 +22,7 @@
             color: var(--c-high);
             font-family: var(--font-sans);
             overflow-x: hidden;
+            background-color: var(--c-bg);
         }
 
         /* Canvas Background */
@@ -33,7 +32,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: -2;
         }
 
         canvas { 
@@ -42,6 +41,20 @@
             height: 100%; 
             image-rendering: pixelated; 
             image-rendering: crisp-edges;
+        }
+
+        /* NEU: Dark Glass Overlay */
+        #glass-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 10, 5, 0.65); /* Dunkelt den Hintergrund ab */
+            backdrop-filter: blur(12px); /* Macht den Hintergrund unscharf/weich */
+            -webkit-backdrop-filter: blur(12px);
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* Layout */
@@ -58,7 +71,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            mix-blend-mode: difference;
         }
 
         .logo {
@@ -82,6 +94,7 @@
         nav a:hover {
             opacity: 1;
             text-decoration: underline;
+            color: var(--c-mid);
         }
 
         main {
@@ -95,13 +108,13 @@
         /* Hero Section */
         .hero {
             text-align: center;
-            margin: 4rem 0 6rem;
+            margin: 4rem 0 4rem;
             max-width: 800px;
         }
 
         h1 {
-            font-size: clamp(3rem, 10vw, 6rem);
-            line-height: 0.9;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            line-height: 1.1;
             font-weight: 800;
             margin: 0 0 1.5rem;
             letter-spacing: -0.02em;
@@ -112,184 +125,75 @@
 
         .tagline {
             font-family: var(--font-mono);
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--c-high);
-            border-radius: 4px;
-            backdrop-filter: blur(4px);
+            font-size: 1rem;
+            color: var(--c-mid);
+            margin-bottom: 1rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        /* Cassette CSS Art */
-        .cassette-container {
-            margin: 3rem auto;
-            perspective: 1000px;
-            max-width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        .cassette {
-            width: 300px;
-            max-width: 100%;
-            height: 190px;
-            background: #222;
-            border-radius: 10px;
-            position: relative;
-            border: 2px solid #444;
-            box-shadow:
-                0 0 20px rgba(0,0,0,0.5),
-                0 0 50px rgba(0, 140, 165, 0.2);
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            box-sizing: border-box;
-            transition: transform 0.5s ease;
-        }
-
-        .cassette:hover {
-            transform: rotateY(10deg) rotateX(5deg);
-        }
-
-        .cassette-label {
-            background: #eee;
-            flex: 1;
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-        }
-
-        .label-top {
-            height: 30px;
-            background: var(--c-mid);
-            margin: -10px -10px 5px -10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-family: var(--font-mono);
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-
-        .window {
-            width: 180px;
-            height: 50px;
-            background: #333;
-            border-radius: 20px;
-            margin: 10px auto;
-            position: relative;
-            border: 2px solid #999;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 25px;
-        }
-
-        .reel {
-            width: 35px;
-            height: 35px;
-            background: #fff;
-            border-radius: 50%;
-            position: relative;
-        }
-
-        .reel::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 10px;
-            height: 10px;
-            background: #333; /* Spindle */
-            border-radius: 50%;
-        }
-
-        .tape-details {
-            text-align: center;
-            color: #222;
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            margin-top: auto;
-        }
-
-        .screws {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-        }
-
-        .screw {
-            width: 6px;
-            height: 6px;
-            background: #555;
-            border-radius: 50%;
-            position: absolute;
-        }
-        .screw.tl { top: 5px; left: 5px; }
-        .screw.tr { top: 5px; right: 5px; }
-        .screw.bl { bottom: 5px; left: 5px; }
-        .screw.br { bottom: 5px; right: 5px; }
-        .screw.bm { bottom: 5px; left: 50%; transform: translateX(-50%); }
-
-
-        /* Feature Grid */
-        .features {
+        /* Project Grid */
+        .projects {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             width: 100%;
             max-width: 1000px;
-            margin-top: 4rem;
         }
 
-        .feature-card {
-            background: rgba(0, 0, 0, 0.4);
+        .project-card {
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 2rem;
             border-radius: 12px;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s, border-color 0.3s;
+            transition: transform 0.3s, border-color 0.3s, background 0.3s;
+            display: flex;
+            flex-direction: column;
         }
 
-        .feature-card:hover {
+        .project-card:hover {
             transform: translateY(-5px);
             border-color: var(--c-mid);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .feature-card h3 {
+        .project-card h3 {
             font-family: var(--font-mono);
             margin-top: 0;
-            color: var(--c-mid);
+            font-size: 1.5rem;
+            color: var(--c-high);
+            margin-bottom: 0.5rem;
+        }
+
+        .project-card p {
+            line-height: 1.6;
+            opacity: 0.8;
+            font-size: 0.95rem;
+            flex-grow: 1;
         }
 
         .btn {
             display: inline-block;
-            background: var(--c-high);
-            color: var(--c-bg);
-            padding: 1rem 2rem;
+            background: transparent;
+            color: var(--c-high);
+            padding: 0.8rem 1.5rem;
             font-family: var(--font-mono);
+            font-size: 0.9rem;
             font-weight: 700;
             text-decoration: none;
+            border: 1px solid var(--c-mid);
             border-radius: 4px;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             transition: all 0.3s;
             text-transform: uppercase;
+            text-align: center;
         }
 
         .btn:hover {
             background: var(--c-mid);
             color: #fff;
-            box-shadow: 0 0 20px var(--c-mid);
+            box-shadow: 0 0 15px rgba(0, 140, 165, 0.4);
         }
 
         footer {
@@ -297,22 +201,19 @@
             text-align: center;
             font-family: var(--font-mono);
             font-size: 0.8rem;
-            opacity: 0.6;
+            opacity: 0.5;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
         }
 
-        @media (min-width: 768px) {
-            .cassette {
-                width: 400px;
-                height: 250px;
-            }
-            .window {
-                width: 240px;
-                height: 60px;
-            }
-            .reel {
-                width: 45px;
-                height: 45px;
-            }
+        footer a {
+            color: var(--c-high);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -320,70 +221,44 @@
     <div id="canvas-container">
         <canvas id="glcanvas"></canvas>
     </div>
+    <div id="glass-overlay"></div>
 
     <div class="wrapper">
         <header>
-            <div class="logo">Kanito</div>
+            <div class="logo">Silas Hoerz</div>
             <nav>
-                <a href="#specs">Specs</a>
-                <a href="#about">Story</a>
-                <a href="#order">Buy</a>
+                <a href="#projects">Projekte</a>
+                <a href="https://github.com/Silas-Hoerz" target="_blank">GitHub</a>
             </nav>
         </header>
 
         <main>
             <section class="hero">
-                <div class="tagline">The Cassette Reinvented</div>
-                <h1>ANALOG SOUL.<br>DIGITAL HEART.</h1>
-                <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto 2rem; line-height: 1.6;">
-                    Experience high-fidelity audio in a classic form factor.
-                    Kanito combines the tactile joy of a cassette with state-of-the-art audiophile technology.
+                <span class="tagline">Developer / Creator</span>
+                <h1>Ideen in Code gießen.</h1>
+                <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto; line-height: 1.6; opacity: 0.8;">
+                    Willkommen auf meinem Portfolio. Ich baue Software, scripte Tools und experimentiere mit Web-Technologien.
                 </p>
-                <a href="#order" class="btn">Pre-Order Now</a>
             </section>
 
-            <div class="cassette-container">
-                <div class="cassette">
-                    <div class="screws">
-                        <div class="screw tl"></div>
-                        <div class="screw tr"></div>
-                        <div class="screw bl"></div>
-                        <div class="screw br"></div>
-                        <div class="screw bm"></div>
-                    </div>
-                    <div class="cassette-label">
-                        <div class="label-top">KANITO HI-RES</div>
-                        <div class="window">
-                            <div class="reel"></div>
-                            <div class="reel"></div>
-                        </div>
-                        <div class="tape-details">
-                            <p>MP3 / FLAC / WAV PLAYER</p>
-                            <p>SIDE A: THE FUTURE</p>
-                        </div>
-                    </div>
+            <section class="projects" id="projects">
+                <div class="project-card">
+                    <h3>Kanito-Tally</h3>
+                    <p>Ein Tally-Counter-System, das ich entwickelt habe. Hier kannst du dir den Quellcode, die Struktur und die Dokumentation im Detail ansehen.</p>
+                    <a href="https://github.com/Silas-Hoerz/Kanito-Tally" target="_blank" class="btn">Auf GitHub ansehen</a>
                 </div>
-            </div>
-
-            <section class="features" id="specs">
-                <div class="feature-card">
-                    <h3>Audiophile DAC</h3>
-                    <p>Equipped with a premium 32-bit DAC for crystal clear sound reproduction that rivals high-end desktop setups.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Retina Display</h3>
-                    <p>Hidden behind the "tape window" is a sharp OLED display showing track info and visualizations.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Tactile Controls</h3>
-                    <p>Physical buttons for play, pause, and rewind. Feel the click. Connect via Bluetooth 5.2 or 3.5mm jack.</p>
+                
+                <div class="project-card">
+                    <h3>Nächstes Projekt</h3>
+                    <p>Hier ist Platz für dein nächstes großes Repo oder Experiment. Einfach den HTML-Block kopieren und anpassen.</p>
+                    <a href="#" class="btn">Coming Soon</a>
                 </div>
             </section>
         </main>
 
         <footer>
-            &copy; 2023 Kanito Audio Lab. Designed for the Retro Future.
-        </footer>
+            <span>&copy; 2024 Silas Hoerz</span>
+            <a href="#">Impressum</a> </footer>
     </div>
 
     <script id="fragShader" type="x-shader/x-fragment">
@@ -437,7 +312,6 @@
     </script>
 
     <script>
-        // --- KONFIGURATION ---
         const CONFIG = {
             scaleFactor: 2,     
             blobCount: 50,      
@@ -445,10 +319,8 @@
             blobRadius: 150.0,  
             speed: 0.4,         
             wander: 0.05,
-            
-            // NEU: Steuerung für den Rand
-            returnForce: 0.04,  // Wie stark werden sie zurückgeschubst (kleiner = weicher)
-            borderMargin: 150   // Wie weit dürfen sie raus, bevor sie zurückgeschubst werden
+            returnForce: 0.04,  
+            borderMargin: 150   
         };
 
         const canvas = document.getElementById('glcanvas');
@@ -515,42 +387,30 @@
 
             const blobData = [];
             
-            // --- PHYIK LOGIK ---
             blobs.forEach(b => {
-                // 1. Zufälliges "Wander" Verhalten
                 b.vx += (Math.random() - 0.5) * CONFIG.wander;
                 b.vy += (Math.random() - 0.5) * CONFIG.wander;
                 
-                // 2. SOFT BORDER LOGIK (Sanftes Zurückschubsen)
-                // Wir definieren Grenzen außerhalb des Bildschirms
                 let minX = -CONFIG.borderMargin;
                 let maxX = window.innerWidth + CONFIG.borderMargin;
                 let minY = -CONFIG.borderMargin;
                 let maxY = window.innerHeight + CONFIG.borderMargin;
 
-                // Wenn Blob zu weit links ist -> Schubse nach rechts (+force)
                 if (b.x < minX) b.vx += CONFIG.returnForce;
-                // Wenn Blob zu weit rechts ist -> Schubse nach links (-force)
                 if (b.x > maxX) b.vx -= CONFIG.returnForce;
                 
-                // Gleiches für Oben/Unten
                 if (b.y < minY) b.vy += CONFIG.returnForce;
                 if (b.y > maxY) b.vy -= CONFIG.returnForce;
 
-                // 3. Geschwindigkeitsbegrenzung (Damping)
-                // Wichtig, damit sie durch das Schubsen nicht unendlich schnell werden
                 const speed = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
                 if (speed > CONFIG.speed) {
-                    // Sanftes abbremsen auf Max Speed
                     b.vx = (b.vx / speed) * CONFIG.speed;
                     b.vy = (b.vy / speed) * CONFIG.speed;
                 }
 
-                // 4. Position updaten
                 b.x += b.vx;
                 b.y += b.vy;
 
-                // Für WebGL aufbereiten
                 blobData.push(b.x / CONFIG.scaleFactor);
                 blobData.push(canvas.height - (b.y / CONFIG.scaleFactor));
             });
