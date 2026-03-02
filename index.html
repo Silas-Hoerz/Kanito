@@ -21,7 +21,6 @@
             color: var(--c-high);
             font-family: var(--font-sans);
             overflow-x: hidden;
-            /* background-color entfernt, damit der Canvas sichtbar bleibt */
         }
 
         /* Canvas Background */
@@ -42,16 +41,14 @@
             image-rendering: crisp-edges;
         }
 
-        /* Dark Glass Overlay - Blur reduziert für Dithering-Sichtbarkeit */
+        /* Dark Overlay - Blur completely removed per request */
         #glass-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 10, 5, 0.7); 
-            backdrop-filter: blur(2px); 
-            -webkit-backdrop-filter: blur(2px);
+            background: rgba(5, 10, 5, 0.85); /* Slightly darker for better text contrast without blur */
             z-index: -1;
             pointer-events: none;
         }
@@ -70,12 +67,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .logo {
             font-family: var(--font-mono);
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             letter-spacing: -1px;
             text-transform: uppercase;
         }
@@ -101,99 +102,91 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 2rem;
+            padding: 0 2rem 4rem;
         }
 
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            margin: 4rem 0 4rem;
+        /* Content Formatting */
+        article {
             max-width: 800px;
-        }
-
-        h1 {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            line-height: 1.2; /* Erhöht, um Abschneiden zu verhindern */
-            padding-bottom: 0.1em; /* Zusätzlicher Platz für Buchstaben wie g, p, y */
-            font-weight: 800;
-            margin: 0 0 1.5rem;
-            letter-spacing: -0.02em;
-            background: linear-gradient(180deg, #fff, var(--c-mid));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .tagline {
-            font-family: var(--font-mono);
-            font-size: 1rem;
-            color: var(--c-mid);
-            margin-bottom: 1rem;
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* Project Grid */
-        .projects {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
             width: 100%;
-            max-width: 1000px;
-        }
-
-        .project-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 12px;
-            transition: transform 0.3s, border-color 0.3s, background 0.3s;
-            display: flex;
-            flex-direction: column;
+            padding: 3rem;
+            border-radius: 8px;
+            box-sizing: border-box;
         }
 
-        .project-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--c-mid);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .project-card h3 {
-            font-family: var(--font-mono);
+        article h1 {
+            font-size: 2.5rem;
             margin-top: 0;
-            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
             color: var(--c-high);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        article h2 {
+            font-size: 1.5rem;
+            color: var(--c-mid);
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        article h3 {
+            font-size: 1.2rem;
+            margin-top: 2rem;
             margin-bottom: 0.5rem;
         }
 
-        .project-card p {
-            line-height: 1.6;
-            opacity: 0.8;
-            font-size: 0.95rem;
-            flex-grow: 1;
+        article p, article li {
+            line-height: 1.7;
+            font-size: 1rem;
+            opacity: 0.85;
+            margin-bottom: 1.2rem;
         }
 
-        .btn {
-            display: inline-block;
-            background: transparent;
+        article ul, article ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        article li {
+            margin-bottom: 0.5rem;
+        }
+
+        article strong {
             color: var(--c-high);
-            padding: 0.8rem 1.5rem;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-decoration: none;
-            border: 1px solid var(--c-mid);
-            border-radius: 4px;
-            margin-top: 1.5rem;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            text-align: center;
+            opacity: 1;
         }
 
-        .btn:hover {
-            background: var(--c-mid);
-            color: #fff;
-            box-shadow: 0 0 15px rgba(0, 140, 165, 0.4);
+        article a {
+            color: var(--c-mid);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        article a:hover {
+            border-color: var(--c-mid);
+        }
+
+        article img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: block;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 3rem 0;
         }
 
         footer {
@@ -205,6 +198,12 @@
             display: flex;
             justify-content: center;
             gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            article {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -218,37 +217,95 @@
         <header>
             <div class="logo">Kanito</div>
             <nav>
-                <a href="#projects">Projects</a>
-                <a href="https://github.com/Silas-Hoerz" target="_blank">GitHub</a>
+                <a href="https://github.com/Silas-Hoerz/Kanito-Tally" target="_blank">Repository</a>
             </nav>
         </header>
 
         <main>
-            <section class="hero">
-                <span class="tagline">Project Showcase</span>
-                <h1>ENGINEERING & CODE.</h1>
-                <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto; line-height: 1.6; opacity: 0.8;">
-                    A collection of technical projects, tools, and experiments. Focused on functionality, clean architecture, and performance.
-                </p>
-            </section>
-
-            <section class="projects" id="projects">
-                <div class="project-card">
-                    <h3>Kanito-Tally</h3>
-                    <p>A comprehensive tally counter system. This repository contains the source code, structural architecture, and detailed technical documentation.</p>
-                    <a href="https://github.com/Silas-Hoerz/Kanito-Tally" target="_blank" class="btn">View Repository</a>
-                </div>
+            <article>
+                <h1>Kanito Tally</h1>
                 
-                <div class="project-card">
-                    <h3>Project Name</h3>
-                    <p>Description of the project's purpose, the tech stack used, and the problems it solves. Keep it brief and objective.</p>
-                    <a href="#" class="btn">Coming Soon</a>
-                </div>
-            </section>
+                <p>Welcome to the Kanito Tally project.</p>
+                <p>I built this because existing wireless tally systems for live video production are usually either prohibitively expensive or, in the DIY space, far too bulky and complicated to set up on site. The goal was simple: create an ultra-compact, reliable, and completely wireless tally light that fits in a 3x3cm enclosure, runs for a full 10-hour event on a tiny battery, and requires zero explanation for the camera operators using it.</p>
+
+                <img src="images/tally-hero.jpg" alt="Compact wireless tally light mounted on a professional broadcast camera">
+
+                <p>Whether you are here to build one for your own multi-camera production, or I am reading this three years from now trying to remember how my own code works, this document covers the core architecture and design decisions of the project.</p>
+
+                <hr>
+
+                <h2>The Hardware Approach</h2>
+                <p>The physical footprint of this device is dictated by the battery and the microcontroller. To keep it as small as a matchbox without designing a custom PCB with microscopic SMD components, the hardware relies on highly integrated modules.</p>
+
+                <ul>
+                    <li><strong>Microcontroller:</strong> Seeed Studio XIAO ESP32-C6. This board is smaller than a postage stamp, features a highly efficient WiFi 6 chip, an integrated ceramic antenna, and a built-in lithium battery charging circuit.</li>
+                    <li><strong>Power:</strong> A 380mAh Li-Ion battery (approx. 36x26x5mm). Sits flush right underneath the microcontroller.</li>
+                    <li><strong>Input:</strong> A single tactile switch (Alps Alpine or RAFI RACON for a premium click feel).</li>
+                    <li><strong>Output:</strong> An ultra-bright red LED (or a 4-pin common cathode RGB LED, supported via a hardware abstraction layer in the code).</li>
+                </ul>
+
+                <img src="images/hardware-wiring.jpg" alt="Seeed Studio XIAO ESP32C6 microcontroller wired to a small LiPo battery and tactile switch">
+
+                <p>To make a 380mAh battery last for 10 to 12 hours with active WiFi, the code aggressively utilizes the ESP32's hardware features: CPU underclocking, WiFi modem-sleep (turning off the radio between router beacons), and heavy reliance on the deep sleep mode when "turned off".</p>
+
+                <hr>
+
+                <h2>Installation: The Web Flasher</h2>
+                <p>Nobody likes downloading drivers, installing IDEs, and resolving library dependencies just to update a smart device.</p>
+                <p>Kanito Tally utilizes the Web Serial API. You can flash the firmware directly from your browser (Chrome or Edge) without installing any software.</p>
+
+                <ol>
+                    <li>Connect the XIAO ESP32-C6 to your computer via USB-C.</li>
+                    <li>Go to the Web Installer: <strong><a href="https://silas-hoerz.github.io/Kanito-Tally/web-installer/">Kanito Tally Web Installer</a></strong></li>
+                    <li>Click "Install" and wait for the process to finish.</li>
+                </ol>
+
+                <hr>
+
+                <h2>Configuration & Network</h2>
+                <p>Once flashed, the tally light needs to know how to connect to your production network and your video switcher. Hardcoding credentials is bad practice for touring event tech.</p>
+                <p>Instead, Kanito Tally uses a Captive Portal.<br>If you boot the device into config mode, it acts as its own WiFi access point. Connect your phone to it, and a clean, responsive dark-mode web interface will pop up automatically.</p>
+
+                <img src="images/captive-portal.jpg" alt="A smartphone screen displaying a dark mode captive portal web interface for WiFi and IP configuration">
+
+                <p>From this web UI, you can select the operating mode:</p>
+                <ul>
+                    <li><strong>Native Blackmagic ATEM:</strong> Connects directly to an ATEM switcher via IP. Great for simple setups.</li>
+                    <li><strong>TallyArbiter:</strong> Connects to a TallyArbiter server via WebSockets. This is the recommended mode, as it makes the tally compatible with vMix, OBS, NDI, and takes the network load off the hardware switcher.</li>
+                </ul>
+
+                <hr>
+
+                <h2>Operation: The Invisible Manual</h2>
+                <p>Since there is only one button and one LED, the user interface relies on muscle memory and clear visual feedback. The interaction design is heavily inspired by the power buttons on DJI drones.</p>
+
+                <h3>State Machine Logic</h3>
+                <ul>
+                    <li><strong>Power On:</strong> Press short, release, then press and hold for 2 seconds. The LED will fade in.</li>
+                    <li><strong>Power Off:</strong> While on, press short, then press and hold. The LED fades out, and the ESP32 enters deep sleep (drawing less than 30µA).</li>
+                    <li><strong>Check Camera ID:</strong> While connected (standby), press the button once. The LED will flash the assigned camera number (e.g., 3 rapid flashes for Camera 3).</li>
+                    <li><strong>Enter Config Mode:</strong> From standby, press and hold for 4 seconds. The LED will switch to a pulsing "lighthouse" pattern, indicating the WiFi hotspot is active.</li>
+                </ul>
+
+                <h3>LED Behavior</h3>
+                <p>The LED behaves as follows during normal operation:</p>
+                <ul>
+                    <li><strong>Booting/Searching:</strong> Fast, even blinking.</li>
+                    <li><strong>Standby (Connected):</strong> Very dim, slow breathing effect. Shows the operator the device hasn't frozen.</li>
+                    <li><strong>ON AIR (Live):</strong> 100% solid red. (Software blocks all button inputs in this state except for emergency power off).</li>
+                </ul>
+
+                <hr>
+
+                <h2>Development & Building from Source</h2>
+                <p>If you want to modify the C++ code:<br>The project is built using Visual Studio Code and the PlatformIO extension. It adheres to the Google C++ Style Guide for readability and maintainability.</p>
+                <p>Simply clone the repository, open the folder in PlatformIO, and hit build. All library dependencies (like <code>OneButton</code> and <code>ATEMmax</code>) will be resolved automatically.</p>
+                <p>Enjoy your wireless production setup!</p>
+            </article>
         </main>
 
         <footer>
-            <span>&copy; 2024 Kanito</span>
+            <span>&copy; 2026 Kanito</span>
         </footer>
     </div>
 
@@ -369,8 +426,6 @@
             let displayW = Math.floor(window.innerWidth / CONFIG.scaleFactor);
             let displayH = Math.floor(window.innerHeight / CONFIG.scaleFactor);
 
-            // FIX: Verhindert den Strich im Hintergrund durch ungerade/nicht-durch-4-teilbare Pixelanzahl
-            // Erzwingt, dass die Dimensionen ein Vielfaches von 4 sind (passend zur Bayer 4x4 Matrix)
             displayW += (4 - (displayW % 4)) % 4;
             displayH += (4 - (displayH % 4)) % 4;
 
