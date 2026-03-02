@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanito</title>
+    <title>Kanito | Projects</title>
     <style>
         :root {
             --c-bg: #050a05;
             --c-mid: rgba(0, 140, 165, 0.9);
             --c-high: #d9f2ff;
-            /* System Fonts statt Google Fonts für 100% DSGVO-Sicherheit */
             --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
@@ -22,7 +21,7 @@
             color: var(--c-high);
             font-family: var(--font-sans);
             overflow-x: hidden;
-            background-color: var(--c-bg);
+            /* background-color entfernt, damit der Canvas sichtbar bleibt */
         }
 
         /* Canvas Background */
@@ -43,16 +42,16 @@
             image-rendering: crisp-edges;
         }
 
-        /* NEU: Dark Glass Overlay */
+        /* Dark Glass Overlay - Blur reduziert für Dithering-Sichtbarkeit */
         #glass-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 10, 5, 0.65); /* Dunkelt den Hintergrund ab */
-            backdrop-filter: blur(12px); /* Macht den Hintergrund unscharf/weich */
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(5, 10, 5, 0.7); 
+            backdrop-filter: blur(2px); 
+            -webkit-backdrop-filter: blur(2px);
             z-index: -1;
             pointer-events: none;
         }
@@ -114,7 +113,8 @@
 
         h1 {
             font-size: clamp(2.5rem, 8vw, 4.5rem);
-            line-height: 1.1;
+            line-height: 1.2; /* Erhöht, um Abschneiden zu verhindern */
+            padding-bottom: 0.1em; /* Zusätzlicher Platz für Buchstaben wie g, p, y */
             font-weight: 800;
             margin: 0 0 1.5rem;
             letter-spacing: -0.02em;
@@ -206,15 +206,6 @@
             justify-content: center;
             gap: 1.5rem;
         }
-
-        footer a {
-            color: var(--c-high);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -225,40 +216,40 @@
 
     <div class="wrapper">
         <header>
-            <div class="logo">Silas Hoerz</div>
+            <div class="logo">Kanito</div>
             <nav>
-                <a href="#projects">Projekte</a>
+                <a href="#projects">Projects</a>
                 <a href="https://github.com/Silas-Hoerz" target="_blank">GitHub</a>
             </nav>
         </header>
 
         <main>
             <section class="hero">
-                <span class="tagline">Developer / Creator</span>
-                <h1>Ideen in Code gießen.</h1>
+                <span class="tagline">Project Showcase</span>
+                <h1>ENGINEERING & CODE.</h1>
                 <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto; line-height: 1.6; opacity: 0.8;">
-                    Willkommen auf meinem Portfolio. Ich baue Software, scripte Tools und experimentiere mit Web-Technologien.
+                    A collection of technical projects, tools, and experiments. Focused on functionality, clean architecture, and performance.
                 </p>
             </section>
 
             <section class="projects" id="projects">
                 <div class="project-card">
                     <h3>Kanito-Tally</h3>
-                    <p>Ein Tally-Counter-System, das ich entwickelt habe. Hier kannst du dir den Quellcode, die Struktur und die Dokumentation im Detail ansehen.</p>
-                    <a href="https://github.com/Silas-Hoerz/Kanito-Tally" target="_blank" class="btn">Auf GitHub ansehen</a>
+                    <p>A comprehensive tally counter system. This repository contains the source code, structural architecture, and detailed technical documentation.</p>
+                    <a href="https://github.com/Silas-Hoerz/Kanito-Tally" target="_blank" class="btn">View Repository</a>
                 </div>
                 
                 <div class="project-card">
-                    <h3>Nächstes Projekt</h3>
-                    <p>Hier ist Platz für dein nächstes großes Repo oder Experiment. Einfach den HTML-Block kopieren und anpassen.</p>
+                    <h3>Project Name</h3>
+                    <p>Description of the project's purpose, the tech stack used, and the problems it solves. Keep it brief and objective.</p>
                     <a href="#" class="btn">Coming Soon</a>
                 </div>
             </section>
         </main>
 
         <footer>
-            <span>&copy; 2024 Silas Hoerz</span>
-            <a href="#">Impressum</a> </footer>
+            <span>&copy; 2024 Kanito</span>
+        </footer>
     </div>
 
     <script id="fragShader" type="x-shader/x-fragment">
@@ -375,8 +366,13 @@
         }
 
         function render() {
-            const displayW = Math.floor(window.innerWidth / CONFIG.scaleFactor);
-            const displayH = Math.floor(window.innerHeight / CONFIG.scaleFactor);
+            let displayW = Math.floor(window.innerWidth / CONFIG.scaleFactor);
+            let displayH = Math.floor(window.innerHeight / CONFIG.scaleFactor);
+
+            // FIX: Verhindert den Strich im Hintergrund durch ungerade/nicht-durch-4-teilbare Pixelanzahl
+            // Erzwingt, dass die Dimensionen ein Vielfaches von 4 sind (passend zur Bayer 4x4 Matrix)
+            displayW += (4 - (displayW % 4)) % 4;
+            displayH += (4 - (displayH % 4)) % 4;
 
             if (canvas.width !== displayW || canvas.height !== displayH) {
                 canvas.width = displayW;
