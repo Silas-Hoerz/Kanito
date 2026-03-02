@@ -57,8 +57,10 @@
             display: block;
             width: 100%;
             height: 100%;
-            image-rendering: pixelated;
+            /* Optimiertes Pixel-Rendering für alle Browser */
+            image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
+            image-rendering: pixelated;
         }
 
         /* Overlay */
@@ -668,12 +670,11 @@
         });
 
         function render() {
+            // Exakte Skalierung passend zur CSS-Größe (Keine Modulo-Rundung mehr!)
             let displayW = Math.floor(window.innerWidth / CONFIG.pixelSize);
             let displayH = Math.floor(window.innerHeight / CONFIG.pixelSize);
 
-            displayW += (4 - (displayW % 4)) % 4;
-            displayH += (4 - (displayH % 4)) % 4;
-
+            // Canvas-Größe nur updaten, wenn sich die Fenstergröße ändert
             if (canvas.width !== displayW || canvas.height !== displayH) {
                 canvas.width = displayW;
                 canvas.height = displayH;
