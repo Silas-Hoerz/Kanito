@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kanito | Projects</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
-            --c-bg: #050a05;
-            --c-mid: rgba(0, 140, 165, 0.9);
-            --c-high: #d9f2ff;
+            --c-bg: #0a1414; /* Deutlich heller gemacht */
+            --c-mid: rgba(0, 180, 210, 0.9); /* Leuchtenderes Cyan */
+            --c-high: #e6ffff;
             --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
@@ -41,14 +42,14 @@
             image-rendering: crisp-edges;
         }
 
-        /* Dark Overlay - Blur completely removed per request */
+        /* Dark Overlay */
         #glass-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 10, 5, 0.85); /* Slightly darker for better text contrast without blur */
+            background: rgba(5, 10, 5, 0.75); /* Etwas transparenter gelassen für das hellere Dithering */
             z-index: -1;
             pointer-events: none;
         }
@@ -79,6 +80,7 @@
             font-size: 1.2rem;
             letter-spacing: -1px;
             text-transform: uppercase;
+            cursor: pointer;
         }
 
         nav a {
@@ -105,88 +107,172 @@
             padding: 0 2rem 4rem;
         }
 
-        /* Content Formatting */
-        article {
-            max-width: 800px;
+        /* Home View (Tiles) */
+        #home-view {
             width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero {
+            text-align: center;
+            margin: 4rem 0 4rem;
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            line-height: 1.2;
+            padding-bottom: 0.1em;
+            font-weight: 800;
+            margin: 0 0 1.5rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(180deg, #fff, var(--c-mid));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            transition: transform 0.3s, border-color 0.3s, background 0.3s;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--c-mid);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .project-card h3 {
+            font-family: var(--font-mono);
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: var(--c-high);
+            margin-bottom: 0.5rem;
+        }
+
+        .project-card p {
+            line-height: 1.6;
+            opacity: 0.8;
+            font-size: 0.95rem;
+            flex-grow: 1;
+            margin: 0 0 1.5rem 0;
+        }
+
+        .btn-card {
+            display: inline-block;
+            background: transparent;
+            color: var(--c-high);
+            padding: 0.8rem 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: 1px solid var(--c-mid);
+            border-radius: 4px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .project-card:hover .btn-card {
+            background: var(--c-mid);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 140, 165, 0.4);
+        }
+
+        /* Project View (README Content) */
+        #project-view {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .view-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--c-high);
+            border: none;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .btn-back:hover {
+            opacity: 1;
+            color: var(--c-mid);
+        }
+
+        .btn-repo {
+            display: inline-block;
+            background: var(--c-mid);
+            color: #fff;
+            padding: 0.6rem 1.2rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        article {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 3rem;
             border-radius: 8px;
             box-sizing: border-box;
+            width: 100%;
         }
 
-        article h1 {
-            font-size: 2.5rem;
-            margin-top: 0;
-            margin-bottom: 1.5rem;
-            color: var(--c-high);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
+        /* Markdown Styles injected into article */
+        #readme-content h1 { font-size: 2.5rem; margin-top: 0; margin-bottom: 1.5rem; color: var(--c-high); font-weight: 800; }
+        #readme-content h2 { font-size: 1.5rem; color: var(--c-mid); margin-top: 3rem; margin-bottom: 1rem; font-family: var(--font-mono); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem; }
+        #readme-content h3 { font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.5rem; }
+        #readme-content p, #readme-content li { line-height: 1.7; font-size: 1rem; opacity: 0.85; margin-bottom: 1.2rem; }
+        #readme-content ul, #readme-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        #readme-content li { margin-bottom: 0.5rem; }
+        #readme-content strong { color: var(--c-high); opacity: 1; }
+        #readme-content a { color: var(--c-mid); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+        #readme-content a:hover { border-color: var(--c-mid); }
+        #readme-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 2rem 0; border: 1px solid rgba(255, 255, 255, 0.1); display: block; }
+        #readme-content hr { border: 0; height: 1px; background: rgba(255, 255, 255, 0.1); margin: 3rem 0; }
+        #readme-content code { background: rgba(255, 255, 255, 0.1); padding: 0.2em 0.4em; border-radius: 3px; font-family: var(--font-mono); font-size: 0.9em; }
 
-        article h2 {
-            font-size: 1.5rem;
-            color: var(--c-mid);
-            margin-top: 3rem;
-            margin-bottom: 1rem;
+        .loader {
+            text-align: center;
             font-family: var(--font-mono);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 0.5rem;
-        }
-
-        article h3 {
-            font-size: 1.2rem;
-            margin-top: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        article p, article li {
-            line-height: 1.7;
-            font-size: 1rem;
-            opacity: 0.85;
-            margin-bottom: 1.2rem;
-        }
-
-        article ul, article ol {
-            margin-bottom: 1.5rem;
-            padding-left: 1.5rem;
-        }
-
-        article li {
-            margin-bottom: 0.5rem;
-        }
-
-        article strong {
-            color: var(--c-high);
-            opacity: 1;
-        }
-
-        article a {
+            padding: 3rem;
             color: var(--c-mid);
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.2s;
-        }
-
-        article a:hover {
-            border-color: var(--c-mid);
-        }
-
-        article img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
-            margin: 2rem 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: block;
-        }
-
-        hr {
-            border: 0;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 3rem 0;
         }
 
         footer {
@@ -201,9 +287,8 @@
         }
 
         @media (max-width: 600px) {
-            article {
-                padding: 1.5rem;
-            }
+            article { padding: 1.5rem; }
+            .hero h1 { font-size: 2.2rem; }
         }
     </style>
 </head>
@@ -215,97 +300,38 @@
 
     <div class="wrapper">
         <header>
-            <div class="logo">Kanito</div>
-            <nav>
-                <a href="https://github.com/Silas-Hoerz/Kanito-Tally" target="_blank">Repository</a>
-            </nav>
+            <div class="logo" onclick="showHome()">Kanito</div>
+            <nav id="main-nav">
+                </nav>
         </header>
 
         <main>
-            <article>
-                <h1>Kanito Tally</h1>
-                
-                <p>Welcome to the Kanito Tally project.</p>
-                <p>I built this because existing wireless tally systems for live video production are usually either prohibitively expensive or, in the DIY space, far too bulky and complicated to set up on site. The goal was simple: create an ultra-compact, reliable, and completely wireless tally light that fits in a 3x3cm enclosure, runs for a full 10-hour event on a tiny battery, and requires zero explanation for the camera operators using it.</p>
+            <div id="home-view">
+                <section class="hero">
+                    <h1>ENGINEERING & CODE.</h1>
+                </section>
 
-                <img src="images/tally-hero.jpg" alt="Compact wireless tally light mounted on a professional broadcast camera">
+                <section class="projects">
+                    <div class="project-card" onclick="loadProject('Silas-Hoerz', 'Kanito-Tally')">
+                        <h3>Kanito-Tally</h3>
+                        <p>A comprehensive tally counter system. Wireless, compact, and designed for professional live video production environments.</p>
+                        <span class="btn-card">Read Documentation</span>
+                    </div>
+                </section>
+            </div>
 
-                <p>Whether you are here to build one for your own multi-camera production, or I am reading this three years from now trying to remember how my own code works, this document covers the core architecture and design decisions of the project.</p>
-
-                <hr>
-
-                <h2>The Hardware Approach</h2>
-                <p>The physical footprint of this device is dictated by the battery and the microcontroller. To keep it as small as a matchbox without designing a custom PCB with microscopic SMD components, the hardware relies on highly integrated modules.</p>
-
-                <ul>
-                    <li><strong>Microcontroller:</strong> Seeed Studio XIAO ESP32-C6. This board is smaller than a postage stamp, features a highly efficient WiFi 6 chip, an integrated ceramic antenna, and a built-in lithium battery charging circuit.</li>
-                    <li><strong>Power:</strong> A 380mAh Li-Ion battery (approx. 36x26x5mm). Sits flush right underneath the microcontroller.</li>
-                    <li><strong>Input:</strong> A single tactile switch (Alps Alpine or RAFI RACON for a premium click feel).</li>
-                    <li><strong>Output:</strong> An ultra-bright red LED (or a 4-pin common cathode RGB LED, supported via a hardware abstraction layer in the code).</li>
-                </ul>
-
-                <img src="images/hardware-wiring.jpg" alt="Seeed Studio XIAO ESP32C6 microcontroller wired to a small LiPo battery and tactile switch">
-
-                <p>To make a 380mAh battery last for 10 to 12 hours with active WiFi, the code aggressively utilizes the ESP32's hardware features: CPU underclocking, WiFi modem-sleep (turning off the radio between router beacons), and heavy reliance on the deep sleep mode when "turned off".</p>
-
-                <hr>
-
-                <h2>Installation: The Web Flasher</h2>
-                <p>Nobody likes downloading drivers, installing IDEs, and resolving library dependencies just to update a smart device.</p>
-                <p>Kanito Tally utilizes the Web Serial API. You can flash the firmware directly from your browser (Chrome or Edge) without installing any software.</p>
-
-                <ol>
-                    <li>Connect the XIAO ESP32-C6 to your computer via USB-C.</li>
-                    <li>Go to the Web Installer: <strong><a href="https://silas-hoerz.github.io/Kanito-Tally/web-installer/">Kanito Tally Web Installer</a></strong></li>
-                    <li>Click "Install" and wait for the process to finish.</li>
-                </ol>
-
-                <hr>
-
-                <h2>Configuration & Network</h2>
-                <p>Once flashed, the tally light needs to know how to connect to your production network and your video switcher. Hardcoding credentials is bad practice for touring event tech.</p>
-                <p>Instead, Kanito Tally uses a Captive Portal.<br>If you boot the device into config mode, it acts as its own WiFi access point. Connect your phone to it, and a clean, responsive dark-mode web interface will pop up automatically.</p>
-
-                <img src="images/captive-portal.jpg" alt="A smartphone screen displaying a dark mode captive portal web interface for WiFi and IP configuration">
-
-                <p>From this web UI, you can select the operating mode:</p>
-                <ul>
-                    <li><strong>Native Blackmagic ATEM:</strong> Connects directly to an ATEM switcher via IP. Great for simple setups.</li>
-                    <li><strong>TallyArbiter:</strong> Connects to a TallyArbiter server via WebSockets. This is the recommended mode, as it makes the tally compatible with vMix, OBS, NDI, and takes the network load off the hardware switcher.</li>
-                </ul>
-
-                <hr>
-
-                <h2>Operation: The Invisible Manual</h2>
-                <p>Since there is only one button and one LED, the user interface relies on muscle memory and clear visual feedback. The interaction design is heavily inspired by the power buttons on DJI drones.</p>
-
-                <h3>State Machine Logic</h3>
-                <ul>
-                    <li><strong>Power On:</strong> Press short, release, then press and hold for 2 seconds. The LED will fade in.</li>
-                    <li><strong>Power Off:</strong> While on, press short, then press and hold. The LED fades out, and the ESP32 enters deep sleep (drawing less than 30µA).</li>
-                    <li><strong>Check Camera ID:</strong> While connected (standby), press the button once. The LED will flash the assigned camera number (e.g., 3 rapid flashes for Camera 3).</li>
-                    <li><strong>Enter Config Mode:</strong> From standby, press and hold for 4 seconds. The LED will switch to a pulsing "lighthouse" pattern, indicating the WiFi hotspot is active.</li>
-                </ul>
-
-                <h3>LED Behavior</h3>
-                <p>The LED behaves as follows during normal operation:</p>
-                <ul>
-                    <li><strong>Booting/Searching:</strong> Fast, even blinking.</li>
-                    <li><strong>Standby (Connected):</strong> Very dim, slow breathing effect. Shows the operator the device hasn't frozen.</li>
-                    <li><strong>ON AIR (Live):</strong> 100% solid red. (Software blocks all button inputs in this state except for emergency power off).</li>
-                </ul>
-
-                <hr>
-
-                <h2>Development & Building from Source</h2>
-                <p>If you want to modify the C++ code:<br>The project is built using Visual Studio Code and the PlatformIO extension. It adheres to the Google C++ Style Guide for readability and maintainability.</p>
-                <p>Simply clone the repository, open the folder in PlatformIO, and hit build. All library dependencies (like <code>OneButton</code> and <code>ATEMmax</code>) will be resolved automatically.</p>
-                <p>Enjoy your wireless production setup!</p>
-            </article>
+            <div id="project-view">
+                <div class="view-controls">
+                    <button class="btn-back" onclick="showHome()">← Back to Projects</button>
+                    <a href="#" id="repo-link" target="_blank" class="btn-repo">View Repository</a>
+                </div>
+                <article id="readme-content">
+                    </article>
+            </div>
         </main>
 
         <footer>
-            <span>&copy; 2026 Kanito</span>
+            <span>&copy; <span id="current-year"></span> Kanito</span>
         </footer>
     </div>
 
@@ -329,9 +355,10 @@
         }
 
         vec3 getPalette(float t) {
-            vec3 c_bg   = vec3(0.02, 0.04, 0.02); 
-            vec3 c_mid  = vec3(0.0, 0.55, 0.65); 
-            vec3 c_high = vec3(0.85, 0.95, 1.0); 
+            // Farben heller und leuchtender gemacht
+            vec3 c_bg   = vec3(0.05, 0.12, 0.12); 
+            vec3 c_mid  = vec3(0.0, 0.65, 0.75); 
+            vec3 c_high = vec3(0.9, 1.0, 1.0); 
             if (t < 0.5) return mix(c_bg, c_mid, t * 2.0);
             return mix(c_mid, c_high, (t - 0.5) * 2.0);
         }
@@ -347,7 +374,7 @@
                 influence += val * u_blob_force; 
             }
 
-            influence *= 1.5; 
+            influence *= 2.0; // Leuchtkraft der Blobs leicht erhöht
             float ditherVal = bayer4x4(st);
             float layers = 6.0; 
             float spread = 0.2; 
@@ -360,10 +387,52 @@
     </script>
 
     <script>
+        // --- 1. UI & Markdown Logik ---
+
+        // Automatisches Jahr im Footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        function showHome() {
+            document.getElementById('project-view').style.display = 'none';
+            document.getElementById('home-view').style.display = 'flex';
+            window.scrollTo(0, 0);
+        }
+
+        async function loadProject(owner, repo) {
+            // UI umstellen
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('project-view').style.display = 'block';
+            window.scrollTo(0, 0);
+            
+            const contentDiv = document.getElementById('readme-content');
+            const repoLink = document.getElementById('repo-link');
+            
+            repoLink.href = `https://github.com/${owner}/${repo}`;
+            contentDiv.innerHTML = '<div class="loader">Loading Documentation...</div>';
+
+            try {
+                // Lade raw README von GitHub
+                const response = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`);
+                if (!response.ok) throw new Error('Repository or README not found');
+                
+                let markdown = await response.text();
+
+                // Regex: Korrigiert relative Bildpfade (z.B. images/tally-hero.jpg) zu absoluten GitHub-Pfade
+                markdown = markdown.replace(/!\[([^\]]*)\]\((?!http)(.*?)\)/g, `![$1](https://raw.githubusercontent.com/${owner}/${repo}/main/$2)`);
+
+                // Markdown zu HTML parsen und einsetzen
+                contentDiv.innerHTML = marked.parse(markdown);
+
+            } catch (error) {
+                contentDiv.innerHTML = `<p style="color: #ff5555;">Failed to load documentation. Please check out the <a href="https://github.com/${owner}/${repo}" target="_blank">Repository directly</a>.</p>`;
+            }
+        }
+
+        // --- 2. WebGL Background Engine ---
         const CONFIG = {
             scaleFactor: 2,     
             blobCount: 50,      
-            blobForce: 0.1,    
+            blobForce: 0.12,   // Leicht erhöht für kräftigere Blobs 
             blobRadius: 150.0,  
             speed: 0.4,         
             wander: 0.05,
