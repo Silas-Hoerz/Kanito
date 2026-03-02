@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Kanito</title>
+    <title>Kanito | Engineering & Code</title>
     <meta name="description" content="Portfolio of technical projects, tools, and experiments. Focused on functionality, clean architecture, and performance.">
     <meta name="keywords" content="Kanito, Engineering, Code, Open Source, GitHub, Developer, Projects">
     <meta name="author" content="Kanito">
     <meta name="robots" content="index, follow">
     
-    <meta property="og:title" content="Kanito">
+    <meta property="og:title" content="Kanito | Engineering & Code">
     <meta property="og:description" content="A collection of technical projects, tools, and hardware integrations.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kanito.de">
@@ -38,6 +38,7 @@
             color: var(--c-high);
             font-family: var(--font-sans);
             overflow-x: hidden;
+            background-color: var(--c-bg);
         }
 
         /* Canvas Background */
@@ -58,13 +59,14 @@
             image-rendering: crisp-edges;
         }
 
+        /* Overlay heller und transparenter für mehr Farbkraft */
         #glass-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 10, 5, 0.75);
+            background: rgba(5, 12, 16, 0.4); 
             z-index: -1;
             pointer-events: none;
         }
@@ -158,7 +160,7 @@
         .project-card:hover {
             transform: translateY(-4px);
             border-color: var(--c-mid);
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.08); /* Leicht heller beim Hover */
         }
 
         .project-card h3 {
@@ -172,7 +174,7 @@
 
         .project-card p {
             line-height: 1.5;
-            opacity: 0.8;
+            opacity: 0.9;
             font-size: 0.95rem;
             flex-grow: 1;
             margin: 0 0 1.5rem 0;
@@ -218,24 +220,25 @@
         }
 
         .btn-back {
-            background: transparent;
+            background: rgba(0, 0, 0, 0.4);
             color: var(--c-high);
-            border: none;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
             font-family: var(--font-mono);
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0;
-            opacity: 0.8;
-            transition: opacity 0.2s;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
             text-decoration: none;
         }
 
         .btn-back:hover {
-            opacity: 1;
+            border-color: var(--c-mid);
             color: var(--c-mid);
+            background: rgba(0, 180, 210, 0.1);
         }
 
         .btn-repo {
@@ -252,19 +255,21 @@
         }
 
         article {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(10, 20, 25, 0.6); /* Hintergrund für Text besser lesbar gemacht */
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 2.5rem;
             border-radius: 8px;
             width: 100%;
             overflow-wrap: break-word;
+            backdrop-filter: blur(5px); /* Leichter Blur NUR für die Textbox, damit der Code lesbar bleibt */
+            -webkit-backdrop-filter: blur(5px);
         }
 
         /* Injected Markdown Styles */
         #readme-content h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); margin-top: 0; margin-bottom: 1.5rem; color: var(--c-high); font-weight: 800; }
         #readme-content h2 { font-size: clamp(1.3rem, 4vw, 1.5rem); color: var(--c-mid); margin-top: 2.5rem; margin-bottom: 1rem; font-family: var(--font-mono); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem; }
         #readme-content h3 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--c-high); }
-        #readme-content p, #readme-content li { line-height: 1.6; font-size: 1rem; opacity: 0.85; margin-bottom: 1.2rem; }
+        #readme-content p, #readme-content li { line-height: 1.6; font-size: 1rem; opacity: 0.9; margin-bottom: 1.2rem; }
         #readme-content ul, #readme-content ol { margin-bottom: 1.5rem; padding-left: 1.2rem; }
         #readme-content li { margin-bottom: 0.5rem; }
         #readme-content strong { color: var(--c-high); opacity: 1; }
@@ -273,7 +278,7 @@
         #readme-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 1.5rem 0; border: 1px solid rgba(255, 255, 255, 0.1); display: block; }
         #readme-content hr { border: 0; height: 1px; background: rgba(255, 255, 255, 0.1); margin: 2.5rem 0; }
         #readme-content code { background: rgba(255, 255, 255, 0.1); padding: 0.2em 0.4em; border-radius: 3px; font-family: var(--font-mono); font-size: 0.9em; }
-        #readme-content pre { background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 6px; overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.05); }
+        #readme-content pre { background: rgba(0, 0, 0, 0.5); padding: 1rem; border-radius: 6px; overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.05); }
         #readme-content pre code { background: none; padding: 0; }
 
         .loader {
@@ -315,7 +320,7 @@
         <main>
             <div id="home-view">
                 <section class="hero">
-                    <h1>Projects</h1>
+                    <h1>ENGINEERING & CODE.</h1>
                 </section>
                 <section class="projects" id="projects-container">
                     <div class="loader">Loading Projects...</div>
@@ -355,9 +360,10 @@
         }
 
         vec3 getPalette(float t) {
-            vec3 c_bg   = vec3(0.05, 0.12, 0.12); 
-            vec3 c_mid  = vec3(0.0, 0.65, 0.75); 
-            vec3 c_high = vec3(0.9, 1.0, 1.0); 
+            // Lebendigere, farbenfrohere Palette
+            vec3 c_bg   = vec3(0.02, 0.12, 0.18); // Tiefes Blaugrün statt Grau
+            vec3 c_mid  = vec3(0.0, 0.75, 0.85);  // Kräftiges Cyan
+            vec3 c_high = vec3(0.7, 1.0, 1.0);    // Strahlendes Weiß-Cyan
             if (t < 0.5) return mix(c_bg, c_mid, t * 2.0);
             return mix(c_mid, c_high, (t - 0.5) * 2.0);
         }
@@ -371,7 +377,7 @@
                 float val = exp(-(dist * dist) / (2.0 * u_blob_radius * u_blob_radius));
                 influence += val * u_blob_force; 
             }
-            influence *= 2.0; 
+            influence *= 2.2; // Etwas stärker für mehr Kontrast
             float ditherVal = bayer4x4(st);
             float layers = 6.0; 
             float spread = 0.2; 
@@ -384,14 +390,22 @@
 
     <script>
         // ==========================================
-        // DEINE PROJEKTE: EINFACH HIER EINTRAGEN!
-        // Format: "GitHub-Nutzername/Repository-Name"
+        // KONFIGURATION
         // ==========================================
         const PROJECTS = [
             "Silas-Hoerz/Kanito-Tally"
-            // "Silas-Hoerz/Anderes-Projekt",
-            // "Silas-Hoerz/Noch-Ein-Repo"
         ];
+
+        const CONFIG = {
+            pixelSize: 3,       // <-- HIER KANNST DU DIE PIXELGRÖSSE ÄNDERN (Vorher 2, jetzt 3)
+            blobCount: 50,      
+            blobForce: 0.15,    
+            baseRadius: 0.2,    // <-- NEU: Radius ist jetzt 20% der Bildschirmgröße (Responsive!)
+            speed: 0.4,         
+            wander: 0.05,
+            returnForce: 0.04,  
+            borderMargin: 150   
+        };
 
         // Automatisches Jahr
         document.getElementById('current-year').textContent = new Date().getFullYear();
@@ -399,7 +413,7 @@
         // --- Routing & UI Logik ---
         function showHome(e) {
             if (e) e.preventDefault();
-            window.location.hash = ''; // Clear Hash
+            window.location.hash = ''; 
             document.getElementById('project-view').style.display = 'none';
             document.getElementById('home-view').style.display = 'flex';
             window.scrollTo(0, 0);
@@ -407,15 +421,13 @@
 
         async function initHome() {
             const container = document.getElementById('projects-container');
-            container.innerHTML = ''; // Laderoutine entfernen
+            container.innerHTML = ''; 
 
             for (const repoPath of PROJECTS) {
                 try {
-                    // Hole Titel und Beschreibung von der GitHub API
                     const response = await fetch(`https://api.github.com/repos/${repoPath}`);
                     const data = await response.json();
                     
-                    // Fallback, falls ein Repo keine Beschreibung hat
                     const desc = data.description || "Technical project repository.";
                     const title = data.name;
 
@@ -450,18 +462,15 @@
                 if (!response.ok) throw new Error('Not found');
                 
                 let markdown = await response.text();
-                // Korrigiert relative Bildpfade (z.B. images/...) zu absoluten GitHub-Pfaden
                 markdown = markdown.replace(/!\[([^\]]*)\]\((?!http)(.*?)\)/g, `![$1](https://raw.githubusercontent.com/${repoPath}/main/$2)`);
                 contentDiv.innerHTML = marked.parse(markdown);
 
-                // Update Page Title für SEO
                 document.title = `Kanito | ${repoPath.split('/')[1]}`;
             } catch (error) {
                 contentDiv.innerHTML = `<p style="color: #ff5555;">Failed to load documentation. Please check the <a href="https://github.com/${repoPath}" target="_blank" style="color:#fff;">Repository</a> directly.</p>`;
             }
         }
 
-        // Router lauscht auf URL-Änderungen (z.B. Zurück-Button im Browser)
         function handleRoute() {
             const hash = window.location.hash.substring(1);
             if (hash && hash.includes('/')) {
@@ -474,24 +483,11 @@
 
         window.addEventListener('hashchange', handleRoute);
 
-        // App Start
         initHome().then(() => {
-            handleRoute(); // Prüfe ob die Seite direkt mit einem Link zu einem Projekt aufgerufen wurde
+            handleRoute(); 
         });
 
-
         // --- WebGL Background Engine ---
-        const CONFIG = {
-            scaleFactor: 2,     
-            blobCount: 50,      
-            blobForce: 0.12,    
-            blobRadius: 150.0,  
-            speed: 0.4,         
-            wander: 0.05,
-            returnForce: 0.04,  
-            borderMargin: 150   
-        };
-
         const canvas = document.getElementById('glcanvas');
         const gl = canvas.getContext('webgl');
         if (!gl) { document.body.innerHTML = "WebGL Error"; }
@@ -540,8 +536,8 @@
         }
 
         function render() {
-            let displayW = Math.floor(window.innerWidth / CONFIG.scaleFactor);
-            let displayH = Math.floor(window.innerHeight / CONFIG.scaleFactor);
+            let displayW = Math.floor(window.innerWidth / CONFIG.pixelSize);
+            let displayH = Math.floor(window.innerHeight / CONFIG.pixelSize);
 
             displayW += (4 - (displayW % 4)) % 4;
             displayH += (4 - (displayH % 4)) % 4;
@@ -552,6 +548,9 @@
                 gl.viewport(0, 0, canvas.width, canvas.height);
                 gl.uniform2f(locs.resolution, canvas.width, canvas.height);
             }
+
+            // Berechne den Blob-Radius dynamisch anhand der Fenstergröße
+            let dynamicRadius = Math.max(window.innerWidth, window.innerHeight) * CONFIG.baseRadius;
 
             const blobData = [];
             blobs.forEach(b => {
@@ -575,13 +574,16 @@
                 b.x += b.vx;
                 b.y += b.vy;
 
-                blobData.push(b.x / CONFIG.scaleFactor);
-                blobData.push(canvas.height - (b.y / CONFIG.scaleFactor));
+                blobData.push(b.x / CONFIG.pixelSize);
+                blobData.push(canvas.height - (b.y / CONFIG.pixelSize));
             });
 
             gl.uniform2fv(locs.blobs, new Float32Array(blobData));
             gl.uniform1i(locs.count, CONFIG.blobCount);
-            gl.uniform1f(locs.radius, CONFIG.blobRadius / CONFIG.scaleFactor);
+            
+            // Übergib den dynamischen, skalierten Radius an den Shader
+            gl.uniform1f(locs.radius, dynamicRadius / CONFIG.pixelSize);
+            
             gl.uniform1f(locs.force, CONFIG.blobForce);
 
             gl.drawArrays(gl.TRIANGLES, 0, 6);
