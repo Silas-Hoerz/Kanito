@@ -3,15 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanito | Projects</title>
+    
+    <title>Kanito | Engineering & Code</title>
+    <meta name="description" content="Portfolio of technical projects, tools, and experiments. Focused on functionality, clean architecture, and performance.">
+    <meta name="keywords" content="Kanito, Engineering, Code, Open Source, GitHub, Developer, Projects">
+    <meta name="author" content="Kanito">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:title" content="Kanito | Engineering & Code">
+    <meta property="og:description" content="A collection of technical projects, tools, and hardware integrations.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kanito.de">
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <style>
         :root {
-            --c-bg: #0a1414; /* Deutlich heller gemacht */
-            --c-mid: rgba(0, 180, 210, 0.9); /* Leuchtenderes Cyan */
+            --c-bg: #0a1414; 
+            --c-mid: rgba(0, 180, 210, 0.9); 
             --c-high: #e6ffff;
             --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body, html { 
@@ -22,6 +38,7 @@
             color: var(--c-high);
             font-family: var(--font-sans);
             overflow-x: hidden;
+            background-color: var(--c-bg);
         }
 
         /* Canvas Background */
@@ -42,14 +59,13 @@
             image-rendering: crisp-edges;
         }
 
-        /* Dark Overlay */
         #glass-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 10, 5, 0.75); /* Etwas transparenter gelassen für das hellere Dithering */
+            background: rgba(5, 10, 5, 0.75);
             z-index: -1;
             pointer-events: none;
         }
@@ -64,14 +80,13 @@
         }
 
         header {
-            padding: 2rem;
+            padding: 1.5rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             max-width: 1000px;
             margin: 0 auto;
             width: 100%;
-            box-sizing: border-box;
         }
 
         .logo {
@@ -81,22 +96,8 @@
             letter-spacing: -1px;
             text-transform: uppercase;
             cursor: pointer;
-        }
-
-        nav a {
-            color: var(--c-high);
             text-decoration: none;
-            margin-left: 2rem;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-
-        nav a:hover {
-            opacity: 1;
-            text-decoration: underline;
-            color: var(--c-mid);
+            color: var(--c-high);
         }
 
         main {
@@ -104,10 +105,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 0 2rem 4rem;
+            padding: 0 1.5rem 4rem;
         }
 
-        /* Home View (Tiles) */
+        /* Home View */
         #home-view {
             width: 100%;
             max-width: 1000px;
@@ -118,43 +119,45 @@
 
         .hero {
             text-align: center;
-            margin: 4rem 0 4rem;
-            max-width: 800px;
+            margin: 3rem 0 4rem;
+            width: 100%;
         }
 
         .hero h1 {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-size: clamp(2rem, 6vw, 4.5rem);
             line-height: 1.2;
             padding-bottom: 0.1em;
             font-weight: 800;
-            margin: 0 0 1.5rem;
+            margin: 0;
             letter-spacing: -0.02em;
             background: linear-gradient(180deg, #fff, var(--c-mid));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
+        /* Project Grid */
         .projects {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
             width: 100%;
         }
 
         .project-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 12px;
             transition: transform 0.3s, border-color 0.3s, background 0.3s;
             display: flex;
             flex-direction: column;
             cursor: pointer;
             text-align: left;
+            height: 100%;
         }
 
         .project-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
             border-color: var(--c-mid);
             background: rgba(255, 255, 255, 0.05);
         }
@@ -162,13 +165,14 @@
         .project-card h3 {
             font-family: var(--font-mono);
             margin-top: 0;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: var(--c-high);
             margin-bottom: 0.5rem;
+            word-break: break-word;
         }
 
         .project-card p {
-            line-height: 1.6;
+            line-height: 1.5;
             opacity: 0.8;
             font-size: 0.95rem;
             flex-grow: 1;
@@ -179,25 +183,25 @@
             display: inline-block;
             background: transparent;
             color: var(--c-high);
-            padding: 0.8rem 1.5rem;
+            padding: 0.7rem 1.2rem;
             font-family: var(--font-mono);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
-            text-decoration: none;
             border: 1px solid var(--c-mid);
             border-radius: 4px;
             transition: all 0.3s;
             text-transform: uppercase;
             text-align: center;
+            width: fit-content;
         }
 
         .project-card:hover .btn-card {
             background: var(--c-mid);
             color: #fff;
-            box-shadow: 0 0 15px rgba(0, 140, 165, 0.4);
+            box-shadow: 0 0 15px rgba(0, 180, 210, 0.4);
         }
 
-        /* Project View (README Content) */
+        /* Project Detail View */
         #project-view {
             display: none;
             width: 100%;
@@ -210,6 +214,8 @@
             align-items: center;
             margin-bottom: 2rem;
             width: 100%;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .btn-back {
@@ -225,6 +231,7 @@
             padding: 0;
             opacity: 0.8;
             transition: opacity 0.2s;
+            text-decoration: none;
         }
 
         .btn-back:hover {
@@ -248,25 +255,27 @@
         article {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem;
+            padding: 2.5rem;
             border-radius: 8px;
-            box-sizing: border-box;
             width: 100%;
+            overflow-wrap: break-word;
         }
 
-        /* Markdown Styles injected into article */
-        #readme-content h1 { font-size: 2.5rem; margin-top: 0; margin-bottom: 1.5rem; color: var(--c-high); font-weight: 800; }
-        #readme-content h2 { font-size: 1.5rem; color: var(--c-mid); margin-top: 3rem; margin-bottom: 1rem; font-family: var(--font-mono); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem; }
-        #readme-content h3 { font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.5rem; }
-        #readme-content p, #readme-content li { line-height: 1.7; font-size: 1rem; opacity: 0.85; margin-bottom: 1.2rem; }
-        #readme-content ul, #readme-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        /* Injected Markdown Styles */
+        #readme-content h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); margin-top: 0; margin-bottom: 1.5rem; color: var(--c-high); font-weight: 800; }
+        #readme-content h2 { font-size: clamp(1.3rem, 4vw, 1.5rem); color: var(--c-mid); margin-top: 2.5rem; margin-bottom: 1rem; font-family: var(--font-mono); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem; }
+        #readme-content h3 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--c-high); }
+        #readme-content p, #readme-content li { line-height: 1.6; font-size: 1rem; opacity: 0.85; margin-bottom: 1.2rem; }
+        #readme-content ul, #readme-content ol { margin-bottom: 1.5rem; padding-left: 1.2rem; }
         #readme-content li { margin-bottom: 0.5rem; }
         #readme-content strong { color: var(--c-high); opacity: 1; }
         #readme-content a { color: var(--c-mid); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
         #readme-content a:hover { border-color: var(--c-mid); }
-        #readme-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 2rem 0; border: 1px solid rgba(255, 255, 255, 0.1); display: block; }
-        #readme-content hr { border: 0; height: 1px; background: rgba(255, 255, 255, 0.1); margin: 3rem 0; }
+        #readme-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 1.5rem 0; border: 1px solid rgba(255, 255, 255, 0.1); display: block; }
+        #readme-content hr { border: 0; height: 1px; background: rgba(255, 255, 255, 0.1); margin: 2.5rem 0; }
         #readme-content code { background: rgba(255, 255, 255, 0.1); padding: 0.2em 0.4em; border-radius: 3px; font-family: var(--font-mono); font-size: 0.9em; }
+        #readme-content pre { background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 6px; overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.05); }
+        #readme-content pre code { background: none; padding: 0; }
 
         .loader {
             text-align: center;
@@ -281,14 +290,15 @@
             font-family: var(--font-mono);
             font-size: 0.8rem;
             opacity: 0.5;
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
         }
 
+        /* Mobile Adjustments */
         @media (max-width: 600px) {
+            header { padding: 1.2rem 1rem; }
+            main { padding: 0 1rem 3rem; }
             article { padding: 1.5rem; }
-            .hero h1 { font-size: 2.2rem; }
+            .hero { margin: 2rem 0 3rem; }
+            .projects { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -300,9 +310,7 @@
 
     <div class="wrapper">
         <header>
-            <div class="logo" onclick="showHome()">Kanito</div>
-            <nav id="main-nav">
-                </nav>
+            <a href="#" class="logo" onclick="showHome(event)">Kanito</a>
         </header>
 
         <main>
@@ -310,23 +318,17 @@
                 <section class="hero">
                     <h1>ENGINEERING & CODE.</h1>
                 </section>
-
-                <section class="projects">
-                    <div class="project-card" onclick="loadProject('Silas-Hoerz', 'Kanito-Tally')">
-                        <h3>Kanito-Tally</h3>
-                        <p>A comprehensive tally counter system. Wireless, compact, and designed for professional live video production environments.</p>
-                        <span class="btn-card">Read Documentation</span>
-                    </div>
+                <section class="projects" id="projects-container">
+                    <div class="loader">Loading Projects...</div>
                 </section>
             </div>
 
             <div id="project-view">
                 <div class="view-controls">
-                    <button class="btn-back" onclick="showHome()">← Back to Projects</button>
+                    <a href="#" class="btn-back" onclick="showHome(event)">← Back</a>
                     <a href="#" id="repo-link" target="_blank" class="btn-repo">View Repository</a>
                 </div>
-                <article id="readme-content">
-                    </article>
+                <article id="readme-content"></article>
             </div>
         </main>
 
@@ -337,7 +339,6 @@
 
     <script id="fragShader" type="x-shader/x-fragment">
         precision mediump float;
-
         uniform vec2 u_resolution;
         uniform vec2 u_blobs[30]; 
         uniform int u_blob_count;
@@ -355,7 +356,6 @@
         }
 
         vec3 getPalette(float t) {
-            // Farben heller und leuchtender gemacht
             vec3 c_bg   = vec3(0.05, 0.12, 0.12); 
             vec3 c_mid  = vec3(0.0, 0.65, 0.75); 
             vec3 c_high = vec3(0.9, 1.0, 1.0); 
@@ -366,40 +366,76 @@
         void main() {
             vec2 st = gl_FragCoord.xy;
             float influence = 0.0;
-
             for (int i = 0; i < 30; i++) {
                 if (i >= u_blob_count) break;
                 float dist = distance(st, u_blobs[i]);
                 float val = exp(-(dist * dist) / (2.0 * u_blob_radius * u_blob_radius));
                 influence += val * u_blob_force; 
             }
-
-            influence *= 2.0; // Leuchtkraft der Blobs leicht erhöht
+            influence *= 2.0; 
             float ditherVal = bayer4x4(st);
             float layers = 6.0; 
             float spread = 0.2; 
             float dithered = influence + (ditherVal - 0.5) * spread;
             float finalLevel = floor(dithered * (layers - 1.0) + 0.5) / (layers - 1.0);
             finalLevel = clamp(finalLevel, 0.0, 1.0);
-
             gl_FragColor = vec4(getPalette(finalLevel), 1.0);
         }
     </script>
 
     <script>
-        // --- 1. UI & Markdown Logik ---
+        // ==========================================
+        // DEINE PROJEKTE: EINFACH HIER EINTRAGEN!
+        // Format: "GitHub-Nutzername/Repository-Name"
+        // ==========================================
+        const PROJECTS = [
+            "Silas-Hoerz/Kanito-Tally"
+            // "Silas-Hoerz/Anderes-Projekt",
+            // "Silas-Hoerz/Noch-Ein-Repo"
+        ];
 
-        // Automatisches Jahr im Footer
+        // Automatisches Jahr
         document.getElementById('current-year').textContent = new Date().getFullYear();
 
-        function showHome() {
+        // --- Routing & UI Logik ---
+        function showHome(e) {
+            if (e) e.preventDefault();
+            window.location.hash = ''; // Clear Hash
             document.getElementById('project-view').style.display = 'none';
             document.getElementById('home-view').style.display = 'flex';
             window.scrollTo(0, 0);
         }
 
-        async function loadProject(owner, repo) {
-            // UI umstellen
+        async function initHome() {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = ''; // Laderoutine entfernen
+
+            for (const repoPath of PROJECTS) {
+                try {
+                    // Hole Titel und Beschreibung von der GitHub API
+                    const response = await fetch(`https://api.github.com/repos/${repoPath}`);
+                    const data = await response.json();
+                    
+                    // Fallback, falls ein Repo keine Beschreibung hat
+                    const desc = data.description || "Technical project repository.";
+                    const title = data.name;
+
+                    const card = document.createElement('div');
+                    card.className = 'project-card';
+                    card.onclick = () => { window.location.hash = repoPath; };
+                    card.innerHTML = `
+                        <h3>${title}</h3>
+                        <p>${desc}</p>
+                        <span class="btn-card">Read Docs</span>
+                    `;
+                    container.appendChild(card);
+                } catch (error) {
+                    console.error("Error loading tile for", repoPath);
+                }
+            }
+        }
+
+        async function loadProjectView(repoPath) {
             document.getElementById('home-view').style.display = 'none';
             document.getElementById('project-view').style.display = 'block';
             window.scrollTo(0, 0);
@@ -407,32 +443,49 @@
             const contentDiv = document.getElementById('readme-content');
             const repoLink = document.getElementById('repo-link');
             
-            repoLink.href = `https://github.com/${owner}/${repo}`;
+            repoLink.href = `https://github.com/${repoPath}`;
             contentDiv.innerHTML = '<div class="loader">Loading Documentation...</div>';
 
             try {
-                // Lade raw README von GitHub
-                const response = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`);
-                if (!response.ok) throw new Error('Repository or README not found');
+                const response = await fetch(`https://raw.githubusercontent.com/${repoPath}/main/README.md`);
+                if (!response.ok) throw new Error('Not found');
                 
                 let markdown = await response.text();
-
-                // Regex: Korrigiert relative Bildpfade (z.B. images/tally-hero.jpg) zu absoluten GitHub-Pfade
-                markdown = markdown.replace(/!\[([^\]]*)\]\((?!http)(.*?)\)/g, `![$1](https://raw.githubusercontent.com/${owner}/${repo}/main/$2)`);
-
-                // Markdown zu HTML parsen und einsetzen
+                // Korrigiert relative Bildpfade (z.B. images/...) zu absoluten GitHub-Pfaden
+                markdown = markdown.replace(/!\[([^\]]*)\]\((?!http)(.*?)\)/g, `![$1](https://raw.githubusercontent.com/${repoPath}/main/$2)`);
                 contentDiv.innerHTML = marked.parse(markdown);
 
+                // Update Page Title für SEO
+                document.title = `Kanito | ${repoPath.split('/')[1]}`;
             } catch (error) {
-                contentDiv.innerHTML = `<p style="color: #ff5555;">Failed to load documentation. Please check out the <a href="https://github.com/${owner}/${repo}" target="_blank">Repository directly</a>.</p>`;
+                contentDiv.innerHTML = `<p style="color: #ff5555;">Failed to load documentation. Please check the <a href="https://github.com/${repoPath}" target="_blank" style="color:#fff;">Repository</a> directly.</p>`;
             }
         }
 
-        // --- 2. WebGL Background Engine ---
+        // Router lauscht auf URL-Änderungen (z.B. Zurück-Button im Browser)
+        function handleRoute() {
+            const hash = window.location.hash.substring(1);
+            if (hash && hash.includes('/')) {
+                loadProjectView(hash);
+            } else {
+                document.title = "Kanito | Engineering & Code";
+                showHome();
+            }
+        }
+
+        window.addEventListener('hashchange', handleRoute);
+
+        // App Start
+        initHome().then(() => {
+            handleRoute(); // Prüfe ob die Seite direkt mit einem Link zu einem Projekt aufgerufen wurde
+        });
+
+
+        // --- WebGL Background Engine ---
         const CONFIG = {
             scaleFactor: 2,     
             blobCount: 50,      
-            blobForce: 0.12,   // Leicht erhöht für kräftigere Blobs 
+            blobForce: 0.12,    
             blobRadius: 150.0,  
             speed: 0.4,         
             wander: 0.05,
@@ -442,7 +495,6 @@
 
         const canvas = document.getElementById('glcanvas');
         const gl = canvas.getContext('webgl');
-
         if (!gl) { document.body.innerHTML = "WebGL Error"; }
 
         const vsSource = `attribute vec4 position; void main() { gl_Position = position; }`;
@@ -452,9 +504,6 @@
             const shader = gl.createShader(type);
             gl.shaderSource(shader, source);
             gl.compileShader(shader);
-            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                console.error(gl.getShaderInfoLog(shader)); return null;
-            }
             return shader;
         }
 
@@ -506,19 +555,15 @@
             }
 
             const blobData = [];
-            
             blobs.forEach(b => {
                 b.vx += (Math.random() - 0.5) * CONFIG.wander;
                 b.vy += (Math.random() - 0.5) * CONFIG.wander;
                 
-                let minX = -CONFIG.borderMargin;
-                let maxX = window.innerWidth + CONFIG.borderMargin;
-                let minY = -CONFIG.borderMargin;
-                let maxY = window.innerHeight + CONFIG.borderMargin;
+                let minX = -CONFIG.borderMargin, maxX = window.innerWidth + CONFIG.borderMargin;
+                let minY = -CONFIG.borderMargin, maxY = window.innerHeight + CONFIG.borderMargin;
 
                 if (b.x < minX) b.vx += CONFIG.returnForce;
                 if (b.x > maxX) b.vx -= CONFIG.returnForce;
-                
                 if (b.y < minY) b.vy += CONFIG.returnForce;
                 if (b.y > maxY) b.vy -= CONFIG.returnForce;
 
@@ -543,7 +588,6 @@
             gl.drawArrays(gl.TRIANGLES, 0, 6);
             requestAnimationFrame(render);
         }
-
         requestAnimationFrame(render);
     </script>
 </body>
