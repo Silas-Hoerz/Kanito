@@ -7,9 +7,14 @@
 
     <title>{{TITLE}}</title>
     <meta name="description" content="{{DESCRIPTION}}">
+    <meta name="robots" content="index, follow">
+
+    <link rel="icon" type="image/png" href="/logo.png">
+
     <meta property="og:title" content="{{TITLE}}">
     <meta property="og:description" content="{{DESCRIPTION}}">
     <meta property="og:image" content="{{IMAGE}}">
+    <meta property="og:url" content="{{URL}}">
     <meta property="og:type" content="website">
 
     <style>
@@ -81,15 +86,24 @@
             width: 100%;
         }
 
+        /* Das Logo ist jetzt ein h2 wegen SEO Hierarchie */
         .logo {
+            margin: 0;
+        }
+
+        .logo a {
             font-family: var(--font-mono);
             font-weight: 700;
             font-size: 1.2rem;
             letter-spacing: -1px;
             text-transform: uppercase;
-            cursor: pointer;
             text-decoration: none;
             color: var(--c-high);
+            transition: opacity 0.2s;
+        }
+
+        .logo a:hover {
+            opacity: 0.8;
         }
 
         main {
@@ -118,6 +132,18 @@
             -webkit-text-fill-color: transparent;
         }
 
+        /* Visuell versteckter Subtitle für SEO/Screenreader */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
         .projects {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -135,7 +161,6 @@
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
-            cursor: pointer;
             text-align: left;
             height: 100%;
             text-decoration: none;
@@ -363,7 +388,7 @@
 
     <div class="wrapper">
         <header>
-            <a href="/" class="logo">Kanito</a>
+            <h2 class="logo"><a href="/" title="Kanito Startseite">Kanito</a></h2>
         </header>
 
         <main>
