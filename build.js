@@ -11,14 +11,16 @@ async function build() {
     await fs.rm('dist', { recursive: true, force: true }).catch(() => { });
     await fs.mkdir('dist', { recursive: true });
 
-    // Kopiere das Logo, falls vorhanden (fängt den Fehler auf, falls keins da ist)
     try {
         await fs.copyFile('logo.png', 'dist/logo.png');
     } catch (e) {
-        console.log("Hinweis: Keine logo.png für das Favicon gefunden.");
+        console.log("Hinweis: Keine logo.png gefunden.");
     }
 
     let indexCardsHtml = '';
+
+    // Für die Sitemap
+    let sitemapUrls = `<url><loc>${DOMAIN}/</loc><priority>1.0</priority></url>\n`;
 
     for (const repo of PROJECTS) {
         console.log(`Verarbeite ${repo}...`);
@@ -31,7 +33,8 @@ async function build() {
         const data = await apiRes.json();
 
         const branch = data.default_branch || 'main';
-        const desc = data.description || `Dokumentation und Code für das Projekt ${data.name}. Entdecke alle Details, Installation-Guides und Features.`;
+        // Kürzere, menschlichere Fallback-Beschreibung
+        const desc = data.description || `Ein technisches Hobby-Projekt: ${data.name}.`;
         const title = data.name;
         const slug = title;
 
@@ -52,7 +55,26 @@ async function build() {
         }
 
         md = md.replace(/!\[([^\]]*)\]\((?!http)(.*?)\)/g, `![$1](https://raw.githubusercontent.com/${repo}/${branch}/$2)`);
-        const readmeHtml = marked.parse(md);
+
+        // --- MATHE FIX START ---
+        // 1. GitHubs $`math`$ Syntax zu normalem $math$ konvertieren
+        md = md.replace(/\$`(.*?)`\$/g, '$$$1$$');
+
+        // 2. Mathe-Blöcke vor marked verstecken
+        const mathBlocks = [];
+        md = md.replace(/\$\$([\s\S]+?)\$\$/g, (match) => {
+            mathBlocks.push(match);
+            return `__MATH_BLOCK_${mathBlocks.length - 1}__`;
+        });
+        md = md.replace(/\$((?!\$).+?)\$/g, (match) => {
+            mathBlocks.push(match);
+            return `__MATH_BLOCK_${mathBlocks.length - 1}__`;
+        });
+
+        // 3. Parsen und Mathe wieder einfügen
+        let readmeHtml = marked.parse(md);
+        readmeHtml = readmeHtml.replace(/__MATH_BLOCK_(\d+)__/g, (match, i) => mathBlocks[i]);
+        // --- MATHE FIX ENDE ---
 
         const imageDiv = imageUrl ? `<div class="card-image" style="background-image: url('${imageUrl}');" title="Vorschau von ${title}"></div>` : '';
         indexCardsHtml += `
@@ -74,10 +96,10 @@ async function build() {
             </div>
         `;
 
-        // SEO für die Unterseite
+        // SEO für die Unterseite: Minimalistisch ("Projektname | Kanito")
         let pageHtml = TEMPLATE
-            .replace(/{{TITLE}}/g, `Projekt ${title} | Kanito Engineering`)
-            .replace(/{{DESCRIPTION}}/g, desc.length > 50 ? desc : `${desc} Erfahre mehr über die technische Umsetzung und Features.`)
+            .replace(/{{TITLE}}/g, `${title} | Kanito`)
+            .replace(/{{DESCRIPTION}}/g, desc.replace(/"/g, '&quot;'))
             .replace(/{{IMAGE}}/g, imageUrl || `${DOMAIN}/logo.png`)
             .replace(/{{URL}}/g, `${DOMAIN}/${slug}/`)
             .replace(/{{YEAR}}/g, YEAR)
@@ -85,13 +107,15 @@ async function build() {
 
         await fs.mkdir(`dist/${slug}`, { recursive: true });
         await fs.writeFile(`dist/${slug}/index.html`, pageHtml);
+
+        sitemapUrls += `<url><loc>${DOMAIN}/${slug}/</loc><priority>0.8</priority></url>\n`;
     }
 
-    // SEO für die Startseite (inkl. unsichtbarem H2 für Struktur und mehr Text für die Word-Count)
+    // SEO für die Startseite: Menschlich, minimalistisch
     const indexContent = `
         <section class="hero">
-            <h1>Engineering & Code</h1>
-            <p class="sr-only">Ein Portfolio von Open-Source-Projekten, Hardware-Integrationen und Software-Entwicklung.</p>
+            <h1>Projects.</h1>
+            <p class="sr-only">Kanito - Hier sammle ich meine technischen Hobby-Projekte, Tools und Code-Experimente. Fokus auf Funktionalität und saubere Architektur.</p>
         </section>
         <section class="projects">
             <h2 class="sr-only">Alle Projekte in der Übersicht</h2>
@@ -99,15 +123,21 @@ async function build() {
         </section>
     `;
 
+    // Titel exakt "Kanito"
     let finalIndex = TEMPLATE
-        .replace(/{{TITLE}}/g, 'Kanito | Engineering, Software & Open Source Projekte')
-        .replace(/{{DESCRIPTION}}/g, 'Entdecke das Portfolio von Kanito: Technische Projekte, Hardware-Tools, Open-Source Repositories und saubere Code-Architekturen an einem Ort.')
+        .replace(/{{TITLE}}/g, 'Kanito')
+        .replace(/{{DESCRIPTION}}/g, 'Hi, hier ist Kanito. Auf dieser Seite sammle ich meine technischen Hobby-Projekte, Hardware-Tools und Code-Experimente.')
         .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
         .replace(/{{URL}}/g, `${DOMAIN}/`)
         .replace(/{{YEAR}}/g, YEAR)
         .replace('{{CONTENT}}', indexContent);
 
     await fs.writeFile('dist/index.html', finalIndex);
+
+    // Generiere Sitemap für Google (hilft extrem für Sitelinks!)
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}</urlset>`;
+    await fs.writeFile('dist/sitemap.xml', sitemap);
+
     console.log('Build erfolgreich! ✅');
 }
 
