@@ -12,11 +12,15 @@
     <link rel="icon" type="image/png" href="/logo.png">
     <link rel="apple-touch-icon" href="/logo.png">
 
+    <link rel="canonical" href="{{URL}}">
+
     <meta property="og:title" content="{{TITLE}}">
     <meta property="og:description" content="{{DESCRIPTION}}">
     <meta property="og:image" content="{{IMAGE}}">
     <meta property="og:url" content="{{URL}}">
     <meta property="og:type" content="website">
+
+    {{JSON_LD}}
 
     <script>
         window.MathJax = {
@@ -97,7 +101,6 @@
             width: 100%;
         }
 
-        /* Das Logo ist jetzt ein h2 wegen SEO Hierarchie */
         .logo {
             margin: 0;
         }
@@ -126,7 +129,6 @@
             width: 100%;
         }
 
-        /* Home */
         .hero {
             text-align: center;
             margin: 3rem 0 4rem;
@@ -143,7 +145,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Visuell versteckter Subtitle für SEO/Screenreader */
         .sr-only {
             position: absolute;
             width: 1px;
@@ -233,7 +234,6 @@
             box-shadow: 0 0 15px rgba(0, 180, 210, 0.4);
         }
 
-        /* Project View */
         .view-controls {
             display: flex;
             justify-content: space-between;
@@ -399,7 +399,7 @@
 
     <div class="wrapper">
         <header>
-            <h2 class="logo"><a href="/" title="Kanito Startseite">Kanito</a></h2>
+            <h2 class="logo"><a href="/" title="Kanito Home">Kanito</a></h2>
         </header>
 
         <main>

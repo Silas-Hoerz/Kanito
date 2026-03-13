@@ -14,16 +14,16 @@ async function build() {
     try {
         await fs.copyFile('logo.png', 'dist/logo.png');
     } catch (e) {
-        console.log("Hinweis: Keine logo.png gefunden.");
+        console.log("Note: No logo.png found.");
     }
 
     let indexCardsHtml = '';
 
-    // Für die Sitemap
+    // Sitemap initialization
     let sitemapUrls = `<url><loc>${DOMAIN}/</loc><priority>1.0</priority></url>\n`;
 
     for (const repo of PROJECTS) {
-        console.log(`Verarbeite ${repo}...`);
+        console.log(`Processing ${repo}...`);
 
         const headers = process.env.GITHUB_TOKEN
             ? { 'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
@@ -33,13 +33,13 @@ async function build() {
         const data = await apiRes.json();
 
         const branch = data.default_branch || 'main';
-        // Kürzere, menschlichere Fallback-Beschreibung
-        const desc = data.description || `Ein technisches Hobby-Projekt: ${data.name}.`;
+        // Objective, professional fallback description
+        const desc = data.description || `Technical documentation and source code for ${data.name}.`;
         const title = data.name;
         const slug = title;
 
         const readmeRes = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/README.md`);
-        let md = readmeRes.ok ? await readmeRes.text() : 'Keine README gefunden.';
+        let md = readmeRes.ok ? await readmeRes.text() : 'No README found.';
 
         let imageUrl = null;
         const mdMatch = md.match(/!\[.*?\]\((.*?)\)/);
@@ -56,29 +56,26 @@ async function build() {
 
         md = md.replace(/!\[([^\]]*)\]\((?!http)(.*?)\)/g, `![$1](https://raw.githubusercontent.com/${repo}/${branch}/$2)`);
 
-        // --- MATHE FIX START ---
-        // 1. GitHubs $`math`$ Syntax zu normalem $math$ konvertieren
+        // --- MATH FIX START ---
         md = md.replace(/\$`(.*?)`\$/g, '$$$1$$');
 
-        // 2. Mathe-Blöcke vor marked verstecken
         const mathBlocks = [];
         md = md.replace(/\$\$([\s\S]+?)\$\$/g, (match) => {
             mathBlocks.push(match);
-            return `__MATH_BLOCK_${mathBlocks.length - 1}__`;
+            return `%%%MATH_BLOCK_${mathBlocks.length - 1}%%%`;
         });
         md = md.replace(/\$((?!\$).+?)\$/g, (match) => {
             mathBlocks.push(match);
-            return `__MATH_BLOCK_${mathBlocks.length - 1}__`;
+            return `%%%MATH_BLOCK_${mathBlocks.length - 1}%%%`;
         });
 
-        // 3. Parsen und Mathe wieder einfügen
-        let readmeHtml = marked.parse(md);
-        readmeHtml = readmeHtml.replace(/__MATH_BLOCK_(\d+)__/g, (match, i) => mathBlocks[i]);
-        // --- MATHE FIX ENDE ---
+        let readmeHtml = marked.parse(md, { gfm: true, breaks: true });
+        readmeHtml = readmeHtml.replace(/%%%MATH_BLOCK_(\d+)%%%/g, (match, i) => mathBlocks[i]);
+        // --- MATH FIX END ---
 
-        const imageDiv = imageUrl ? `<div class="card-image" style="background-image: url('${imageUrl}');" title="Vorschau von ${title}"></div>` : '';
+        const imageDiv = imageUrl ? `<div class="card-image" style="background-image: url('${imageUrl}');" title="Preview of ${title}"></div>` : '';
         indexCardsHtml += `
-            <a href="/${slug}/" class="project-card" title="Mehr über ${title} erfahren">
+            <a href="/${slug}/" class="project-card" title="View details for ${title}">
                 ${imageDiv}
                 <h3>${title}</h3>
                 <p>${desc}</p>
@@ -89,20 +86,33 @@ async function build() {
         const subpageContent = `
             <div style="width: 100%; max-width: 800px; margin: 0 auto;">
                 <div class="view-controls">
-                    <a href="/" class="btn-back" title="Zurück zur Startseite">← Back</a>
-                    <a href="https://github.com/${repo}" target="_blank" class="btn-repo" title="Quellcode auf GitHub ansehen">View Repository</a>
+                    <a href="/" class="btn-back" title="Return to index">← Back</a>
+                    <a href="https://github.com/${repo}" target="_blank" class="btn-repo" title="View source code on GitHub">View Repository</a>
                 </div>
                 <article>${readmeHtml}</article>
             </div>
         `;
 
-        // SEO für die Unterseite: Minimalistisch ("Projektname | Kanito")
+        const jsonLd = {
+            "@context": "https://schema.org",
+            "@type": "SoftwareSourceCode",
+            "name": title,
+            "description": desc,
+            "codeRepository": `https://github.com/${repo}`,
+            "author": {
+                "@type": "Person",
+                "name": "Kanito"
+            }
+        };
+
+        // Project Subpage SEO
         let pageHtml = TEMPLATE
             .replace(/{{TITLE}}/g, `${title} | Kanito`)
             .replace(/{{DESCRIPTION}}/g, desc.replace(/"/g, '&quot;'))
             .replace(/{{IMAGE}}/g, imageUrl || `${DOMAIN}/logo.png`)
             .replace(/{{URL}}/g, `${DOMAIN}/${slug}/`)
             .replace(/{{YEAR}}/g, YEAR)
+            .replace('{{JSON_LD}}', `<script type="application/ld+json">\n${JSON.stringify(jsonLd)}\n</script>`)
             .replace('{{CONTENT}}', subpageContent);
 
         await fs.mkdir(`dist/${slug}`, { recursive: true });
@@ -111,34 +121,46 @@ async function build() {
         sitemapUrls += `<url><loc>${DOMAIN}/${slug}/</loc><priority>0.8</priority></url>\n`;
     }
 
-    // SEO für die Startseite: Menschlich, minimalistisch
+    // Index Page SEO
     const indexContent = `
         <section class="hero">
             <h1>Projects.</h1>
-            <p class="sr-only">Kanito - Hier sammle ich meine technischen Hobby-Projekte, Tools und Code-Experimente. Fokus auf Funktionalität und saubere Architektur.</p>
+            <p class="sr-only">Portfolio of technical projects, tools, and experiments. Focused on functionality, clean architecture, and performance.</p>
         </section>
         <section class="projects">
-            <h2 class="sr-only">Alle Projekte in der Übersicht</h2>
+            <h2 class="sr-only">Project Index</h2>
             ${indexCardsHtml}
         </section>
     `;
 
-    // Titel exakt "Kanito"
+    const indexJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Kanito",
+        "url": DOMAIN,
+        "description": "Portfolio of technical projects, tools, and experiments."
+    };
+
     let finalIndex = TEMPLATE
         .replace(/{{TITLE}}/g, 'Kanito')
-        .replace(/{{DESCRIPTION}}/g, 'Hi, hier ist Kanito. Auf dieser Seite sammle ich meine technischen Hobby-Projekte, Hardware-Tools und Code-Experimente.')
+        .replace(/{{DESCRIPTION}}/g, 'Portfolio of technical projects, tools, and experiments. Focused on functionality, clean architecture, and performance.')
         .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
         .replace(/{{URL}}/g, `${DOMAIN}/`)
         .replace(/{{YEAR}}/g, YEAR)
+        .replace('{{JSON_LD}}', `<script type="application/ld+json">\n${JSON.stringify(indexJsonLd)}\n</script>`)
         .replace('{{CONTENT}}', indexContent);
 
     await fs.writeFile('dist/index.html', finalIndex);
 
-    // Generiere Sitemap für Google (hilft extrem für Sitelinks!)
+    // Generate Sitemap
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}</urlset>`;
     await fs.writeFile('dist/sitemap.xml', sitemap);
 
-    console.log('Build erfolgreich! ✅');
+    // Generate robots.txt
+    const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: ${DOMAIN}/sitemap.xml`;
+    await fs.writeFile('dist/robots.txt', robotsTxt);
+
+    console.log('Build successful! ✅');
 }
 
 build();
