@@ -11,17 +11,16 @@ async function build() {
     await fs.rm('dist', { recursive: true, force: true }).catch(() => { });
     await fs.mkdir('dist', { recursive: true });
 
-    const staticFiles = ['logo.png', 'legal.html', 'privacy.html'];
-    for (const file of staticFiles) {
+    // Alle statischen Assets in den dist-Ordner kopieren
+    const assets = ['logo.png', 'legal.html', 'privacy.html'];
+    for (const asset of assets) {
         try {
-            await fs.copyFile(file, `dist/${file}`);
+            await fs.copyFile(asset, `dist/${asset}`);
+            console.log(`Copied ${asset} to dist/`);
         } catch (e) {
-            console.log(`Note: ${file} not found, skipping.`);
+            console.log(`Note: ${asset} was not found, skipping.`);
         }
     }
-    // Kopiert die Legal-Seite, falls sie existiert
-    try { await fs.copyFile('legal.html', 'dist/legal.html'); } catch (e) { console.log("Note: No legal.html found."); }
-
     let indexCardsHtml = '';
 
     // Sitemap initialization
