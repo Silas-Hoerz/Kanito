@@ -16,6 +16,8 @@ async function build() {
     } catch (e) {
         console.log("Note: No logo.png found.");
     }
+    // Kopiert die Legal-Seite, falls sie existiert
+    try { await fs.copyFile('legal.html', 'dist/legal.html'); } catch (e) { console.log("Note: No legal.html found."); }
 
     let indexCardsHtml = '';
 
