@@ -1,42 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legal Notice | Kanito</title>
     <meta name="robots" content="noindex, nofollow">
     <style>
         body {
-            background-color: #0a1414;
+            background: #0a1414;
             color: #e6ffff;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            padding: 3rem 1.5rem;
-            max-width: 600px;
-            margin: 0 auto;
+            padding: 2rem;
             line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         h1 {
-            color: rgba(0, 180, 210, 0.9);
-            font-size: 1.5rem;
-        }
-
-        a {
-            color: rgba(0, 180, 210, 0.9);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
+            color: #00b4d2;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
         }
 
         .back {
-            display: inline-block;
+            color: #00b4d2;
+            text-decoration: none;
+            display: block;
             margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
+        }
+
+        .address-box {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-left: 2px solid #00b4d2;
+            background: rgba(0, 180, 210, 0.05);
+        }
+
+        .reverse {
+            unicode-bidi: bidi-override;
+            direction: rtl;
+        }
+
+        .backlink-area {
+            margin-top: 5rem;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+
+        .backlink-area a {
+            color: inherit;
+        }
+
+        .hidden-access {
+            display: none;
+            visibility: hidden;
         }
     </style>
 </head>
@@ -44,16 +63,30 @@
 <body>
     <a href="/" class="back">← Back to Home</a>
 
-    <h1>Legal Notice</h1>
-    <p>
-        <strong>Responsible for content:</strong><br>
-        Silas Hörz<br>
-    </p>
+    <h1>Impressum</h1>
 
-    <p style="margin-top: 2rem; font-size: 0.85rem; opacity: 0.8;">
-        This website is a purely personal, non-commercial portfolio showcasing technical hobby projects and code
-        experiments. No tracking cookies or analytics are used.
-    </p>
+    <p><strong>Angaben gemäß § 5 DDG:</strong></p>
+    <div class="address-box">
+        Silas Hörz<br>
+        C/O www.impressum-ohne-adresse.de<br>
+        Wernher-von-Braun-Str. 5-7<br>
+        69214 Eppelheim
+    </div>
+
+    <p><strong>Kontakt:</strong><br>
+        E-Mail: <span class="reverse">ed.otinak@ofni</span></p>
+
+    <p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong><br>
+        Silas Hörz</p>
+
+    <a href="/sys/internal-config" class="hidden-access">System Configuration</a>
+
+    <div class="backlink-area">
+        <p>
+            <a href="https://www.impressum-ohne-adresse.de">Impressum ohne Adresse</a> wird zur Verfügung gestellt von
+            <a href="https://www.antavi.de">Antavi IT Solutions GmbH</a>
+        </p>
+    </div>
 </body>
 
 </html>

@@ -11,10 +11,13 @@ async function build() {
     await fs.rm('dist', { recursive: true, force: true }).catch(() => { });
     await fs.mkdir('dist', { recursive: true });
 
-    try {
-        await fs.copyFile('logo.png', 'dist/logo.png');
-    } catch (e) {
-        console.log("Note: No logo.png found.");
+    const staticFiles = ['logo.png', 'legal.html', 'privacy.html'];
+    for (const file of staticFiles) {
+        try {
+            await fs.copyFile(file, `dist/${file}`);
+        } catch (e) {
+            console.log(`Note: ${file} not found, skipping.`);
+        }
     }
     // Kopiert die Legal-Seite, falls sie existiert
     try { await fs.copyFile('legal.html', 'dist/legal.html'); } catch (e) { console.log("Note: No legal.html found."); }
