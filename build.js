@@ -11,16 +11,33 @@ async function build() {
     await fs.rm('dist', { recursive: true, force: true }).catch(() => { });
     await fs.mkdir('dist', { recursive: true });
 
-    // Alle statischen Assets in den dist-Ordner kopieren
-    const assets = ['logo.png', 'legal.html', 'privacy.html'];
-    for (const asset of assets) {
+    const legalPages = [
+        { file: 'legal.html', title: 'Legal Notice', slug: 'legal.html' },
+        { file: 'privacy.html', title: 'Privacy Policy', slug: 'privacy.html' }
+    ];
+
+    for (const page of legalPages) {
         try {
-            await fs.copyFile(asset, `dist/${asset}`);
-            console.log(`Copied ${asset} to dist/`);
+            const content = await fs.readFile(page.file, 'utf-8');
+            const finalHtml = TEMPLATE
+                .replace(/{{TITLE}}/g, `${page.title} | Kanito`)
+                .replace(/{{DESCRIPTION}}/g, `Legal information for Kanito.`)
+                .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
+                .replace(/{{URL}}/g, `${DOMAIN}/${page.slug}`)
+                .replace(/{{YEAR}}/g, YEAR)
+                .replace('{{JSON_LD}}', '') // Keine speziellen Schema-Daten hier
+                .replace('{{CONTENT}}', content);
+
+            await fs.writeFile(`dist/${page.slug}`, finalHtml);
+            console.log(`Generated themed ${page.slug}`);
         } catch (e) {
-            console.log(`Note: ${asset} was not found, skipping.`);
+            console.log(`Note: Could not generate ${page.file}`);
         }
     }
+
+
+    try { await fs.copyFile('logo.png', 'dist/logo.png'); } catch (e) { }
+
     let indexCardsHtml = '';
 
     // Sitemap initialization
@@ -159,6 +176,9 @@ async function build() {
     // Generate Sitemap
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}</urlset>`;
     await fs.writeFile('dist/sitemap.xml', sitemap);
+
+    sitemapUrls += `<url><loc>${DOMAIN}/legal.html</loc><priority>0.3</priority></url>\n`;
+    sitemapUrls += `<url><loc>${DOMAIN}/privacy.html</loc><priority>0.3</priority></url>\n`;
 
     // Generate robots.txt
     const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: ${DOMAIN}/sitemap.xml`;
