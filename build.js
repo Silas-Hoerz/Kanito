@@ -146,7 +146,7 @@ async function build() {
     const indexContent = `
         <section class="hero">
             <h1>Projects.</h1>
-            <p class="sr-only">Portfolio of technical projects, tools, and experiments. Focused on functionality, clean architecture, and performance.</p>
+            <p class="sr-only">Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components.</p>
         </section>
         <section class="projects">
             <h2 class="sr-only">Project Index</h2>
@@ -159,12 +159,12 @@ async function build() {
         "@type": "WebSite",
         "name": "Kanito",
         "url": DOMAIN,
-        "description": "Portfolio of technical projects, tools, and experiments."
+        "description": "Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components."
     };
 
     let finalIndex = TEMPLATE
-        .replace(/{{TITLE}}/g, 'Kanito')
-        .replace(/{{DESCRIPTION}}/g, 'Portfolio of technical projects, tools, and experiments. Focused on functionality, clean architecture, and performance.')
+        .replace(/{{TITLE}}/g, 'Kanito | Electronics & Prototyping')
+        .replace(/{{DESCRIPTION}}/g, 'Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components for hardware projects.')
         .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
         .replace(/{{URL}}/g, `${DOMAIN}/`)
         .replace(/{{YEAR}}/g, YEAR)
@@ -173,12 +173,11 @@ async function build() {
 
     await fs.writeFile('dist/index.html', finalIndex);
 
-    // Generate Sitemap
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}</urlset>`;
-    await fs.writeFile('dist/sitemap.xml', sitemap);
-
     sitemapUrls += `<url><loc>${DOMAIN}/legal.html</loc><priority>0.3</priority></url>\n`;
     sitemapUrls += `<url><loc>${DOMAIN}/privacy.html</loc><priority>0.3</priority></url>\n`;
+
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}</urlset>`;
+    await fs.writeFile('dist/sitemap.xml', sitemap);
 
     // Generate robots.txt
     const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: ${DOMAIN}/sitemap.xml`;
