@@ -275,10 +275,13 @@
                     </div>
                     <div class="col">
                         <label>Fotograf</label>
-                        <select id="input-photographer">
-                            <option value="Silas Hörz">Silas Hörz</option>
-                            <option value="Partner Photographer">Partner Photographer</option>
-                        </select>
+                        <input type="text" id="input-photographer" list="photographer-list" placeholder="z.B. Silas Hörz" autocomplete="off">
+                        <datalist id="photographer-list"></datalist>
+                    </div>
+                    <div class="col">
+                        <label>Instagram Account</label>
+                        <input type="text" id="input-instagram" list="instagram-list" placeholder="z.B. @silas.hoerz" autocomplete="off">
+                        <datalist id="instagram-list"></datalist>
                     </div>
                 </div>
 
@@ -338,12 +341,13 @@
                     <tr>
                         <th>Titel</th>
                         <th>Fotograf</th>
+                        <th>Instagram</th>
                         <th>Ort</th>
                         <th>Aktion</th>
                     </tr>
                 </thead>
                 <tbody id="catalog-rows">
-                    <tr><td colspan="4" style="color:var(--muted);">Lade Katalog...</td></tr>
+                    <tr><td colspan="5" style="color:var(--muted);">Lade Katalog...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -372,6 +376,9 @@
 
             const inputTitle = document.getElementById('input-title');
             const inputPhotographer = document.getElementById('input-photographer');
+            const inputInstagram = document.getElementById('input-instagram');
+            const photographerList = document.getElementById('photographer-list');
+            const instagramList = document.getElementById('instagram-list');
             const inputDesc = document.getElementById('input-desc');
             const inputLocName = document.getElementById('input-loc-name');
             const inputLat = document.getElementById('input-lat');
@@ -386,6 +393,60 @@
 
             const publishBtn = document.getElementById('publish-btn');
             const statusBox = document.getElementById('status-box');
+
+            // --- PHOTOGRAPHER & INSTAGRAM AUTO-COMPLETE & PERSISTENCE ---
+            const DEFAULT_PHOTOGRAPHERS = {
+                'Silas Hörz': '@silas.hoerz',
+                'Partner Photographer': '@partner.photo'
+            };
+
+            function getPhotographerRegistry() {
+                try {
+                    const saved = localStorage.getItem('kanito_photographers_ig');
+                    return saved ? Object.assign({}, DEFAULT_PHOTOGRAPHERS, JSON.parse(saved)) : Object.assign({}, DEFAULT_PHOTOGRAPHERS);
+                } catch(e) {
+                    return Object.assign({}, DEFAULT_PHOTOGRAPHERS);
+                }
+            }
+
+            function savePhotographerMapping(name, ig) {
+                if (!name) return;
+                const reg = getPhotographerRegistry();
+                reg[name] = ig || '';
+                try {
+                    localStorage.setItem('kanito_photographers_ig', JSON.stringify(reg));
+                } catch(e) {}
+                updateDatalists();
+            }
+
+            function updateDatalists() {
+                const reg = getPhotographerRegistry();
+                const names = Object.keys(reg).sort();
+                const igs = Array.from(new Set(Object.values(reg).filter(Boolean))).sort();
+
+                if (photographerList) {
+                    photographerList.innerHTML = names.map(n => `<option value="${n}">`).join('');
+                }
+                if (instagramList) {
+                    instagramList.innerHTML = igs.map(i => `<option value="${i}">`).join('');
+                }
+            }
+
+            updateDatalists();
+
+            // Auto-fill Instagram when photographer is selected or typed
+            inputPhotographer.addEventListener('input', () => {
+                const val = inputPhotographer.value.trim();
+                const reg = getPhotographerRegistry();
+                if (reg[val] && (!inputInstagram.value || inputInstagram.dataset.autofilled === 'true')) {
+                    inputInstagram.value = reg[val];
+                    inputInstagram.dataset.autofilled = 'true';
+                }
+            });
+
+            inputInstagram.addEventListener('input', () => {
+                inputInstagram.dataset.autofilled = 'false';
+            });
 
             function setStatus(msg) {
                 statusBox.textContent = msg;
@@ -441,7 +502,8 @@
                         zoom: 12
                     });
 
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png?key=cb1_41ek_1_34d4832863884ce67d5857ea', {
+                        subdomains: 'abcd',
                         maxZoom: 19
                     }).addTo(pickerMap);
 
@@ -613,7 +675,8 @@
                     const newEntry = {
                         id: photoId,
                         title: inputTitle.value.trim() || 'UNTITLED',
-                        photographer: inputPhotographer.value,
+                        photographer: inputPhotographer.value.trim() || 'Silas Hörz',
+                        instagram: inputInstagram.value.trim(),
                         description: inputDesc.value.trim(),
                         location_name: inputLocName.value.trim() || 'Location',
                         latitude: parseFloat(inputLat.value) || 0,
@@ -631,6 +694,10 @@
                         aspect_ratio: Number((w / h).toFixed(4)),
                         filename: binFilename
                     };
+
+                    if (newEntry.photographer) {
+                        savePhotographerMapping(newEntry.photographer, newEntry.instagram);
+                    }
 
                     catalog.unshift(newEntry);
 
@@ -659,6 +726,8 @@
                         previewThumb.style.display = 'none';
                         dropLabel.textContent = '📁 Weiteres Bild auswählen';
                         fileInput.value = '';
+                        inputInstagram.value = '';
+                        inputInstagram.dataset.autofilled = 'false';
                     }, 3000);
 
                 } catch(err) {
@@ -672,18 +741,32 @@
             // Catalog Management
             async function loadCatalog() {
                 const tbody = document.getElementById('catalog-rows');
-                tbody.innerHTML = '<tr><td colspan="4" style="color:var(--muted);">Lade Katalog...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);">Lade Katalog...</td></tr>';
 
                 try {
                     const res = await fetch('/photos.json?' + Date.now());
                     const photos = await res.json();
                     tbody.innerHTML = '';
 
+                    // Enrich photographer registry from existing catalog entries
+                    photos.forEach(p => {
+                        if (p.photographer && p.instagram) {
+                            const reg = getPhotographerRegistry();
+                            if (!reg[p.photographer]) {
+                                savePhotographerMapping(p.photographer, p.instagram);
+                            }
+                        }
+                    });
+
                     photos.forEach(p => {
                         const tr = document.createElement('tr');
+                        const igDisplay = p.instagram
+                            ? `<a href="https://instagram.com/${p.instagram.replace(/^@/, '')}" target="_blank" rel="noopener noreferrer" style="color:var(--muted); text-decoration:none;">${p.instagram} ↗</a>`
+                            : '<span style="color:var(--muted);">—</span>';
                         tr.innerHTML = `
                             <td><strong>${p.title}</strong></td>
                             <td>${p.photographer}</td>
+                            <td>${igDisplay}</td>
                             <td>${p.location_name}</td>
                             <td><button type="button" class="danger" data-id="${p.id}">Löschen</button></td>
                         `;
@@ -724,7 +807,7 @@
                         });
                     });
                 } catch(e) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--red);">Katalog konnte nicht geladen werden.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="color:var(--red);">Katalog konnte nicht geladen werden.</td></tr>';
                 }
             }
 

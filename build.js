@@ -222,6 +222,7 @@ async function build() {
 
         let galleryCardsHtml = '';
         for (const p of PHOTOS) {
+            const igBadge = p.instagram ? ` <span class="photo-ig-badge">${p.instagram}</span>` : '';
             galleryCardsHtml += `
                 <figure class="photo-item" data-id="${p.id}" data-author="${p.photographer}" tabindex="0" role="button" aria-label="Open ${p.title}">
                     <div class="canvas-container-box" style="aspect-ratio: ${p.width} / ${p.height};">
@@ -231,13 +232,13 @@ async function build() {
                     <div class="photo-meta-bar">
                         <div>
                             <div class="photo-title">${p.title}</div>
-                            <div class="photo-author">${p.photographer}</div>
+                            <div class="photo-author">${p.photographer}${igBadge}</div>
                         </div>
                         <div class="photo-location-tag">${p.location_name}</div>
                     </div>
                     <figcaption class="sr-only">
                         <h3>${p.title}</h3>
-                        <p>Fine art monochrome photograph by ${p.photographer} in ${p.location_name}. ${p.description || ''} Camera: ${p.camera || 'Leica'}, Lens: ${p.lens || 'Prime'}.</p>
+                        <p>Fine art monochrome photograph by ${p.photographer} (${p.instagram || ''}) in ${p.location_name}. ${p.description || ''} Camera: ${p.camera || 'Leica'}, Lens: ${p.lens || 'Prime'}.</p>
                     </figcaption>
                 </figure>
             `;
@@ -259,7 +260,8 @@ async function build() {
                 "description": p.description,
                 "author": {
                     "@type": "Person",
-                    "name": p.photographer
+                    "name": p.photographer,
+                    ...(p.instagram ? { "sameAs": `https://instagram.com/${p.instagram.replace(/^@/, '')}` } : {})
                 },
                 "contentLocation": p.location_name,
                 "dateCreated": p.date

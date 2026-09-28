@@ -132,8 +132,8 @@
 
         .brand-logo {
             display: block;
-            width: 26px;
-            height: 26px;
+            width: 52px;
+            height: 52px;
             object-fit: contain;
         }
 
@@ -492,12 +492,46 @@
             margin: 0 0 0.5rem 0;
         }
 
+        .detail-author-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
         .detail-author {
             font-family: var(--font-mono);
             font-size: 0.85rem;
             color: #ffffff;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+        }
+
+        .detail-ig-link {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--c-mid);
+            text-decoration: none;
+            border: 1px solid var(--c-border);
+            padding: 0.2rem 0.5rem;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #000000;
+        }
+
+        .detail-ig-link:hover {
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+
+        .photo-ig-badge {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--c-mid);
+            margin-left: 0.3rem;
         }
 
         .detail-description {
@@ -627,7 +661,7 @@
         <header>
             <h2 class="logo">
                 <a href="/" title="Kanito Home">
-                    <img src="/logo/Logo_white.svg" alt="Kanito Logo" class="brand-logo" width="26" height="26">
+                    <img src="/logo/Logo_white.svg" alt="Kanito Logo" class="brand-logo" width="52" height="52">
                     <span>Kanito</span>
                 </a>
             </h2>
@@ -679,7 +713,10 @@
                 <div class="sidebar-section">
                     <div class="section-label">EXHIBITION FRAME</div>
                     <h2 class="detail-title" id="detail-title">TITLE</h2>
-                    <div class="detail-author" id="detail-author">PHOTOGRAPHER</div>
+                    <div class="detail-author-row">
+                        <span class="detail-author" id="detail-author">PHOTOGRAPHER</span>
+                        <a href="#" id="detail-instagram" target="_blank" rel="noopener noreferrer" class="detail-ig-link" style="display:none;"></a>
+                    </div>
                     <p class="detail-description" id="detail-description">Description text.</p>
                 </div>
 
@@ -903,6 +940,7 @@
 
             const detailTitle = document.getElementById('detail-title');
             const detailAuthor = document.getElementById('detail-author');
+            const detailInstagram = document.getElementById('detail-instagram');
             const detailDescription = document.getElementById('detail-description');
             const detailLocationName = document.getElementById('detail-location-name');
             const detailCoords = document.getElementById('detail-coords');
@@ -928,7 +966,8 @@
 
                     L.control.zoom({ position: 'bottomright' }).addTo(leafletMap);
 
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png?key=cb1_41ek_1_34d4832863884ce67d5857ea', {
+                        subdomains: 'abcd',
                         maxZoom: 19,
                         attribution: '&copy; CartoDB &copy; OpenStreetMap contributors'
                     }).addTo(leafletMap);
@@ -958,6 +997,14 @@
 
                 detailTitle.textContent = photo.title;
                 detailAuthor.textContent = photo.photographer;
+                if (photo.instagram) {
+                    const cleanHandle = photo.instagram.replace(/^@/, '');
+                    detailInstagram.href = `https://instagram.com/${cleanHandle}`;
+                    detailInstagram.textContent = `@${cleanHandle} ↗`;
+                    detailInstagram.style.display = 'inline-flex';
+                } else {
+                    detailInstagram.style.display = 'none';
+                }
                 detailDescription.textContent = photo.description || 'Monochrome architectural framing.';
                 detailLocationName.textContent = photo.location_name || 'Unspecified';
                 detailCoords.textContent = `${Number(photo.latitude).toFixed(4)}° N, ${Number(photo.longitude).toFixed(4)}° E`;
