@@ -3,14 +3,46 @@ import { marked } from 'marked';
 
 const DOMAIN = "https://kanito.de";
 
+async function copyDir(src, dest) {
+    await fs.mkdir(dest, { recursive: true });
+    const entries = await fs.readdir(src, { withFileTypes: true });
+    for (const entry of entries) {
+        const srcPath = `${src}/${entry.name}`;
+        const destPath = `${dest}/${entry.name}`;
+        if (entry.isDirectory()) {
+            await copyDir(srcPath, destPath);
+        } else {
+            await fs.copyFile(srcPath, destPath);
+        }
+    }
+}
+
 async function build() {
+    console.log('Starting Kanito portfolio build...');
     const TEMPLATE = await fs.readFile('template.html', 'utf-8');
     const PROJECTS = JSON.parse(await fs.readFile('projects.json', 'utf-8'));
     const YEAR = new Date().getFullYear().toString();
 
+    let PHOTOS = [];
+    try {
+        PHOTOS = JSON.parse(await fs.readFile('photos.json', 'utf-8'));
+        // Chronological sort: newest first
+        PHOTOS.sort((a, b) => {
+            const timeA = new Date(a.date || a.year || '2000-01-01').getTime();
+            const timeB = new Date(b.date || b.year || '2000-01-01').getTime();
+            return timeB - timeA;
+        });
+    } catch (e) {
+        console.warn('Note: Could not parse photos.json, defaulting to empty list.');
+    }
+
     await fs.rm('dist', { recursive: true, force: true }).catch(() => { });
     await fs.mkdir('dist', { recursive: true });
 
+    // --- CNAME FOR GITHUB PAGES ---
+    await fs.writeFile('dist/CNAME', 'kanito.de\n');
+
+    // --- LEGAL & PRIVACY PAGES ---
     const legalPages = [
         { file: 'legal.html', title: 'Legal Notice', slug: 'legal.html' },
         { file: 'privacy.html', title: 'Privacy Policy', slug: 'privacy.html' }
@@ -25,7 +57,7 @@ async function build() {
                 .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
                 .replace(/{{URL}}/g, `${DOMAIN}/${page.slug}`)
                 .replace(/{{YEAR}}/g, YEAR)
-                .replace('{{JSON_LD}}', '') // Keine speziellen Schema-Daten hier
+                .replace('{{JSON_LD}}', '')
                 .replace('{{CONTENT}}', content);
 
             await fs.writeFile(`dist/${page.slug}`, finalHtml);
@@ -35,16 +67,29 @@ async function build() {
         }
     }
 
-
+    // Static assets
     try { await fs.copyFile('logo.png', 'dist/logo.png'); } catch (e) { }
+    try { await fs.copyFile('logo.png', 'dist/favicon.png'); } catch (e) { }
+    try { await fs.copyFile('logo.png', 'dist/favicon.ico'); } catch (e) { }
+    try { await copyDir('logo', 'dist/logo'); } catch (e) { }
+
+    // Copy photos.json so admin and client can query it
+    try { await fs.copyFile('photos.json', 'dist/photos.json'); } catch (e) { }
+
+    // Copy binary photo storage
+    try {
+        await copyDir('photos/data', 'dist/photos/data');
+        console.log('Synchronized secure photos/data to dist/photos/data');
+    } catch (e) {
+        console.warn('Note: No photos/data folder found to copy.');
+    }
 
     let indexCardsHtml = '';
-
-    // Sitemap initialization
     let sitemapUrls = `<url><loc>${DOMAIN}/</loc><priority>1.0</priority></url>\n`;
 
+    // --- GITHUB PROJECT PAGES ---
     for (const repo of PROJECTS) {
-        console.log(`Processing ${repo}...`);
+        console.log(`Processing project ${repo}...`);
 
         const headers = process.env.GITHUB_TOKEN
             ? { 'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
@@ -54,7 +99,6 @@ async function build() {
         const data = await apiRes.json();
 
         const branch = data.default_branch || 'main';
-        // Objective, professional fallback description
         const desc = data.description || `Technical documentation and source code for ${data.name}.`;
         const title = data.name;
         const slug = title;
@@ -126,7 +170,6 @@ async function build() {
             }
         };
 
-        // Project Subpage SEO
         let pageHtml = TEMPLATE
             .replace(/{{TITLE}}/g, `${title} | Kanito`)
             .replace(/{{DESCRIPTION}}/g, desc.replace(/"/g, '&quot;'))
@@ -142,7 +185,7 @@ async function build() {
         sitemapUrls += `<url><loc>${DOMAIN}/${slug}/</loc><priority>0.8</priority></url>\n`;
     }
 
-    // Index Page SEO
+    // --- INDEX (MAIN PROJECTS) PAGE ---
     const indexContent = `
         <section class="hero">
             <h1>Projects.</h1>
@@ -173,17 +216,98 @@ async function build() {
 
     await fs.writeFile('dist/index.html', finalIndex);
 
+    // --- PHOTOS GALLERY PAGE (kanito.de/photos) ---
+    try {
+        const PHOTOS_TEMPLATE = await fs.readFile('photos/template-photos.html', 'utf-8');
+
+        let galleryCardsHtml = '';
+        for (const p of PHOTOS) {
+            galleryCardsHtml += `
+                <figure class="photo-item" data-id="${p.id}" data-author="${p.photographer}" tabindex="0" role="button" aria-label="Open ${p.title}">
+                    <div class="canvas-container-box" style="aspect-ratio: ${p.width} / ${p.height};">
+                        <canvas width="${p.width}" height="${p.height}" aria-hidden="true"></canvas>
+                        <div class="photo-shield" title="View details: ${p.title}"></div>
+                    </div>
+                    <div class="photo-meta-bar">
+                        <div>
+                            <div class="photo-title">${p.title}</div>
+                            <div class="photo-author">${p.photographer}</div>
+                        </div>
+                        <div class="photo-location-tag">${p.location_name}</div>
+                    </div>
+                    <figcaption class="sr-only">
+                        <h3>${p.title}</h3>
+                        <p>Fine art monochrome photograph by ${p.photographer} in ${p.location_name}. ${p.description || ''} Camera: ${p.camera || 'Leica'}, Lens: ${p.lens || 'Prime'}.</p>
+                    </figcaption>
+                </figure>
+            `;
+        }
+
+        const photosJsonLd = {
+            "@context": "https://schema.org",
+            "@type": "ImageGallery",
+            "name": "Kanito Photos",
+            "url": `${DOMAIN}/photos/`,
+            "description": "Curated architectural and monochrome photography portfolio by Silas Hörz and collaborative photographers.",
+            "author": {
+                "@type": "Person",
+                "name": "Silas Hörz"
+            },
+            "hasPart": PHOTOS.map(p => ({
+                "@type": "Photograph",
+                "name": p.title,
+                "description": p.description,
+                "author": {
+                    "@type": "Person",
+                    "name": p.photographer
+                },
+                "contentLocation": p.location_name,
+                "dateCreated": p.date
+            }))
+        };
+
+        const finalPhotosHtml = PHOTOS_TEMPLATE
+            .replace(/{{TITLE}}/g, 'Photos | Kanito')
+            .replace(/{{DESCRIPTION}}/g, 'Curated fine-art architectural and monochrome photography portfolio by Silas Hörz and collaborative photographers.')
+            .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
+            .replace(/{{URL}}/g, `${DOMAIN}/photos/`)
+            .replace(/{{YEAR}}/g, YEAR)
+            .replace('{{JSON_LD}}', `<script type="application/ld+json">\n${JSON.stringify(photosJsonLd, null, 2)}\n</script>`)
+            .replace('{{GALLERY_ITEMS}}', galleryCardsHtml)
+            .replace('{{PHOTOS_JSON}}', JSON.stringify(PHOTOS));
+
+        await fs.mkdir('dist/photos', { recursive: true });
+        await fs.writeFile('dist/photos/index.html', finalPhotosHtml);
+        console.log(`Generated Photos Gallery (dist/photos/index.html) with ${PHOTOS.length} frames.`);
+
+        sitemapUrls += `<url><loc>${DOMAIN}/photos/</loc><priority>0.9</priority></url>\n`;
+    } catch (e) {
+        console.error('Error generating photos gallery:', e);
+    }
+
+    // --- CURATOR STUDIO & ADMIN (kanito.de/photos/edit) ---
+    try {
+        const EDIT_TEMPLATE = await fs.readFile('photos/template-edit.html', 'utf-8');
+        await fs.mkdir('dist/photos/edit', { recursive: true });
+        await fs.writeFile('dist/photos/edit/index.html', EDIT_TEMPLATE);
+        console.log('Generated Curator Studio & Admin (dist/photos/edit/index.html)');
+
+        sitemapUrls += `<url><loc>${DOMAIN}/photos/edit/</loc><priority>0.2</priority></url>\n`;
+    } catch (e) {
+        console.error('Error generating photos edit page:', e);
+    }
+
+    // --- SITEMAP & ROBOTS ---
     sitemapUrls += `<url><loc>${DOMAIN}/legal.html</loc><priority>0.3</priority></url>\n`;
     sitemapUrls += `<url><loc>${DOMAIN}/privacy.html</loc><priority>0.3</priority></url>\n`;
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}</urlset>`;
     await fs.writeFile('dist/sitemap.xml', sitemap);
 
-    // Generate robots.txt
     const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: ${DOMAIN}/sitemap.xml`;
     await fs.writeFile('dist/robots.txt', robotsTxt);
 
-    console.log('Build successful! ✅');
+    console.log('Build successful! ✅ All pages generated.');
 }
 
 build();

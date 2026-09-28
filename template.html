@@ -9,6 +9,7 @@
     <meta name="description" content="{{DESCRIPTION}}">
     <meta name="robots" content="index, follow">
 
+    <link rel="icon" type="image/svg+xml" href="/logo/favicon.svg">
     <link rel="icon" type="image/png" href="/logo.png">
     <link rel="apple-touch-icon" href="/logo.png">
 
@@ -106,18 +107,54 @@
         }
 
         .logo a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
             font-family: var(--font-mono);
             font-weight: 700;
             font-size: 1.2rem;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
             text-transform: uppercase;
             text-decoration: none;
             color: var(--c-high);
             transition: opacity 0.2s;
         }
 
+        .brand-logo {
+            display: block;
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+        }
+
         .logo a:hover {
             opacity: 0.8;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            color: var(--c-high);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.45rem 0.9rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            border-color: var(--c-mid);
+            color: var(--c-mid);
+            background: rgba(0, 180, 210, 0.1);
         }
 
         main {
@@ -399,7 +436,15 @@
 
     <div class="wrapper">
         <header>
-            <h2 class="logo"><a href="/" title="Kanito Home">Kanito</a></h2>
+            <h2 class="logo">
+                <a href="/" title="Kanito Home">
+                    <img src="/logo/Logo_white.svg" alt="Kanito Logo" class="brand-logo" width="26" height="26">
+                    <span>Kanito</span>
+                </a>
+            </h2>
+            <nav class="nav-links">
+                <a href="/photos/" class="nav-link" title="Photography Portfolio">Photos</a>
+            </nav>
         </header>
 
         <main>
