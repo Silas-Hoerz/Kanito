@@ -291,6 +291,105 @@
             white-space: nowrap;
         }
 
+        .photo-meta-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+            margin-left: 0.5rem;
+        }
+
+        .photo-card-like-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--c-border);
+            color: var(--c-mid);
+            border-radius: 2px;
+            padding: 0.2rem 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        .photo-card-like-btn:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+
+        .photo-card-like-btn.liked {
+            color: #ffffff;
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .photo-card-like-btn.liked .heart-icon {
+            fill: #ffffff;
+            stroke: #ffffff;
+            animation: heartPulse 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .detail-actions-bar {
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-like-btn {
+            background: #000000;
+            border: 1px solid var(--c-border);
+            color: #ffffff;
+            border-radius: 3px;
+            padding: 0.6rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+            justify-content: center;
+        }
+
+        .detail-like-btn:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .detail-like-btn.liked {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+
+        .detail-like-btn.liked .heart-icon {
+            fill: #000000;
+            stroke: #000000;
+            animation: heartPulse 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .detail-like-badge {
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.15);
+            font-size: 0.75rem;
+        }
+
+        .detail-like-btn.liked .detail-like-badge {
+            background: rgba(0, 0, 0, 0.15);
+            color: #000000;
+        }
+
+        @keyframes heartPulse {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.35); }
+            100% { transform: scale(1); }
+        }
+
         /* Detail Modal */
         #detail-modal {
             position: fixed;
@@ -362,13 +461,6 @@
             overflow: hidden;
         }
 
-        @media (max-width: 900px) {
-            .modal-body {
-                flex-direction: column;
-                overflow-y: auto;
-            }
-        }
-
         /* Stage */
         .modal-stage {
             flex: 1;
@@ -379,6 +471,7 @@
             justify-content: center;
             padding: 2rem;
             overflow: hidden;
+            height: 100%;
         }
 
         .stage-canvas-box {
@@ -394,6 +487,8 @@
             display: block;
             max-width: 100%;
             max-height: calc(100vh - 120px);
+            width: auto;
+            height: auto;
             object-fit: contain;
             pointer-events: none;
             user-select: none;
@@ -446,15 +541,51 @@
         }
 
         @media (max-width: 900px) {
+            .modal-top-bar {
+                padding: 0.8rem 1rem;
+            }
+
+            .modal-body {
+                flex-direction: column;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .modal-stage {
+                padding: 1rem 0.5rem;
+                width: 100%;
+                min-height: auto;
+                flex: none;
+                overflow: visible;
+                background: #000000;
+            }
+
+            .stage-canvas-box {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            #modal-canvas {
+                width: 100%;
+                height: auto;
+                max-height: 70vh;
+                object-fit: contain;
+                margin: 0 auto;
+                box-shadow: none;
+            }
+
             .modal-sidebar {
                 width: 100%;
                 border-left: none;
                 border-top: 1px solid var(--c-border);
+                overflow-y: visible;
+                padding: 1.5rem 1rem 5rem;
+                flex-shrink: 0;
             }
 
             .stage-nav-btn {
-                width: 36px;
-                height: 36px;
+                width: 38px;
+                height: 38px;
             }
 
             .stage-nav-prev {
@@ -513,13 +644,20 @@
             color: var(--c-mid);
             text-decoration: none;
             border: 1px solid var(--c-border);
-            padding: 0.2rem 0.5rem;
+            padding: 0.25rem 0.6rem;
             border-radius: 2px;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.4rem;
             background: #000000;
+        }
+
+        .detail-ig-link .ig-icon {
+            display: block;
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
         }
 
         .detail-ig-link:hover {
@@ -532,6 +670,16 @@
             font-size: 0.7rem;
             color: var(--c-mid);
             margin-left: 0.3rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .photo-ig-badge .ig-icon {
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            vertical-align: middle;
         }
 
         .detail-description {
@@ -589,7 +737,7 @@
         }
 
         .leaflet-tile {
-            filter: grayscale(100%) contrast(140%) brightness(80%) !important;
+            filter: grayscale(100%) brightness(450%) contrast(130%) !important;
         }
 
         .leaflet-control-attribution {
@@ -711,11 +859,22 @@
 
             <aside class="modal-sidebar">
                 <div class="sidebar-section">
-                    <div class="section-label">EXHIBITION FRAME</div>
+                    <div class="section-label"></div>
                     <h2 class="detail-title" id="detail-title">TITLE</h2>
                     <div class="detail-author-row">
                         <span class="detail-author" id="detail-author">PHOTOGRAPHER</span>
-                        <a href="#" id="detail-instagram" target="_blank" rel="noopener noreferrer" class="detail-ig-link" style="display:none;"></a>
+                        <a href="#" id="detail-instagram" target="_blank" rel="noopener noreferrer"
+                            class="detail-ig-link" style="display:none;" aria-label="Photographer Instagram Profile">
+                            <svg class="ig-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                            <span id="detail-instagram-handle"></span>
+                        </a>
+                    </div>
+                    <div class="detail-actions-bar">
+                        <button type="button" class="detail-like-btn" id="modal-like-btn" aria-label="Give a heart to this photo">
+                            <svg class="heart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            <span id="modal-like-text">Gefällt mir</span>
+                            <span class="detail-like-badge" id="modal-like-count">0</span>
+                        </button>
                     </div>
                     <p class="detail-description" id="detail-description">Description text.</p>
                 </div>
@@ -938,6 +1097,10 @@
             const stagePrevBtn = document.getElementById('stage-prev-btn');
             const stageNextBtn = document.getElementById('stage-next-btn');
 
+            const modalLikeBtn = document.getElementById('modal-like-btn');
+            const modalLikeText = document.getElementById('modal-like-text');
+            const modalLikeCount = document.getElementById('modal-like-count');
+
             const detailTitle = document.getElementById('detail-title');
             const detailAuthor = document.getElementById('detail-author');
             const detailInstagram = document.getElementById('detail-instagram');
@@ -951,6 +1114,91 @@
             const exifAperture = document.getElementById('exif-aperture');
             const exifShutter = document.getElementById('exif-shutter');
             const exifIso = document.getElementById('exif-iso');
+
+            // --- LIKE SYSTEM (Max 1 Heart per visitor, persisted in localStorage) ---
+            function getLikedPhotos() {
+                try {
+                    return JSON.parse(localStorage.getItem('kanito_liked_photos') || '[]');
+                } catch (e) { return []; }
+            }
+
+            function isPhotoLiked(id) {
+                return getLikedPhotos().includes(id);
+            }
+
+            function togglePhotoLike(id) {
+                let liked = getLikedPhotos();
+                const index = liked.indexOf(id);
+                let isNowLiked = false;
+                if (index > -1) {
+                    liked.splice(index, 1);
+                    isNowLiked = false;
+                } else {
+                    liked.push(id);
+                    isNowLiked = true;
+                }
+                try {
+                    localStorage.setItem('kanito_liked_photos', JSON.stringify(liked));
+                } catch (e) {}
+
+                updatePhotoLikeUI(id, isNowLiked);
+            }
+
+            function updatePhotoLikeUI(id, isNowLiked) {
+                const photo = photosCatalog.find(p => p.id === id);
+                if (!photo) return;
+
+                const baseLikes = Number(photo.likes || 0);
+                const currentLikes = baseLikes + (isNowLiked ? 1 : 0);
+
+                // Update card on gallery grid
+                const card = document.querySelector(`.photo-item[data-id="${id}"]`);
+                if (card) {
+                    const cardBtn = card.querySelector('.photo-card-like-btn');
+                    const countSpan = card.querySelector('.like-count');
+                    if (cardBtn) {
+                        if (isNowLiked) cardBtn.classList.add('liked');
+                        else cardBtn.classList.remove('liked');
+                    }
+                    if (countSpan) countSpan.textContent = currentLikes;
+                }
+
+                // Update modal if open for this photo
+                if (modal.classList.contains('active') && photosCatalog[activeIndex] && photosCatalog[activeIndex].id === id) {
+                    if (isNowLiked) modalLikeBtn.classList.add('liked');
+                    else modalLikeBtn.classList.remove('liked');
+                    if (modalLikeText) modalLikeText.textContent = isNowLiked ? 'Gefällt dir' : 'Gefällt mir';
+                    if (modalLikeCount) modalLikeCount.textContent = currentLikes;
+                }
+            }
+
+            function setupLikeButtons() {
+                const liked = getLikedPhotos();
+                document.querySelectorAll('.photo-card-like-btn').forEach(btn => {
+                    const id = btn.dataset.id;
+                    const baseLikes = Number(btn.dataset.baseLikes || 0);
+                    const isLiked = liked.includes(id);
+                    if (isLiked) btn.classList.add('liked');
+                    else btn.classList.remove('liked');
+                    const countSpan = btn.querySelector('.like-count');
+                    if (countSpan) countSpan.textContent = baseLikes + (isLiked ? 1 : 0);
+
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        togglePhotoLike(id);
+                    });
+                });
+
+                if (modalLikeBtn) {
+                    modalLikeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (photosCatalog[activeIndex]) {
+                            togglePhotoLike(photosCatalog[activeIndex].id);
+                        }
+                    });
+                }
+            }
 
             let leafletMap = null;
             let leafletMarker = null;
@@ -997,14 +1245,27 @@
 
                 detailTitle.textContent = photo.title;
                 detailAuthor.textContent = photo.photographer;
+                const detailIgHandle = document.getElementById('detail-instagram-handle');
                 if (photo.instagram) {
                     const cleanHandle = photo.instagram.replace(/^@/, '');
                     detailInstagram.href = `https://instagram.com/${cleanHandle}`;
-                    detailInstagram.textContent = `@${cleanHandle} ↗`;
+                    if (detailIgHandle) detailIgHandle.textContent = `@${cleanHandle} ↗`;
+                    else detailInstagram.textContent = `@${cleanHandle} ↗`;
                     detailInstagram.style.display = 'inline-flex';
                 } else {
                     detailInstagram.style.display = 'none';
                 }
+
+                // Sync like state in modal
+                const isLiked = isPhotoLiked(photo.id);
+                const baseLikes = Number(photo.likes || 0);
+                if (modalLikeBtn) {
+                    if (isLiked) modalLikeBtn.classList.add('liked');
+                    else modalLikeBtn.classList.remove('liked');
+                }
+                if (modalLikeText) modalLikeText.textContent = isLiked ? 'Gefällt dir' : 'Gefällt mir';
+                if (modalLikeCount) modalLikeCount.textContent = baseLikes + (isLiked ? 1 : 0);
+
                 detailDescription.textContent = photo.description || 'Monochrome architectural framing.';
                 detailLocationName.textContent = photo.location_name || 'Unspecified';
                 detailCoords.textContent = `${Number(photo.latitude).toFixed(4)}° N, ${Number(photo.longitude).toFixed(4)}° E`;
@@ -1021,21 +1282,16 @@
 
                 try {
                     const bitmap = await fetchAndUnscramble('/photos/data/' + photo.filename);
-                    const stageW = Math.min(window.innerWidth * 0.65, bitmap.width);
-                    const aspect = bitmap.width / bitmap.height;
-                    const stageH = stageW / aspect;
-
-                    const dpr = window.devicePixelRatio || 1;
-                    modalCanvas.width = stageW * dpr;
-                    modalCanvas.height = stageH * dpr;
-                    modalCanvas.style.width = stageW + 'px';
-                    modalCanvas.style.height = stageH + 'px';
+                    modalCanvas.width = bitmap.width;
+                    modalCanvas.height = bitmap.height;
+                    modalCanvas.style.width = '';
+                    modalCanvas.style.height = '';
+                    modalCanvas.style.aspectRatio = `${bitmap.width} / ${bitmap.height}`;
 
                     const ctx = modalCanvas.getContext('2d');
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
-                    ctx.scale(dpr, dpr);
-                    ctx.drawImage(bitmap, 0, 0, stageW, stageH);
+                    ctx.drawImage(bitmap, 0, 0);
                 } catch (e) {
                     console.error('Failed to render modal image:', e);
                 }
@@ -1075,6 +1331,7 @@
             });
 
             document.addEventListener('click', (e) => {
+                if (e.target.closest('.photo-card-like-btn')) return;
                 const card = e.target.closest('.photo-item');
                 if (card) {
                     const id = card.dataset.id;
@@ -1085,6 +1342,7 @@
 
             window.addEventListener('load', () => {
                 setupInfiniteScroll();
+                setupLikeButtons();
                 if (window.location.hash && window.location.hash.startsWith('#photo-')) {
                     const id = window.location.hash.replace('#photo-', '');
                     const idx = photosCatalog.findIndex(p => p.id === id);

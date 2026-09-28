@@ -19,7 +19,8 @@
     "height": 1600,
     "aspect_ratio": 1.5,
     "filename": "717272e5-0eb1-40f9-b525-045ed72be540.bin",
-    "instagram": "@silas.hoerz"
+    "instagram": "@silas.hoerz",
+    "likes": 34
   },
   {
     "id": "71af9854-9779-46cc-ab3c-9372102ecff0",
@@ -41,7 +42,8 @@
     "height": 2400,
     "aspect_ratio": 0.75,
     "filename": "71af9854-9779-46cc-ab3c-9372102ecff0.bin",
-    "instagram": "@partner.photo"
+    "instagram": "@partner.photo",
+    "likes": 28
   },
   {
     "id": "0db1a258-d1ab-4df3-a748-d2eb0c836055",
@@ -63,7 +65,8 @@
     "height": 1440,
     "aspect_ratio": 1.7778,
     "filename": "0db1a258-d1ab-4df3-a748-d2eb0c836055.bin",
-    "instagram": "@silas.hoerz"
+    "instagram": "@silas.hoerz",
+    "likes": 45
   },
   {
     "id": "6f90ffd8-6676-4a04-acb8-0b1eef816092",
@@ -85,7 +88,8 @@
     "height": 1650,
     "aspect_ratio": 1.3333,
     "filename": "6f90ffd8-6676-4a04-acb8-0b1eef816092.bin",
-    "instagram": "@partner.photo"
+    "instagram": "@partner.photo",
+    "likes": 19
   },
   {
     "id": "e4c8b211-923f-42a1-893c-2384a561109a",
@@ -107,7 +111,8 @@
     "height": 848,
     "aspect_ratio": 1.49,
     "filename": "e4c8b211-923f-42a1-893c-2384a561109a.bin",
-    "instagram": "@silas.hoerz"
+    "instagram": "@silas.hoerz",
+    "likes": 52
   },
   {
     "id": "f1b9a842-12ef-41c8-a477-984210e74c82",
@@ -129,6 +134,7 @@
     "height": 1264,
     "aspect_ratio": 0.67,
     "filename": "f1b9a842-12ef-41c8-a477-984210e74c82.bin",
-    "instagram": "@partner.photo"
+    "instagram": "@partner.photo",
+    "likes": 38
   }
 ]
