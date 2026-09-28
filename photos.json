@@ -1,4 +1,8 @@
-[
+{
+  "settings": {
+    "show_likes": true
+  },
+  "photos": [
   {
     "id": "717272e5-0eb1-40f9-b525-045ed72be540",
     "title": "MONOLITH NO. 01 — CONCRETE GEOMETRY",
@@ -137,4 +141,5 @@
     "instagram": "@partner.photo",
     "likes": 38
   }
-]
+  ]
+}
