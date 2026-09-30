@@ -26,53 +26,6 @@ const LANDING_THEME_STYLES = `
             color: #ffffff;
             text-shadow: 0 0 45px rgba(155, 105, 255, 0.22);
         }
-        .hub-card {
-            background: rgba(15, 11, 28, 0.58);
-            border: 1px solid rgba(155, 105, 255, 0.16);
-        }
-        .hub-card:hover {
-            border-color: #9b69ff;
-            background: rgba(22, 16, 38, 0.78);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65), 0 0 35px rgba(155, 105, 255, 0.22);
-        }
-        .hub-card::before {
-            background: linear-gradient(90deg, transparent, #9b69ff, transparent);
-        }
-        .hub-tag {
-            color: #b78eff;
-        }
-        .hub-visual-photos {
-            background: radial-gradient(circle at center, rgba(155, 105, 255, 0.15) 0%, rgba(9, 7, 15, 0.9) 100%);
-            border-color: rgba(155, 105, 255, 0.15);
-        }
-        .hub-visual-projects {
-            background: radial-gradient(circle at center, rgba(155, 105, 255, 0.12) 0%, rgba(9, 7, 15, 0.9) 100%);
-            border-color: rgba(155, 105, 255, 0.15);
-        }
-        .hub-card:hover .hub-visual {
-            border-color: rgba(155, 105, 255, 0.45);
-        }
-        .hub-code-preview {
-            border-color: rgba(155, 105, 255, 0.15);
-            background: rgba(6, 4, 12, 0.65);
-        }
-        .hub-card:hover .hub-code-preview {
-            border-color: rgba(155, 105, 255, 0.45);
-        }
-        .hub-code-line-dim {
-            color: rgba(183, 142, 255, 0.75);
-        }
-        .btn-card {
-            border-color: rgba(155, 105, 255, 0.4);
-            background: rgba(155, 105, 255, 0.12);
-            color: #fcfaff;
-        }
-        .hub-card:hover .btn-card {
-            background: #9b69ff;
-            border-color: #9b69ff;
-            color: #ffffff;
-            box-shadow: 0 0 20px rgba(155, 105, 255, 0.45);
-        }
         .nav-link:hover {
             border-color: #9b69ff;
             color: #b78eff;
@@ -80,6 +33,70 @@ const LANDING_THEME_STYLES = `
         }
         footer {
             color: rgba(183, 142, 255, 0.75);
+        }
+
+        /* Photos Card Specifics (Monochrome B&W world) */
+        .hub-card-photos {
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: #09090b;
+        }
+        .hub-card-photos::before {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        }
+        .hub-card-photos:hover {
+            border-color: rgba(255, 255, 255, 0.55);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 255, 255, 0.14);
+        }
+        .hub-card-photos .hub-tag {
+            color: rgba(255, 255, 255, 0.88);
+        }
+        .hub-card-photos .btn-card {
+            border-color: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+        .hub-card-photos:hover .btn-card {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Projects Card Specifics (Cyan/Turquoise world) */
+        .hub-card-projects {
+            border: 1px solid rgba(0, 180, 210, 0.25);
+            background: #061114;
+        }
+        .hub-card-projects::before {
+            background: linear-gradient(90deg, transparent, rgba(0, 180, 210, 0.9), transparent);
+        }
+        .hub-card-projects:hover {
+            border-color: rgba(0, 180, 210, 0.85);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 180, 210, 0.28);
+        }
+        .hub-card-projects .hub-tag {
+            color: #00e5ff;
+        }
+        .hub-card-projects .btn-card {
+            border-color: rgba(0, 180, 210, 0.4);
+            background: rgba(0, 180, 210, 0.12);
+            color: #e6ffff;
+        }
+        .hub-card-projects:hover .btn-card {
+            background: rgba(0, 180, 210, 1);
+            color: #031014;
+            border-color: rgba(0, 180, 210, 1);
+            box-shadow: 0 0 20px rgba(0, 180, 210, 0.5);
+        }
+        .hub-card-projects .hub-code-preview {
+            border-color: rgba(0, 180, 210, 0.25);
+            background: rgba(2, 8, 10, 0.75);
+        }
+        .hub-card-projects:hover .hub-code-preview {
+            border-color: rgba(0, 180, 210, 0.6);
+        }
+        .hub-card-projects .hub-code-line-dim {
+            color: rgba(0, 210, 240, 0.75);
         }
 `;
 
@@ -346,45 +363,160 @@ async function build() {
 
         <section class="hub-grid">
             <!-- Photos Card -->
-            <a href="/photos/" class="hub-card" id="hub-card-photos" title="Explore Photography Portfolio">
-                <div class="hub-card-header">
-                    <span class="hub-tag">[01 / VISUALS]</span>
+            <a href="/photos/" class="hub-card hub-card-photos" id="hub-card-photos" title="Explore Photography Portfolio">
+                <div class="hub-card-canvas-wrap">
+                    <canvas id="hub-canvas-photos" class="hub-tile-canvas"></canvas>
+                    <div class="hub-card-tint"></div>
                 </div>
-                <div class="hub-visual hub-visual-photos">
-                    <div class="hub-frame-preview" id="hub-frame-preview" aria-label="Curated landscape photographs slideshow">
-                        <img class="hub-slide-img is-active" id="hub-slide-a" alt="Curated photograph" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 138 92'%3E%3Crect fill='%230d0c14' width='138' height='92'/%3E%3C/svg%3E">
-                        <img class="hub-slide-img" id="hub-slide-b" alt="Curated photograph">
+                <div class="hub-card-inner">
+                    <div class="hub-visual hub-visual-photos">
+                        <div class="hub-frame-preview" id="hub-frame-preview" aria-label="Curated landscape photographs slideshow">
+                            <img class="hub-slide-img is-active" id="hub-slide-a" alt="Curated photograph" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 230 153'%3E%3Crect fill='%230d0c14' width='230' height='153'/%3E%3C/svg%3E">
+                            <img class="hub-slide-img" id="hub-slide-b" alt="Curated photograph">
+                        </div>
                     </div>
-                </div>
-                <h2 class="hub-card-title">photos.</h2>
-                <p class="hub-card-desc">A space where we simply share our photographs with the world. Feel free to take a look around and explore.</p>
-                <div class="hub-card-footer">
-                    <span class="btn-card">Explore →</span>
+                    <h2 class="hub-card-title">PHOTOS.</h2>
+                    <p class="hub-card-desc">A space where we simply share our photographs with the world. Feel free to take a look around and explore.</p>
+                    <div class="hub-card-footer">
+                        <span class="btn-card">Explore →</span>
+                    </div>
                 </div>
             </a>
 
             <!-- Projects Card -->
-            <a href="/projects/" class="hub-card" id="hub-card-projects" title="View Hardware Projects &amp; Documentation">
-                <div class="hub-card-header">
-                    <span class="hub-tag">[02 / ENGINEERING]</span>
+            <a href="/projects/" class="hub-card hub-card-projects" id="hub-card-projects" title="View Hardware Projects &amp; Documentation">
+                <div class="hub-card-canvas-wrap">
+                    <canvas id="hub-canvas-projects" class="hub-tile-canvas"></canvas>
+                    <div class="hub-card-tint"></div>
                 </div>
-                <div class="hub-visual hub-visual-projects">
-                    <div class="hub-code-preview">
-                        <span class="hub-code-line-dim">// Embedded Hardware &amp; Firmware</span>
-                        <span class="hub-code-line-hi">kanito.prototype.init();</span>
-                        <span class="hub-code-line-dim">export const Tally = new Device();</span>
+                <div class="hub-card-inner">
+                    <div class="hub-visual hub-visual-projects">
+                        <div class="hub-code-preview">
+                            <span class="hub-code-line-dim">// Embedded Hardware &amp; Firmware</span>
+                            <span class="hub-code-line-hi">kanito.prototype.init();</span>
+                            <span class="hub-code-line-dim">export const Tally = new Device();</span>
+                        </div>
                     </div>
-                </div>
-                <h2 class="hub-card-title">projects.</h2>
-                <p class="hub-card-desc">Development and distribution of electronic assemblies, microcontroller accessories, open-source hardware, and technical schematics.</p>
-                <div class="hub-card-footer">
-                    <span class="btn-card">Explore →</span>
+                    <h2 class="hub-card-title">PROJECTS.</h2>
+                    <p class="hub-card-desc">A collection of hardware prototypes and engineering projects I'm currently working on. Feel free to take a look around and explore.</p>
+                    <div class="hub-card-footer">
+                        <span class="btn-card">Explore →</span>
+                    </div>
                 </div>
             </a>
         </section>
 
         <script>
         (function() {
+            // --- LIVE TILE WEBGL DITHER SHADERS ---
+            function initTileShader(canvasId, paletteCode, blobCount) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return null;
+                const gl = canvas.getContext('webgl', { alpha: false, antialias: false, depth: false });
+                if (!gl) return null;
+
+                const vsSource = 'attribute vec4 position; void main() { gl_Position = position; }';
+                const fsSource = 'precision mediump float;' +
+                    'uniform vec2 u_resolution; uniform vec2 u_blobs[25]; uniform int u_blob_count; uniform float u_blob_radius; uniform float u_blob_force;' +
+                    'float bayer4x4(vec2 uv) { int x=int(mod(uv.x,4.0)); int y=int(mod(uv.y,4.0)); if(y==0){if(x==0)return 0.0/16.0;if(x==1)return 8.0/16.0;if(x==2)return 2.0/16.0;return 10.0/16.0;} else if(y==1){if(x==0)return 12.0/16.0;if(x==1)return 4.0/16.0;if(x==2)return 14.0/16.0;return 6.0/16.0;} else if(y==2){if(x==0)return 3.0/16.0;if(x==1)return 11.0/16.0;if(x==2)return 1.0/16.0;return 9.0/16.0;} else{if(x==0)return 15.0/16.0;if(x==1)return 7.0/16.0;if(x==2)return 13.0/16.0;return 5.0/16.0;} return 0.5; }' +
+                    paletteCode +
+                    'void main() { vec2 st = gl_FragCoord.xy; float influence=0.0; for(int i=0;i<25;i++){if(i>=u_blob_count)break; float dist=distance(st,u_blobs[i]); float val=exp(-(dist*dist)/(2.0*u_blob_radius*u_blob_radius)); influence+=val*u_blob_force;} influence*=0.6; float ditherVal=bayer4x4(st); float layers=6.0; float spread=0.2; float dithered=influence+(ditherVal-0.5)*spread; float finalLevel=floor(dithered*(layers-1.0)+0.5)/(layers-1.0); finalLevel=clamp(finalLevel,0.0,1.0); gl_FragColor=vec4(getPalette(finalLevel),1.0); }';
+
+                function createShader(type, src) {
+                    const s = gl.createShader(type);
+                    gl.shaderSource(s, src);
+                    gl.compileShader(s);
+                    return s;
+                }
+
+                const prog = gl.createProgram();
+                gl.attachShader(prog, createShader(gl.VERTEX_SHADER, vsSource));
+                gl.attachShader(prog, createShader(gl.FRAGMENT_SHADER, fsSource));
+                gl.linkProgram(prog);
+                gl.useProgram(prog);
+
+                const buf = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+
+                const pos = gl.getAttribLocation(prog, "position");
+                gl.enableVertexAttribArray(pos);
+                gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+
+                const locs = {
+                    res: gl.getUniformLocation(prog, "u_resolution"),
+                    blobs: gl.getUniformLocation(prog, "u_blobs"),
+                    count: gl.getUniformLocation(prog, "u_blob_count"),
+                    radius: gl.getUniformLocation(prog, "u_blob_radius"),
+                    force: gl.getUniformLocation(prog, "u_blob_force")
+                };
+
+                const count = Math.min(blobCount, 25);
+                const blobs = [];
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    blobs.push({
+                        x: Math.random() * 400,
+                        y: Math.random() * 450,
+                        vx: Math.cos(angle) * 0.35,
+                        vy: Math.sin(angle) * 0.35
+                    });
+                }
+                const blobBuffer = new Float32Array(count * 2);
+
+                return function render() {
+                    const rect = canvas.getBoundingClientRect();
+                    const pixelScale = 2;
+                    const w = Math.max(10, Math.floor(rect.width / pixelScale));
+                    const h = Math.max(10, Math.floor(rect.height / pixelScale));
+                    if (canvas.width !== w || canvas.height !== h) {
+                        canvas.width = w;
+                        canvas.height = h;
+                        gl.viewport(0, 0, w, h);
+                        gl.uniform2f(locs.res, w, h);
+                    }
+
+                    const dynamicRadius = Math.max(45, Math.min(95, rect.width * 0.22));
+                    for (let i = 0; i < count; i++) {
+                        const b = blobs[i];
+                        b.vx += (Math.random() - 0.5) * 0.05;
+                        b.vy += (Math.random() - 0.5) * 0.05;
+                        if (b.x < -30) b.vx += 0.04;
+                        if (b.x > rect.width + 30) b.vx -= 0.04;
+                        if (b.y < -30) b.vy += 0.04;
+                        if (b.y > rect.height + 30) b.vy -= 0.04;
+                        const spd = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+                        if (spd > 0.4) {
+                            b.vx = (b.vx / spd) * 0.4;
+                            b.vy = (b.vy / spd) * 0.4;
+                        }
+                        b.x += b.vx;
+                        b.y += b.vy;
+                        blobBuffer[i * 2] = b.x / pixelScale;
+                        blobBuffer[i * 2 + 1] = canvas.height - (b.y / pixelScale);
+                    }
+
+                    gl.uniform2fv(locs.blobs, blobBuffer);
+                    gl.uniform1i(locs.count, count);
+                    gl.uniform1f(locs.radius, dynamicRadius / pixelScale);
+                    gl.uniform1f(locs.force, 0.16);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                };
+            }
+
+            // Photos: Monochrome B&W palette from photos/template-photos.html
+            const renderPhotos = initTileShader('hub-canvas-photos', 'vec3 getPalette(float t) { vec3 c_bg=vec3(0.02,0.02,0.02); vec3 c_mid=vec3(0.35,0.35,0.35); vec3 c_high=vec3(0.9,0.9,0.9); if(t<0.5)return mix(c_bg,c_mid,t*2.0); return mix(c_mid,c_high,(t-0.5)*2.0); }', 18);
+            // Projects: Cyan/Turquoise palette from template.html
+            const renderProjects = initTileShader('hub-canvas-projects', 'vec3 getPalette(float t) { vec3 c_bg=vec3(0.02,0.12,0.18)*0.7; vec3 c_mid=vec3(0.0,0.75,0.85)*0.7; vec3 c_high=vec3(0.7,1.0,1.0)*0.7; if(t<0.5)return mix(c_bg,c_mid,t*2.0); return mix(c_mid,c_high,(t-0.5)*2.0); }', 18);
+
+            function loopTiles() {
+                if (renderPhotos) renderPhotos();
+                if (renderProjects) renderProjects();
+                requestAnimationFrame(loopTiles);
+            }
+            requestAnimationFrame(loopTiles);
+
+            // --- PHOTOS DIASHOW IN WHITE FRAME ---
             const photos = ${JSON.stringify(landscapePhotos)};
             if (!photos || photos.length === 0) return;
 
