@@ -65,7 +65,7 @@
       "has_location": false,
       "latitude": null,
       "longitude": null,
-      "frame": "white",
+      "frame": "none",
       "frame_width": null,
       "year": "2026",
       "date": "2026-09-28",
@@ -91,18 +91,6 @@
           "focal_length": "35mm",
           "aperture": "f/1.7",
           "shutter": "1/640s",
-          "iso": "100"
-        },
-        {
-          "filename": "e4c8b211-923f-42a1-893c-2384a561109a.bin",
-          "width": 1264,
-          "height": 848,
-          "aspect_ratio": 1.4906,
-          "camera": "Sony A6000",
-          "lens": "Viltrox 35mm F1.7 E",
-          "focal_length": "35mm",
-          "aperture": "f/2.8",
-          "shutter": "1/500s",
           "iso": "100"
         }
       ]
