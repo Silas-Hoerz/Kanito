@@ -3,6 +3,109 @@ import { marked } from 'marked';
 
 const DOMAIN = "https://kanito.de";
 
+const DEFAULT_SHADER_PALETTE = `vec3 getPalette(float t) { vec3 c_bg=vec3(0.02,0.12,0.18)*0.7; vec3 c_mid=vec3(0.0,0.75,0.85)*0.7; vec3 c_high=vec3(0.7,1.0,1.0)*0.7; if(t<0.5)return mix(c_bg,c_mid,t*2.0); return mix(c_mid,c_high,(t-0.5)*2.0); }`;
+
+const LANDING_SHADER_PALETTE = `vec3 getPalette(float t) {
+    vec3 c_bg = vec3(0.035, 0.022, 0.075);
+    vec3 c_mid = vec3(0.55, 0.32, 0.98);
+    vec3 c_high = vec3(0.92, 0.88, 1.0);
+    if (t < 0.5) return mix(c_bg, c_mid, t * 2.0);
+    return mix(c_mid, c_high, (t - 0.5) * 2.0);
+}`;
+
+const LANDING_THEME_STYLES = `
+        :root {
+            --c-bg: #08060e;
+            --c-mid: #9b69ff;
+            --c-high: #fcfaff;
+        }
+        #glass-overlay {
+            background: rgba(8, 6, 14, 0.45);
+        }
+        .landing-title {
+            color: #ffffff;
+            text-shadow: 0 0 45px rgba(155, 105, 255, 0.22);
+        }
+        .hub-card {
+            background: rgba(15, 11, 28, 0.58);
+            border: 1px solid rgba(155, 105, 255, 0.16);
+        }
+        .hub-card:hover {
+            border-color: #9b69ff;
+            background: rgba(22, 16, 38, 0.78);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65), 0 0 35px rgba(155, 105, 255, 0.22);
+        }
+        .hub-card::before {
+            background: linear-gradient(90deg, transparent, #9b69ff, transparent);
+        }
+        .hub-tag {
+            color: #b78eff;
+        }
+        .hub-visual-photos {
+            background: radial-gradient(circle at center, rgba(155, 105, 255, 0.15) 0%, rgba(9, 7, 15, 0.9) 100%);
+            border-color: rgba(155, 105, 255, 0.15);
+        }
+        .hub-visual-projects {
+            background: radial-gradient(circle at center, rgba(155, 105, 255, 0.12) 0%, rgba(9, 7, 15, 0.9) 100%);
+            border-color: rgba(155, 105, 255, 0.15);
+        }
+        .hub-card:hover .hub-visual {
+            border-color: rgba(155, 105, 255, 0.45);
+        }
+        .hub-code-preview {
+            border-color: rgba(155, 105, 255, 0.15);
+            background: rgba(6, 4, 12, 0.65);
+        }
+        .hub-card:hover .hub-code-preview {
+            border-color: rgba(155, 105, 255, 0.45);
+        }
+        .hub-code-line-dim {
+            color: rgba(183, 142, 255, 0.75);
+        }
+        .btn-card {
+            border-color: rgba(155, 105, 255, 0.4);
+            background: rgba(155, 105, 255, 0.12);
+            color: #fcfaff;
+        }
+        .hub-card:hover .btn-card {
+            background: #9b69ff;
+            border-color: #9b69ff;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(155, 105, 255, 0.45);
+        }
+        .nav-link:hover {
+            border-color: #9b69ff;
+            color: #b78eff;
+            background: rgba(155, 105, 255, 0.12);
+        }
+        footer {
+            color: rgba(183, 142, 255, 0.75);
+        }
+`;
+
+function renderTemplate(template, {
+    title,
+    description,
+    image,
+    url,
+    year,
+    jsonLd = '',
+    content,
+    themeStyles = '',
+    shaderPalette = DEFAULT_SHADER_PALETTE
+}) {
+    return template
+        .replace(/{{TITLE}}/g, title)
+        .replace(/{{DESCRIPTION}}/g, description)
+        .replace(/{{IMAGE}}/g, image)
+        .replace(/{{URL}}/g, url)
+        .replace(/{{YEAR}}/g, year)
+        .replace('{{JSON_LD}}', jsonLd)
+        .replace('{{THEME_STYLES}}', themeStyles)
+        .replace('{{SHADER_PALETTE}}', shaderPalette)
+        .replace('{{CONTENT}}', content);
+}
+
 async function copyDir(src, dest) {
     await fs.mkdir(dest, { recursive: true });
     const entries = await fs.readdir(src, { withFileTypes: true });
@@ -52,14 +155,17 @@ async function build() {
     for (const page of legalPages) {
         try {
             const content = await fs.readFile(page.file, 'utf-8');
-            const finalHtml = TEMPLATE
-                .replace(/{{TITLE}}/g, `${page.title} | Kanito`)
-                .replace(/{{DESCRIPTION}}/g, `Legal information for Kanito.`)
-                .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
-                .replace(/{{URL}}/g, `${DOMAIN}/${page.slug}`)
-                .replace(/{{YEAR}}/g, YEAR)
-                .replace('{{JSON_LD}}', '')
-                .replace('{{CONTENT}}', content);
+            const finalHtml = renderTemplate(TEMPLATE, {
+                title: `${page.title} | Kanito`,
+                description: `Legal information for Kanito.`,
+                image: `${DOMAIN}/logo.png`,
+                url: `${DOMAIN}/${page.slug}`,
+                year: YEAR,
+                jsonLd: '',
+                content: content,
+                themeStyles: '',
+                shaderPalette: DEFAULT_SHADER_PALETTE
+            });
 
             await fs.writeFile(`dist/${page.slug}`, finalHtml);
             console.log(`Generated themed ${page.slug}`);
@@ -171,14 +277,17 @@ async function build() {
             }
         };
 
-        let pageHtml = TEMPLATE
-            .replace(/{{TITLE}}/g, `${title} | Kanito`)
-            .replace(/{{DESCRIPTION}}/g, desc.replace(/"/g, '&quot;'))
-            .replace(/{{IMAGE}}/g, imageUrl || `${DOMAIN}/logo.png`)
-            .replace(/{{URL}}/g, `${DOMAIN}/${slug}/`)
-            .replace(/{{YEAR}}/g, YEAR)
-            .replace('{{JSON_LD}}', `<script type="application/ld+json">\n${JSON.stringify(jsonLd)}\n</script>`)
-            .replace('{{CONTENT}}', subpageContent);
+        let pageHtml = renderTemplate(TEMPLATE, {
+            title: `${title} | Kanito`,
+            description: desc.replace(/"/g, '&quot;'),
+            image: imageUrl || `${DOMAIN}/logo.png`,
+            url: `${DOMAIN}/${slug}/`,
+            year: YEAR,
+            jsonLd: `<script type="application/ld+json">\n${JSON.stringify(jsonLd)}\n</script>`,
+            content: subpageContent,
+            themeStyles: '',
+            shaderPalette: DEFAULT_SHADER_PALETTE
+        });
 
         await fs.mkdir(`dist/${slug}`, { recursive: true });
         await fs.writeFile(`dist/${slug}/index.html`, pageHtml);
@@ -206,14 +315,17 @@ async function build() {
         "description": "Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components for hardware projects."
     };
 
-    let finalProjects = TEMPLATE
-        .replace(/{{TITLE}}/g, 'Projects | Kanito')
-        .replace(/{{DESCRIPTION}}/g, 'Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components for hardware projects.')
-        .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
-        .replace(/{{URL}}/g, `${DOMAIN}/projects/`)
-        .replace(/{{YEAR}}/g, YEAR)
-        .replace('{{JSON_LD}}', `<script type="application/ld+json">\n${JSON.stringify(projectsJsonLd)}\n</script>`)
-        .replace('{{CONTENT}}', projectsContent);
+    let finalProjects = renderTemplate(TEMPLATE, {
+        title: 'Projects | Kanito',
+        description: 'Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components for hardware projects.',
+        image: `${DOMAIN}/logo.png`,
+        url: `${DOMAIN}/projects/`,
+        year: YEAR,
+        jsonLd: `<script type="application/ld+json">\n${JSON.stringify(projectsJsonLd)}\n</script>`,
+        content: projectsContent,
+        themeStyles: '',
+        shaderPalette: DEFAULT_SHADER_PALETTE
+    });
 
     await fs.mkdir('dist/projects', { recursive: true });
     await fs.writeFile('dist/projects/index.html', finalProjects);
@@ -222,11 +334,14 @@ async function build() {
     sitemapUrls += `<url><loc>${DOMAIN}/projects/</loc><priority>0.9</priority></url>\n`;
 
     // --- NEW MINIMALIST LANDING PAGE (kanito.de/) ---
+    const landscapePhotos = PHOTOS
+        .filter(p => (p.width && p.height ? (p.width > p.height) : (p.aspect_ratio > 1)))
+        .map(p => `/photos/data/${p.filename}`);
+
     const landingContent = `
         <section class="landing-hero">
-            <div class="landing-tag">[ ARCHIVE &amp; PORTFOLIO ]</div>
-            <h1 class="landing-title">Kanito.</h1>
-            <p class="landing-lead">Hardware engineering, embedded systems prototyping, and curated monochrome architectural photography by Silas Hörz.</p>
+            <h1 class="landing-title">KANITO.</h1>
+            <p class="sr-only">Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components.</p>
         </section>
 
         <section class="hub-grid">
@@ -234,28 +349,24 @@ async function build() {
             <a href="/photos/" class="hub-card" id="hub-card-photos" title="Explore Photography Portfolio">
                 <div class="hub-card-header">
                     <span class="hub-tag">[01 / VISUALS]</span>
-                    <span class="hub-badge">PHOTOGRAPHY</span>
                 </div>
                 <div class="hub-visual hub-visual-photos">
-                    <div class="hub-frame-preview"></div>
+                    <div class="hub-frame-preview" id="hub-frame-preview" aria-label="Curated landscape photographs slideshow">
+                        <img class="hub-slide-img is-active" id="hub-slide-a" alt="Curated photograph" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 138 92'%3E%3Crect fill='%230d0c14' width='138' height='92'/%3E%3C/svg%3E">
+                        <img class="hub-slide-img" id="hub-slide-b" alt="Curated photograph">
+                    </div>
                 </div>
                 <h2 class="hub-card-title">photos.</h2>
-                <p class="hub-card-desc">Curated architectural, structural, and monochrome photography portfolio exploring brutalism, high-contrast light geometry, and fine-art framing.</p>
-                <div class="hub-card-meta">
-                    <span class="hub-meta-item">ARCHITECTURAL</span>
-                    <span class="hub-meta-item">MONOCHROME</span>
-                    <span class="hub-meta-item">LEICA &amp; PRIME</span>
-                </div>
+                <p class="hub-card-desc">A space where we simply share our photographs with the world. Feel free to take a look around and explore.</p>
                 <div class="hub-card-footer">
-                    <span class="btn-card">Explore Photos →</span>
+                    <span class="btn-card">Explore →</span>
                 </div>
             </a>
 
             <!-- Projects Card -->
-            <a href="/projects/" class="hub-card" id="hub-card-projects" title="View Hardware Projects & Documentation">
+            <a href="/projects/" class="hub-card" id="hub-card-projects" title="View Hardware Projects &amp; Documentation">
                 <div class="hub-card-header">
                     <span class="hub-tag">[02 / ENGINEERING]</span>
-                    <span class="hub-badge">HARDWARE &amp; CODE</span>
                 </div>
                 <div class="hub-visual hub-visual-projects">
                     <div class="hub-code-preview">
@@ -266,20 +377,91 @@ async function build() {
                 </div>
                 <h2 class="hub-card-title">projects.</h2>
                 <p class="hub-card-desc">Development and distribution of electronic assemblies, microcontroller accessories, open-source hardware, and technical schematics.</p>
-                <div class="hub-card-meta">
-                    <span class="hub-meta-item">MICROCONTROLLERS</span>
-                    <span class="hub-meta-item">HARDWARE PROTOTYPES</span>
-                    <span class="hub-meta-item">OPEN SOURCE</span>
-                </div>
                 <div class="hub-card-footer">
-                    <span class="btn-card">View Projects →</span>
+                    <span class="btn-card">Explore →</span>
                 </div>
             </a>
         </section>
 
-        <div class="hub-extensible-note">
-            <span>More disciplines &amp; archives upcoming</span>
-        </div>
+        <script>
+        (function() {
+            const photos = ${JSON.stringify(landscapePhotos)};
+            if (!photos || photos.length === 0) return;
+
+            async function unscrambleUrl(url) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) return null;
+                    const buf = await res.arrayBuffer();
+                    const bytes = new Uint8Array(buf);
+                    const header = "KANITOPHOTOS";
+                    let isScrambled = true;
+                    for (let i = 0; i < header.length; i++) {
+                        if (bytes[i] !== header.charCodeAt(i)) { isScrambled = false; break; }
+                    }
+                    let clean;
+                    if (isScrambled) {
+                        clean = new Uint8Array(bytes.length - 16);
+                        for (let i = 0; i < clean.length; i++) {
+                            const k = 0xAA ^ ((i * 31) & 0xFF);
+                            clean[i] = bytes[i + 16] ^ k;
+                        }
+                    } else {
+                        clean = bytes;
+                    }
+                    return URL.createObjectURL(new Blob([clean], { type: 'image/webp' }));
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            async function initSlideshow() {
+                const slideA = document.getElementById('hub-slide-a');
+                const slideB = document.getElementById('hub-slide-b');
+                if (!slideA || !slideB) return;
+
+                const loaded = [];
+                for (const p of photos) {
+                    const blobUrl = await unscrambleUrl(p);
+                    if (blobUrl) loaded.push(blobUrl);
+                }
+                if (loaded.length === 0) return;
+
+                slideA.src = loaded[0];
+                slideA.classList.add('is-active');
+
+                if (loaded.length === 1) return;
+
+                let idx = 0;
+                let onA = true;
+                setInterval(() => {
+                    idx = (idx + 1) % loaded.length;
+                    const nextSrc = loaded[idx];
+                    if (onA) {
+                        slideB.src = nextSrc;
+                        slideB.onload = () => {
+                            slideB.classList.add('is-active');
+                            slideA.classList.remove('is-active');
+                            onA = false;
+                        };
+                    } else {
+                        slideA.src = nextSrc;
+                        slideA.onload = () => {
+                            slideA.classList.add('is-active');
+                            slideB.classList.remove('is-active');
+                            onA = true;
+                        };
+                    }
+                }, 3800);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSlideshow);
+            } else {
+                initSlideshow();
+            }
+        })();
+        </script>
     `;
 
     const indexJsonLd = {
@@ -287,17 +469,20 @@ async function build() {
         "@type": "WebSite",
         "name": "Kanito",
         "url": DOMAIN,
-        "description": "Hardware engineering, embedded systems prototyping, and curated monochrome architectural photography by Silas Hörz."
+        "description": "Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components."
     };
 
-    let finalIndex = TEMPLATE
-        .replace(/{{TITLE}}/g, 'Kanito | Engineering & Fine-Art Photography')
-        .replace(/{{DESCRIPTION}}/g, 'Hardware engineering, embedded systems prototyping, and curated architectural photography by Silas Hörz.')
-        .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
-        .replace(/{{URL}}/g, `${DOMAIN}/`)
-        .replace(/{{YEAR}}/g, YEAR)
-        .replace('{{JSON_LD}}', `<script type="application/ld+json">\n${JSON.stringify(indexJsonLd)}\n</script>`)
-        .replace('{{CONTENT}}', landingContent);
+    let finalIndex = renderTemplate(TEMPLATE, {
+        title: 'Kanito | Engineering & Photography',
+        description: 'Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components.',
+        image: `${DOMAIN}/logo.png`,
+        url: `${DOMAIN}/`,
+        year: YEAR,
+        jsonLd: `<script type="application/ld+json">\n${JSON.stringify(indexJsonLd)}\n</script>`,
+        content: landingContent,
+        themeStyles: LANDING_THEME_STYLES,
+        shaderPalette: LANDING_SHADER_PALETTE
+    });
 
     await fs.writeFile('dist/index.html', finalIndex);
     console.log('Generated Minimalist Landing Page (dist/index.html)');
