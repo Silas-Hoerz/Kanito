@@ -219,14 +219,14 @@
     },
     {
       "id": "photo-mul7f8x8-8mcp",
-      "title": "Meßstetten Milkyway",
+      "title": "Witness to the Night Sky",
       "photographer": "Silas",
       "instagram": "@silas.ah",
       "description": "",
       "location_name": "Meßstetten",
-      "has_location": true,
-      "latitude": 48.1836,
-      "longitude": 8.9469,
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
       "frame": "none",
       "frame_width": null,
       "year": "2026",
@@ -259,7 +259,9 @@
           "width": 1707,
           "height": 2560,
           "aspect_ratio": 0.6668,
+          "camera": "Sony A6000",
           "lens": "----",
+          "focal_length": "12mm",
           "shutter": "25s",
           "iso": "1000"
         }
