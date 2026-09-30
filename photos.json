@@ -274,7 +274,7 @@
       "title": "Meßstetten Milkyway",
       "photographer": "Silas",
       "instagram": "@silas.ah",
-      "description": "Meßstetten Milkyway",
+      "description": "",
       "location_name": "Meßstetten",
       "has_location": true,
       "latitude": 48.1836,
@@ -303,9 +303,17 @@
           "camera": "Sony A6000",
           "lens": "Samyang F2.0 12mm",
           "focal_length": "12mm",
-          "aperture": "",
           "shutter": "25s",
           "iso": "400"
+        },
+        {
+          "filename": "photo-muo6rw0y-3eza.bin",
+          "width": 1707,
+          "height": 2560,
+          "aspect_ratio": 0.6668,
+          "lens": "----",
+          "shutter": "25s",
+          "iso": "1000"
         }
       ]
     }
