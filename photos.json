@@ -182,7 +182,7 @@
       "has_location": false,
       "latitude": null,
       "longitude": null,
-      "frame": "none",
+      "frame": "white",
       "frame_width": null,
       "year": "2026",
       "date": "2026-09-28",
@@ -206,7 +206,6 @@
           "camera": "Sony A6000",
           "lens": "Samyang F2.0 12mm",
           "focal_length": "12mm",
-          "aperture": "",
           "shutter": "6s",
           "iso": "100"
         }
