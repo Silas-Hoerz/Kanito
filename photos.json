@@ -6,6 +6,52 @@
   },
   "photos": [
     {
+      "id": "photo-muo756y6-ytua",
+      "title": "Peak",
+      "photographer": "Silas",
+      "instagram": "@silas.ah",
+      "description": "",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-09-30",
+      "camera": "Sony A6000",
+      "lens": "Samyang F2.0 12mm",
+      "focal_length": "12mm",
+      "aperture": "",
+      "shutter": "1/2500s",
+      "iso": "100",
+      "filename": "photo-muo756y6-ytua.bin",
+      "width": 1707,
+      "height": 2560,
+      "aspect_ratio": 0.6668,
+      "images": [
+        {
+          "filename": "photo-muo756y6-ytua.bin",
+          "width": 1707,
+          "height": 2560,
+          "aspect_ratio": 0.6668,
+          "lens": "----",
+          "shutter": "1/2500s",
+          "iso": "100"
+        },
+        {
+          "filename": "photo-muo759b5-gwbn.bin",
+          "width": 1707,
+          "height": 2560,
+          "aspect_ratio": 0.6668,
+          "lens": "----",
+          "shutter": "1/60s",
+          "iso": "160"
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-muo727vt-umps",
       "title": "Sunset",
       "photographer": "Silas",
