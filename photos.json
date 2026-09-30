@@ -1,7 +1,7 @@
 {
   "settings": {
     "show_likes": true,
-    "default_frame": "none",
+    "default_frame": "white",
     "frame_width": 8
   },
   "photos": [
