@@ -29,7 +29,33 @@
       "height": 1706,
       "aspect_ratio": 1.5006,
       "filename": "photo-mulexw9o-lqy7.bin",
-      "likes": 0
+      "likes": 0,
+      "images": [
+        {
+          "filename": "photo-mulexw9o-lqy7.bin",
+          "width": 2560,
+          "height": 1706,
+          "aspect_ratio": 1.5006,
+          "camera": "Sony A6000",
+          "lens": "Viltrox 35mm F1.7 E",
+          "focal_length": "35mm",
+          "aperture": "f/1.7",
+          "shutter": "1/640s",
+          "iso": "100"
+        },
+        {
+          "filename": "e4c8b211-923f-42a1-893c-2384a561109a.bin",
+          "width": 1264,
+          "height": 848,
+          "aspect_ratio": 1.4906,
+          "camera": "Sony A6000",
+          "lens": "Viltrox 35mm F1.7 E",
+          "focal_length": "35mm",
+          "aperture": "f/2.8",
+          "shutter": "1/500s",
+          "iso": "100"
+        }
+      ]
     },
     {
       "id": "photo-muleryyf-rvkm",
@@ -55,7 +81,21 @@
       "height": 2560,
       "aspect_ratio": 0.6668,
       "filename": "photo-muleryyf-rvkm.bin",
-      "likes": 0
+      "likes": 0,
+      "images": [
+        {
+          "filename": "photo-muleryyf-rvkm.bin",
+          "width": 1707,
+          "height": 2560,
+          "aspect_ratio": 0.6668,
+          "camera": "Sony A6000",
+          "lens": "Samyang F2.0 12mm",
+          "focal_length": "12mm",
+          "aperture": "",
+          "shutter": "1/200s",
+          "iso": "100"
+        }
+      ]
     },
     {
       "id": "photo-mulenklh-3p60",
@@ -81,7 +121,21 @@
       "height": 2560,
       "aspect_ratio": 0.6668,
       "filename": "photo-mulenklh-3p60.bin",
-      "likes": 0
+      "likes": 0,
+      "images": [
+        {
+          "filename": "photo-mulenklh-3p60.bin",
+          "width": 1707,
+          "height": 2560,
+          "aspect_ratio": 0.6668,
+          "camera": "Sony A6000",
+          "lens": "Samyang F2.0 12mm",
+          "focal_length": "12mm",
+          "aperture": "",
+          "shutter": "6s",
+          "iso": "100"
+        }
+      ]
     },
     {
       "id": "photo-mule420o-j4hx",
@@ -107,7 +161,21 @@
       "height": 1707,
       "aspect_ratio": 1.4997,
       "filename": "photo-mule420o-j4hx.bin",
-      "likes": 0
+      "likes": 0,
+      "images": [
+        {
+          "filename": "photo-mule420o-j4hx.bin",
+          "width": 2560,
+          "height": 1707,
+          "aspect_ratio": 1.4997,
+          "camera": "Sony A6000",
+          "lens": "Viltrox 35mm F1.7 E",
+          "focal_length": "35mm",
+          "aperture": "f/3.5",
+          "shutter": "1/60s",
+          "iso": "500"
+        }
+      ]
     },
     {
       "id": "photo-mule1341-t8oc",
@@ -133,7 +201,21 @@
       "height": 1707,
       "aspect_ratio": 1.4997,
       "filename": "photo-mule1341-t8oc.bin",
-      "likes": 0
+      "likes": 0,
+      "images": [
+        {
+          "filename": "photo-mule1341-t8oc.bin",
+          "width": 2560,
+          "height": 1707,
+          "aspect_ratio": 1.4997,
+          "camera": "",
+          "lens": "----",
+          "focal_length": "",
+          "aperture": "",
+          "shutter": "30s",
+          "iso": "100"
+        }
+      ]
     },
     {
       "id": "photo-muldrffc-oowt",
@@ -159,7 +241,33 @@
       "height": 2560,
       "aspect_ratio": 0.6668,
       "filename": "photo-muldrffc-oowt.bin",
-      "likes": 0
+      "likes": 0,
+      "images": [
+        {
+          "filename": "photo-muldrffc-oowt.bin",
+          "width": 1707,
+          "height": 2560,
+          "aspect_ratio": 0.6668,
+          "camera": "Sony A6000",
+          "lens": "Samyang F2.0 12mm",
+          "focal_length": "12mm",
+          "aperture": "",
+          "shutter": "25s",
+          "iso": "1000"
+        },
+        {
+          "filename": "f1b9a842-12ef-41c8-a477-984210e74c82.bin",
+          "width": 848,
+          "height": 1264,
+          "aspect_ratio": 0.6709,
+          "camera": "Sony A6000",
+          "lens": "Samyang F2.0 12mm",
+          "focal_length": "12mm",
+          "aperture": "",
+          "shutter": "20s",
+          "iso": "1250"
+        }
+      ]
     },
     {
       "id": "photo-mul7f8x8-8mcp",
@@ -185,7 +293,21 @@
       "height": 2560,
       "aspect_ratio": 0.6668,
       "filename": "photo-mul7f8x8-8mcp.bin",
-      "likes": 0
+      "likes": 0,
+      "images": [
+        {
+          "filename": "photo-mul7f8x8-8mcp.bin",
+          "width": 1707,
+          "height": 2560,
+          "aspect_ratio": 0.6668,
+          "camera": "Sony A6000",
+          "lens": "Samyang F2.0 12mm",
+          "focal_length": "12mm",
+          "aperture": "",
+          "shutter": "25s",
+          "iso": "400"
+        }
+      ]
     }
   ]
 }

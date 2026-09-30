@@ -513,6 +513,144 @@
             flex-wrap: wrap;
         }
 
+        /* Stack Manager in Curator Studio */
+        .stack-items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .stack-item-card {
+            position: relative;
+            background: rgba(18, 18, 22, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+        }
+
+        .stack-item-card:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+        }
+
+        .stack-item-card.is-hero {
+            border-color: #ffffff;
+            box-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
+        }
+
+        .stack-thumb-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #09090b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .stack-thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .stack-hero-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: #ffffff;
+            color: #000000;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 3px;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .stack-order-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stack-item-details {
+            padding: 9px;
+            font-size: 11px;
+            color: var(--muted);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background: rgba(12, 12, 16, 0.85);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stack-item-name {
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .stack-item-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
+            margin-top: 3px;
+        }
+
+        .stack-btn-mini {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            font-size: 11px;
+            padding: 3px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: var(--font-mono);
+        }
+
+        .stack-btn-mini:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: #ffffff;
+        }
+
+        .stack-btn-mini:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+
+        .stack-btn-danger {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.35);
+        }
+
+        .stack-btn-danger:hover {
+            background: rgba(255, 107, 107, 0.25) !important;
+            border-color: #ff6b6b !important;
+        }
+
         @media (max-width: 768px) {
             header {
                 padding: 1.2rem 1rem;
@@ -619,9 +757,25 @@
                 </div>
 
                 <div class="file-drop" id="file-drop">
-                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display:none;">
-                    <div id="drop-label">📁 Drag &amp; drop image here or click to browse (JPEG, PNG, WebP)</div>
-                    <img id="preview-thumb" style="display:none;" alt="Preview">
+                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" multiple style="display:none;">
+                    <div id="drop-label">📁 Drag &amp; drop photo(s) here or click to browse (upload multiple files to build a stack)</div>
+                </div>
+
+                <!-- Interactive Stack Manager -->
+                <div id="stack-manager-section" style="display:none; margin-top:1.25rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+                        <label style="font-weight:600; font-size:13px; color:#ffffff; margin:0; display:flex; align-items:center; gap:6px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="7" y="7" width="14" height="14" rx="2" ry="2"></rect>
+                                <path d="M3 17V5a2 2 0 0 1 2-2h12"></path>
+                            </svg>
+                            Photo Stack (<span id="stack-count-label">0</span>)
+                        </label>
+                        <button type="button" id="stack-add-more-btn" style="padding:0.4rem 0.85rem; font-size:11px; background:rgba(255,255,255,0.08); border:1px dashed rgba(255,255,255,0.35); border-radius:4px; color:#fff; cursor:pointer;">
+                            + Add more photos to stack
+                        </button>
+                    </div>
+                    <div id="stack-items-grid" class="stack-items-grid"></div>
                 </div>
 
                 <div id="form-fields" style="display:none;">
@@ -807,8 +961,9 @@
             const fileDrop = document.getElementById('file-drop');
             const fileInput = document.getElementById('file-input');
             const dropLabel = document.getElementById('drop-label');
-            const previewThumb = document.getElementById('preview-thumb');
             const formFields = document.getElementById('form-fields');
+            const stackAddMoreBtn = document.getElementById('stack-add-more-btn');
+            let currentStackItems = [];
 
             const inputTitle = document.getElementById('input-title');
             const inputPhotographer = document.getElementById('input-photographer');
@@ -827,16 +982,17 @@
             function updatePreviewFrame() {
                 const f = inputFrame.value === 'default' ? (currentSettings.default_frame || 'none') : inputFrame.value;
                 const w = inputFrameWidth.value ? parseInt(inputFrameWidth.value, 10) : (currentSettings.frame_width || 16);
-                previewThumb.style.boxSizing = 'border-box';
-                if (f === 'white') {
-                    previewThumb.style.border = `${w}px solid #ffffff`;
-                    previewThumb.style.outline = 'none';
-                } else if (f === 'black') {
-                    previewThumb.style.border = `${w}px solid #000000`;
-                    previewThumb.style.outline = '1px solid rgba(255, 255, 255, 0.2)';
-                } else {
-                    previewThumb.style.border = 'none';
-                    previewThumb.style.outline = 'none';
+                const heroWrap = document.querySelector('.stack-item-card.is-hero .stack-thumb-wrap');
+                if (heroWrap) {
+                    if (f === 'white') {
+                        heroWrap.style.border = `${Math.min(w, 8)}px solid #ffffff`;
+                        heroWrap.style.boxSizing = 'border-box';
+                    } else if (f === 'black') {
+                        heroWrap.style.border = `${Math.min(w, 8)}px solid #000000`;
+                        heroWrap.style.boxSizing = 'border-box';
+                    } else {
+                        heroWrap.style.border = 'none';
+                    }
                 }
             }
 
@@ -1012,58 +1168,237 @@
                 if (pickerMarker) pickerMarker.setLatLng([parseFloat(inputLat.value), parseFloat(inputLng.value)]);
             });
 
-            // File selection
-            fileDrop.addEventListener('click', () => fileInput.click());
+            // File selection & Stack Dropzone
+            fileDrop.addEventListener('click', (e) => {
+                if (e.target.closest('#stack-manager-section') || e.target.closest('button')) return;
+                fileInput.click();
+            });
             fileDrop.addEventListener('dragover', (e) => e.preventDefault());
             fileDrop.addEventListener('drop', (e) => {
                 e.preventDefault();
-                if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+                if (e.dataTransfer.files && e.dataTransfer.files.length) {
+                    handleFiles(Array.from(e.dataTransfer.files));
+                }
             });
             fileInput.addEventListener('change', () => {
-                if (fileInput.files.length) handleFile(fileInput.files[0]);
+                if (fileInput.files && fileInput.files.length) {
+                    handleFiles(Array.from(fileInput.files));
+                }
+                fileInput.value = '';
             });
 
-            async function handleFile(file) {
-                selectedFile = file;
-                previewThumb.src = URL.createObjectURL(file);
-                previewThumb.style.display = 'block';
-                dropLabel.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                formFields.style.display = 'block';
+            if (stackAddMoreBtn) {
+                stackAddMoreBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+            }
 
-                if (!editingPhotoId) {
-                    inputTitle.value = file.name.replace(/\.[^/.]+$/, '').toUpperCase();
-                }
+            async function handleFiles(files) {
+                const imageFiles = files.filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp)$/i.test(f.name));
+                if (imageFiles.length === 0) return alert('Please select valid image files (JPEG, PNG, WebP).');
 
-                try {
-                    const exif = await exifr.parse(file, { tiff: true, exif: true, gps: true }) || {};
-                    if (exif.Make || exif.Model) inputCamera.value = `${exif.Make || ''} ${exif.Model || ''}`.trim();
-                    if (exif.LensModel) inputLens.value = exif.LensModel;
-                    if (exif.FocalLength) inputFocal.value = exif.FocalLength + 'mm';
-                    if (exif.FNumber) inputAperture.value = 'f/' + exif.FNumber;
-                    if (exif.ExposureTime) inputShutter.value = exif.ExposureTime < 1 ? `1/${Math.round(1 / exif.ExposureTime)}s` : `${exif.ExposureTime}s`;
-                    if (exif.ISO) inputIso.value = exif.ISO;
+                const wasEmpty = currentStackItems.length === 0;
 
-                    if (exif.latitude != null && exif.longitude != null && !isNaN(exif.latitude) && !isNaN(exif.longitude)) {
-                        inputLat.value = Number(exif.latitude).toFixed(4);
-                        inputLng.value = Number(exif.longitude).toFixed(4);
-                        inputHasLocation.checked = true;
-                        locationFieldsWrap.style.display = 'block';
-                        if (!inputLocName.value) inputLocName.value = 'GPS Location';
-                        setTimeout(() => initPickerMap(exif.latitude, exif.longitude), 100);
-                    } else {
-                        inputLat.value = '';
-                        inputLng.value = '';
-                        inputHasLocation.checked = false;
-                        locationFieldsWrap.style.display = 'none';
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const file = imageFiles[i];
+                    const blobUrl = URL.createObjectURL(file);
+
+                    let fileCamera = '', fileLens = '', fileFocal = '', fileAperture = '', fileShutter = '', fileIso = '';
+                    let fileLat = null, fileLng = null;
+                    try {
+                        const exif = await exifr.parse(file, { tiff: true, exif: true, gps: true }) || {};
+                        if (exif.Make || exif.Model) fileCamera = `${exif.Make || ''} ${exif.Model || ''}`.trim();
+                        if (exif.LensModel) fileLens = exif.LensModel;
+                        if (exif.FocalLength) fileFocal = exif.FocalLength + 'mm';
+                        if (exif.FNumber) fileAperture = 'f/' + exif.FNumber;
+                        if (exif.ExposureTime) fileShutter = exif.ExposureTime < 1 ? `1/${Math.round(1 / exif.ExposureTime)}s` : `${exif.ExposureTime}s`;
+                        if (exif.ISO) fileIso = exif.ISO.toString();
+                        if (exif.latitude != null && exif.longitude != null && !isNaN(exif.latitude) && !isNaN(exif.longitude)) {
+                            fileLat = Number(exif.latitude);
+                            fileLng = Number(exif.longitude);
+                        }
+                    } catch (e) { }
+
+                    const item = {
+                        id: 'new-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 7),
+                        type: 'new',
+                        file: file,
+                        filename: null,
+                        width: null,
+                        height: null,
+                        aspect_ratio: null,
+                        previewUrl: blobUrl,
+                        name: file.name,
+                        sizeStr: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+                        camera: fileCamera,
+                        lens: fileLens,
+                        focal_length: fileFocal,
+                        aperture: fileAperture,
+                        shutter: fileShutter,
+                        iso: fileIso,
+                        lat: fileLat,
+                        lng: fileLng
+                    };
+
+                    currentStackItems.push(item);
+
+                    // If form was empty, auto-fill metadata from first file
+                    if (wasEmpty && i === 0 && !editingPhotoId) {
+                        inputTitle.value = file.name.replace(/\.[^/.]+$/, '').toUpperCase();
+                        if (fileCamera) inputCamera.value = fileCamera;
+                        if (fileLens) inputLens.value = fileLens;
+                        if (fileFocal) inputFocal.value = fileFocal;
+                        if (fileAperture) inputAperture.value = fileAperture;
+                        if (fileShutter) inputShutter.value = fileShutter;
+                        if (fileIso) inputIso.value = fileIso;
+
+                        if (fileLat != null && fileLng != null) {
+                            inputLat.value = fileLat.toFixed(4);
+                            inputLng.value = fileLng.toFixed(4);
+                            inputHasLocation.checked = true;
+                            locationFieldsWrap.style.display = 'block';
+                            if (!inputLocName.value) inputLocName.value = 'GPS Location';
+                            setTimeout(() => initPickerMap(fileLat, fileLng), 100);
+                        }
                     }
-                    updatePreviewFrame();
-                } catch (e) {
-                    inputLat.value = '';
-                    inputLng.value = '';
-                    inputHasLocation.checked = false;
-                    locationFieldsWrap.style.display = 'none';
-                    updatePreviewFrame();
                 }
+
+                renderStackManagerUI();
+                formFields.style.display = 'block';
+                updatePreviewFrame();
+            }
+
+            function renderStackManagerUI() {
+                const stackSection = document.getElementById('stack-manager-section');
+                const stackGrid = document.getElementById('stack-items-grid');
+                const stackCountLabel = document.getElementById('stack-count-label');
+
+                if (!stackSection || !stackGrid) return;
+
+                if (currentStackItems.length === 0) {
+                    stackSection.style.display = 'none';
+                    dropLabel.textContent = editingPhotoId
+                        ? '📁 Drag & drop photo(s) here or click to add photos to this stack'
+                        : '📁 Drag & drop photo(s) here or click to browse (upload multiple files to build a stack)';
+                    return;
+                }
+
+                stackSection.style.display = 'block';
+                stackCountLabel.textContent = `${currentStackItems.length} photo${currentStackItems.length === 1 ? '' : 's'}`;
+                dropLabel.textContent = `📁 Drop more photos here or click to add (Current stack: ${currentStackItems.length} photos)`;
+
+                stackGrid.innerHTML = '';
+
+                currentStackItems.forEach((item, index) => {
+                    const isHero = (index === 0);
+                    const card = document.createElement('div');
+                    card.className = `stack-item-card ${isHero ? 'is-hero' : ''}`;
+                    card.dataset.id = item.id;
+
+                    const heroTag = isHero
+                        ? `<div class="stack-hero-badge">⭐ HERO (Cover)</div>`
+                        : `<div class="stack-order-badge">#${index + 1}</div>`;
+
+                    const moveLeftBtn = index > 0
+                        ? `<button type="button" class="stack-btn-mini move-left-btn" data-idx="${index}" title="Move earlier in stack sequence">◀</button>`
+                        : `<button type="button" class="stack-btn-mini" disabled>◀</button>`;
+
+                    const moveRightBtn = index < currentStackItems.length - 1
+                        ? `<button type="button" class="stack-btn-mini move-right-btn" data-idx="${index}" title="Move later in stack sequence">▶</button>`
+                        : `<button type="button" class="stack-btn-mini" disabled>▶</button>`;
+
+                    const makeHeroBtn = !isHero
+                        ? `<button type="button" class="stack-btn-mini hero-btn" data-idx="${index}" title="Set as Hero cover photo">⭐ Hero</button>`
+                        : '';
+
+                    const removeBtn = `<button type="button" class="stack-btn-mini stack-btn-danger remove-item-btn" data-idx="${index}" title="Remove photo from stack">✕ Remove</button>`;
+
+                    const thumbSrc = item.previewUrl || '';
+                    const imgTag = thumbSrc
+                        ? `<img src="${thumbSrc}" class="stack-thumb-img" alt="Photo ${index + 1}">`
+                        : `<div style="color:var(--muted); font-size:11px; text-align:center; padding:12px; font-family:var(--font-mono);">Decrypting preview...</div>`;
+
+                    card.innerHTML = `
+                        <div class="stack-thumb-wrap">
+                            ${imgTag}
+                            ${heroTag}
+                        </div>
+                        <div class="stack-item-details">
+                            <div class="stack-item-name" title="${item.name || item.filename || ''}">${item.name || item.filename || 'Photo'}</div>
+                            <div style="font-size:10px; color:var(--muted); display:flex; justify-content:space-between;">
+                                <span>${item.type === 'existing' ? 'Synced Asset' : 'New Upload'}</span>
+                                <span>${item.sizeStr || ''}</span>
+                            </div>
+                            <div class="stack-item-actions">
+                                <div style="display:flex; gap:3px;">
+                                    ${moveLeftBtn}
+                                    ${moveRightBtn}
+                                    ${makeHeroBtn}
+                                </div>
+                                ${removeBtn}
+                            </div>
+                        </div>
+                    `;
+
+                    stackGrid.appendChild(card);
+                });
+
+                // Attach stack item actions
+                stackGrid.querySelectorAll('.move-left-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(btn.dataset.idx, 10);
+                        if (idx > 0) {
+                            const tmp = currentStackItems.splice(idx, 1)[0];
+                            currentStackItems.splice(idx - 1, 0, tmp);
+                            renderStackManagerUI();
+                            updatePreviewFrame();
+                        }
+                    });
+                });
+
+                stackGrid.querySelectorAll('.move-right-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(btn.dataset.idx, 10);
+                        if (idx < currentStackItems.length - 1) {
+                            const tmp = currentStackItems.splice(idx, 1)[0];
+                            currentStackItems.splice(idx + 1, 0, tmp);
+                            renderStackManagerUI();
+                            updatePreviewFrame();
+                        }
+                    });
+                });
+
+                stackGrid.querySelectorAll('.hero-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(btn.dataset.idx, 10);
+                        if (idx > 0) {
+                            const tmp = currentStackItems.splice(idx, 1)[0];
+                            currentStackItems.unshift(tmp);
+                            renderStackManagerUI();
+                            updatePreviewFrame();
+                        }
+                    });
+                });
+
+                stackGrid.querySelectorAll('.remove-item-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(btn.dataset.idx, 10);
+                        if (currentStackItems.length <= 1) {
+                            if (!confirm('This is the only photo in this stack. Removing it will reset the form. Proceed?')) return;
+                            currentStackItems = [];
+                            cancelEdit();
+                            return;
+                        }
+                        currentStackItems.splice(idx, 1);
+                        renderStackManagerUI();
+                        updatePreviewFrame();
+                    });
+                });
             }
 
             // Binary Scrambler
@@ -1083,6 +1418,34 @@
                 let bin = '';
                 for (let i = 0; i < u8.byteLength; i++) bin += String.fromCharCode(u8[i]);
                 return window.btoa(bin);
+            }
+
+            async function fetchDecryptedBlobUrl(filename) {
+                try {
+                    const res = await fetch('/photos/data/' + filename);
+                    if (!res.ok) return null;
+                    const ab = await res.arrayBuffer();
+                    const bytes = new Uint8Array(ab);
+                    const header = "KANITOPHOTOS";
+                    let isScrambled = true;
+                    for (let i = 0; i < header.length; i++) {
+                        if (bytes[i] !== header.charCodeAt(i)) { isScrambled = false; break; }
+                    }
+                    let cleanBytes;
+                    if (isScrambled) {
+                        cleanBytes = new Uint8Array(bytes.length - 16);
+                        for (let i = 0; i < cleanBytes.length; i++) {
+                            const k = 0xAA ^ ((i * 31) & 0xFF);
+                            cleanBytes[i] = bytes[16 + i] ^ k;
+                        }
+                    } else {
+                        cleanBytes = bytes;
+                    }
+                    const blob = new Blob([cleanBytes], { type: 'image/webp' });
+                    return URL.createObjectURL(blob);
+                } catch (e) {
+                    return null;
+                }
             }
 
             // --- GLOBAL SETTINGS SAVE ---
@@ -1149,15 +1512,49 @@
                 if (!photo) return;
 
                 editingPhotoId = photoId;
-                selectedFile = null;
                 fileInput.value = '';
+
+                // Extract all images in stack
+                const images = (photo.images && photo.images.length > 0)
+                    ? photo.images
+                    : [{
+                        filename: photo.filename,
+                        width: photo.width,
+                        height: photo.height,
+                        aspect_ratio: photo.aspect_ratio,
+                        camera: photo.camera,
+                        lens: photo.lens,
+                        focal_length: photo.focal_length,
+                        aperture: photo.aperture,
+                        shutter: photo.shutter,
+                        iso: photo.iso
+                    }];
+
+                currentStackItems = images.map((img, i) => ({
+                    id: 'existing-' + i + '-' + Math.random().toString(36).substring(2, 6),
+                    type: 'existing',
+                    file: null,
+                    filename: img.filename,
+                    width: img.width,
+                    height: img.height,
+                    aspect_ratio: img.aspect_ratio,
+                    previewUrl: null,
+                    name: img.filename,
+                    sizeStr: `${img.width}×${img.height}`,
+                    camera: img.camera || photo.camera || '',
+                    lens: img.lens || photo.lens || '',
+                    focal_length: img.focal_length || photo.focal_length || '',
+                    aperture: img.aperture || photo.aperture || '',
+                    shutter: img.shutter || photo.shutter || '',
+                    iso: img.iso || photo.iso || ''
+                }));
 
                 // Update UI state to Edit mode
                 formHeadingText.textContent = `Edit Photo Details`;
                 editModeBanner.style.display = 'flex';
                 editingPhotoTitle.textContent = photo.title;
                 editingPhotoIdSpan.textContent = `(ID: ${photo.id})`;
-                publishBtn.textContent = `💾 Update Photo Details & Publish to GitHub`;
+                publishBtn.textContent = `💾 Update Photo Stack & Publish to GitHub`;
 
                 // Fill form fields
                 inputTitle.value = photo.title || '';
@@ -1174,7 +1571,6 @@
 
                 inputFrame.value = photo.frame || 'default';
                 inputFrameWidth.value = photo.frame_width != null ? photo.frame_width : '';
-                updatePreviewFrame();
 
                 inputCamera.value = photo.camera || '';
                 inputLens.value = photo.lens || '';
@@ -1185,56 +1581,45 @@
 
                 formFields.style.display = 'block';
 
-                dropLabel.textContent = `Current asset: ${photo.filename} (Optional: drop new image to replace file)`;
-                previewThumb.style.display = 'none';
+                renderStackManagerUI();
 
-                // Try to load preview of existing scrambled photo
-                fetchExistingAssetPreview(photo.filename);
+                // Load preview thumbnails for all existing photos in stack
+                currentStackItems.forEach(async (item, itemIdx) => {
+                    const url = await fetchDecryptedBlobUrl(item.filename);
+                    if (url) {
+                        item.previewUrl = url;
+                        const cardImg = document.querySelector(`.stack-item-card[data-id="${item.id}"] img`);
+                        if (cardImg) {
+                            cardImg.src = url;
+                        } else {
+                            const wrap = document.querySelector(`.stack-item-card[data-id="${item.id}"] .stack-thumb-wrap`);
+                            if (wrap) {
+                                const isHero = (item.id === currentStackItems[0].id);
+                                wrap.innerHTML = `<img src="${url}" class="stack-thumb-img" alt="Photo"><div class="${isHero ? 'stack-hero-badge' : 'stack-order-badge'}">${isHero ? '⭐ HERO (Cover)' : '#' + (itemIdx + 1)}</div>`;
+                            }
+                        }
+                    }
+                });
 
                 setTimeout(() => {
                     if (hasLoc) initPickerMap(photo.latitude, photo.longitude);
                 }, 100);
 
                 document.getElementById('photo-form-card').scrollIntoView({ behavior: 'smooth' });
-            }
-
-            async function fetchExistingAssetPreview(filename) {
-                try {
-                    const res = await fetch('/photos/data/' + filename);
-                    if (!res.ok) return;
-                    const ab = await res.arrayBuffer();
-                    const bytes = new Uint8Array(ab);
-                    const header = "KANITOPHOTOS";
-                    let isScrambled = true;
-                    for (let i = 0; i < header.length; i++) {
-                        if (bytes[i] !== header.charCodeAt(i)) { isScrambled = false; break; }
-                    }
-                    let cleanBytes;
-                    if (isScrambled) {
-                        cleanBytes = new Uint8Array(bytes.length - 16);
-                        for (let i = 0; i < cleanBytes.length; i++) {
-                            const k = 0xAA ^ ((i * 31) & 0xFF);
-                            cleanBytes[i] = bytes[16 + i] ^ k;
-                        }
-                    } else {
-                        cleanBytes = bytes;
-                    }
-                    const blob = new Blob([cleanBytes], { type: 'image/webp' });
-                    previewThumb.src = URL.createObjectURL(blob);
-                    previewThumb.style.display = 'block';
-                } catch (e) { }
+                updatePreviewFrame();
             }
 
             function cancelEdit() {
                 editingPhotoId = null;
-                selectedFile = null;
+                currentStackItems = [];
                 fileInput.value = '';
 
                 formHeadingText.textContent = `3. Add New Photo`;
                 editModeBanner.style.display = 'none';
-                publishBtn.textContent = `🔒 Encrypt Image & Publish to GitHub`;
-                dropLabel.textContent = `📁 Drag & drop image here or click to browse (JPEG, PNG, WebP)`;
-                previewThumb.style.display = 'none';
+                publishBtn.textContent = `🔒 Encrypt & Publish to GitHub`;
+                dropLabel.textContent = `📁 Drag & drop photo(s) here or click to browse (upload multiple files to build a stack)`;
+                const stackSection = document.getElementById('stack-manager-section');
+                if (stackSection) stackSection.style.display = 'none';
                 formFields.style.display = 'none';
                 statusBox.classList.remove('show');
 
@@ -1254,46 +1639,36 @@
                 inputAperture.value = '';
                 inputShutter.value = '';
                 inputIso.value = '';
-                updatePreviewFrame();
             }
 
             cancelEditBtn.addEventListener('click', cancelEdit);
 
-            // --- PUBLISH (CREATE OR EDIT) ---
+            // --- PUBLISH (CREATE OR EDIT STACK) ---
             publishBtn.addEventListener('click', async () => {
                 if (!token) return alert('Please enter and save your GitHub Personal Access Token above first.');
 
-                if (!editingPhotoId && !selectedFile) {
-                    return alert('Please select an image file to upload.');
+                if (currentStackItems.length === 0) {
+                    return alert('Please select at least one photo for the stack.');
                 }
 
                 publishBtn.disabled = true;
 
                 try {
-                    let w = null;
-                    let h = null;
-                    let binFilename = null;
+                    const newItems = currentStackItems.filter(item => item.type === 'new');
 
-                    if (editingPhotoId) {
-                        const existingPhoto = currentCatalog.find(p => p.id === editingPhotoId);
-                        if (!existingPhoto) throw new Error('Existing photo not found in local catalog.');
-                        w = existingPhoto.width;
-                        h = existingPhoto.height;
-                        binFilename = existingPhoto.filename;
-                    }
-
-                    // 1. Process & Upload binary file if a new file is provided
-                    if (selectedFile) {
-                        setStatus('⏳ 1/3: Scaling and encrypting image asset...');
+                    // 1. Process & Upload any newly added files
+                    for (let i = 0; i < newItems.length; i++) {
+                        const item = newItems[i];
+                        setStatus(`⏳ ${i + 1}/${newItems.length}: Scaling and encrypting "${item.name}"...`);
 
                         const img = new Image();
-                        img.src = previewThumb.src;
+                        img.src = item.previewUrl;
                         await new Promise(r => img.onload = r);
 
                         const canvas = document.createElement('canvas');
                         const maxDim = 2560;
-                        w = img.naturalWidth;
-                        h = img.naturalHeight;
+                        let w = img.naturalWidth;
+                        let h = img.naturalHeight;
                         if (w > maxDim || h > maxDim) {
                             if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
                             else { w = Math.round((w * maxDim) / h); h = maxDim; }
@@ -1308,26 +1683,10 @@
                         const scrambled = scramble(ab);
                         const base64 = toBase64(scrambled);
 
-                        if (!binFilename) {
-                            const newId = 'photo-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6);
-                            binFilename = newId + '.bin';
-                        }
+                        const newBinId = 'photo-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6);
+                        const binFilename = newBinId + '.bin';
 
-                        setStatus('⏳ 2/3: Uploading encrypted .bin asset to GitHub...');
-
-                        // Fetch existing file SHA if overwriting existing bin
-                        let existingSha = undefined;
-                        if (editingPhotoId) {
-                            try {
-                                const checkRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/photos/data/${binFilename}`, {
-                                    headers: { 'Authorization': 'Bearer ' + token }
-                                });
-                                if (checkRes.ok) {
-                                    const checkData = await checkRes.json();
-                                    existingSha = checkData.sha;
-                                }
-                            } catch (e) { }
-                        }
+                        setStatus(`⏳ Uploading photo ${i + 1}/${newItems.length} (${binFilename}) to GitHub...`);
 
                         const binRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/photos/data/${binFilename}`, {
                             method: 'PUT',
@@ -1336,9 +1695,8 @@
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                message: `Upload photo asset ${binFilename}`,
-                                content: base64,
-                                ...(existingSha ? { sha: existingSha } : {})
+                                message: `Upload photo stack asset ${binFilename}`,
+                                content: base64
                             })
                         });
 
@@ -1346,10 +1704,32 @@
                             const err = await binRes.json();
                             throw new Error('Asset upload failed: ' + (err.message || ''));
                         }
+
+                        item.filename = binFilename;
+                        item.width = w;
+                        item.height = h;
+                        item.aspect_ratio = Number((w / h).toFixed(4));
+                        item.type = 'existing';
                     }
 
-                    // 2. Update photos.json on GitHub
-                    setStatus('⏳ 3/3: Updating photos.json catalog on GitHub...');
+                    // 2. Prepare final stack images array
+                    const finalImages = currentStackItems.map(item => ({
+                        filename: item.filename,
+                        width: item.width,
+                        height: item.height,
+                        aspect_ratio: item.aspect_ratio,
+                        ...(item.camera ? { camera: item.camera } : {}),
+                        ...(item.lens ? { lens: item.lens } : {}),
+                        ...(item.focal_length ? { focal_length: item.focal_length } : {}),
+                        ...(item.aperture ? { aperture: item.aperture } : {}),
+                        ...(item.shutter ? { shutter: item.shutter } : {}),
+                        ...(item.iso ? { iso: item.iso } : {})
+                    }));
+
+                    const hero = finalImages[0];
+
+                    // 3. Update photos.json on GitHub
+                    setStatus('⏳ Updating photos.json catalog on GitHub...');
 
                     const catRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/photos.json`, {
                         headers: { 'Authorization': 'Bearer ' + token }
@@ -1378,7 +1758,6 @@
                     const frameW = inputFrameWidth.value.trim() !== '' ? parseInt(inputFrameWidth.value, 10) : null;
 
                     if (editingPhotoId) {
-                        // Update existing entry
                         const targetIdx = rawPhotos.findIndex(p => p.id === editingPhotoId);
                         if (targetIdx === -1) throw new Error('Photo entry not found in remote catalog.');
 
@@ -1401,18 +1780,18 @@
                             aperture: inputAperture.value.trim(),
                             shutter: inputShutter.value.trim(),
                             iso: inputIso.value.trim(),
-                            width: w || old.width,
-                            height: h || old.height,
-                            aspect_ratio: Number(((w || old.width) / (h || old.height)).toFixed(4)),
-                            filename: binFilename || old.filename
+                            filename: hero.filename,
+                            width: hero.width,
+                            height: hero.height,
+                            aspect_ratio: hero.aspect_ratio,
+                            images: finalImages
                         };
 
                         if (rawPhotos[targetIdx].photographer) {
                             savePhotographerMapping(rawPhotos[targetIdx].photographer, rawPhotos[targetIdx].instagram);
                         }
                     } else {
-                        // Create brand new entry
-                        const newId = binFilename.replace(/\.bin$/, '');
+                        const newId = hero.filename.replace(/\.bin$/, '');
                         const newEntry = {
                             id: newId,
                             title: inputTitle.value.trim() || 'UNTITLED',
@@ -1433,10 +1812,11 @@
                             aperture: inputAperture.value.trim(),
                             shutter: inputShutter.value.trim(),
                             iso: inputIso.value.trim(),
-                            width: w,
-                            height: h,
-                            aspect_ratio: Number((w / h).toFixed(4)),
-                            filename: binFilename,
+                            filename: hero.filename,
+                            width: hero.width,
+                            height: hero.height,
+                            aspect_ratio: hero.aspect_ratio,
+                            images: finalImages,
                             likes: 0
                         };
 
@@ -1460,7 +1840,9 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            message: editingPhotoId ? `Update photo details: ${inputTitle.value.trim()}` : `Curate new photo: ${inputTitle.value.trim()}`,
+                            message: editingPhotoId
+                                ? `Update photo stack (${finalImages.length} images): ${inputTitle.value.trim()}`
+                                : `Curate new photo stack (${finalImages.length} images): ${inputTitle.value.trim()}`,
                             content: encodedCat,
                             sha: catSha
                         })
@@ -1555,6 +1937,11 @@
                         ? (p.location_name || 'Mapped')
                         : (p.location_name ? `${p.location_name} <span style="color:var(--muted); font-size:10px;">(No Map)</span>` : '<span style="color:var(--muted);">—</span>');
 
+                    const stackCount = (p.images && Array.isArray(p.images) && p.images.length > 0) ? p.images.length : 1;
+                    const stackBadge = stackCount > 1
+                        ? ` <span style="display:inline-flex; align-items:center; gap:3px; margin-left:6px; background:rgba(0,180,216,0.15); color:#90e0ef; border:1px solid rgba(0,180,216,0.3); padding:1px 6px; border-radius:4px; font-size:10px; font-weight:700;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="7" y="7" width="14" height="14" rx="2" ry="2"></rect><path d="M3 17V5a2 2 0 0 1 2-2h12"></path></svg>${stackCount}</span>`
+                        : '';
+
                     tr.innerHTML = `
                         <td style="color:var(--muted); font-size:11px;">${idx + 1}</td>
                         <td style="white-space:nowrap;">
@@ -1562,7 +1949,7 @@
                             <button type="button" class="order-btn move-down" data-idx="${idx}" title="Move down" ${idx === currentCatalog.length - 1 ? 'disabled' : ''}>▼</button>
                             <span class="drag-handle" title="Drag to reorder">⠿</span>
                         </td>
-                        <td><strong>${p.title}</strong></td>
+                        <td><strong>${p.title}</strong>${stackBadge}</td>
                         <td>${p.photographer}</td>
                         <td>${igDisplay}</td>
                         <td>${frameBadge}</td>

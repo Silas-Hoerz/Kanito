@@ -291,6 +291,47 @@
             -webkit-user-drag: none;
         }
 
+        /* Stack indicator badge on gallery cards */
+        .photo-card-stack-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 6;
+            background: rgba(8, 8, 10, 0.72);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 6px;
+            padding: 4px 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: #ffffff;
+            pointer-events: none;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+            letter-spacing: 0.04em;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .photo-item:hover .photo-card-stack-badge {
+            background: rgba(16, 16, 20, 0.9);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .stack-badge-icon {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .stack-badge-count {
+            display: inline-block;
+            line-height: 1;
+        }
+
         .photo-meta-bar {
             padding: 1rem 1.2rem;
             border-top: 1px solid var(--c-border);
@@ -593,39 +634,115 @@
             50% { transform: translateY(4px); }
         }
 
-        /* Floating Nav Arrows */
-        .stage-nav-btn {
+        /* Stack Navigation inside Stage (Instagram-style Carousel) */
+        .stage-stack-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 8;
+            background: rgba(8, 8, 10, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: #ffffff;
+            letter-spacing: 0.08em;
+            pointer-events: none;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .stack-arrow-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(6px);
-            border: 1px solid var(--c-border);
-            color: #ffffff;
             width: 44px;
             height: 44px;
+            border-radius: 50%;
+            background: rgba(10, 10, 14, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: var(--font-mono);
-            font-size: 1.1rem;
+            font-size: 1.4rem;
+            line-height: 1;
             cursor: pointer;
-            z-index: 10;
-            transition: all 0.2s ease;
-            border-radius: 2px;
+            z-index: 8;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.7);
+            user-select: none;
         }
 
-        .stage-nav-btn:hover {
+        .stack-arrow-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.2);
             border-color: #ffffff;
-            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-50%) scale(1.08);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 255, 255, 0.25);
         }
 
-        .stage-nav-prev {
-            left: 1rem;
+        .stack-arrow-btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
-        .stage-nav-next {
-            right: 1rem;
+        .stack-arrow-prev {
+            left: 14px;
+        }
+
+        .stack-arrow-next {
+            right: 14px;
+        }
+
+        /* Pagination Dots Bar below photo */
+        .stack-dots-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 1.15rem;
+            z-index: 6;
+            min-height: 16px;
+        }
+
+        .stack-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+        }
+
+        .stack-dot:hover {
+            background: rgba(255, 255, 255, 0.65);
+            transform: scale(1.2);
+        }
+
+        .stack-dot.active {
+            width: 24px;
+            height: 8px;
+            border-radius: 4px;
+            background: #ffffff;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+        }
+
+        #modal-canvas {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        #modal-canvas.is-changing {
+            opacity: 0.25;
+            transform: scale(0.995);
         }
 
         /* Curated Details Section Below the Photo */
@@ -887,17 +1004,18 @@
                 box-shadow: none;
             }
 
-            .stage-nav-btn {
-                width: 36px;
-                height: 36px;
+            .stack-arrow-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.2rem;
             }
 
-            .stage-nav-prev {
-                left: 0.25rem;
+            .stack-arrow-prev {
+                left: 8px;
             }
 
-            .stage-nav-next {
-                right: 0.25rem;
+            .stack-arrow-next {
+                right: 8px;
             }
 
             .modal-details-card {
@@ -1004,10 +1122,14 @@
 
         <div class="modal-scroll-wrap" id="modal-scroll-wrap">
             <section class="modal-hero-stage">
-                <div class="stage-canvas-box">
+                <div class="stage-canvas-box" id="stage-canvas-box">
                     <canvas id="modal-canvas"></canvas>
                     <div class="photo-shield" id="modal-shield"></div>
+                    <button type="button" class="stack-arrow-btn stack-arrow-prev" id="stack-arrow-prev" aria-label="Vorheriges Foto im Stapel" style="display:none;">‹</button>
+                    <button type="button" class="stack-arrow-btn stack-arrow-next" id="stack-arrow-next" aria-label="Nächstes Foto im Stapel" style="display:none;">›</button>
+                    <div class="stage-stack-badge" id="stage-stack-badge" style="display:none;">1 / 1</div>
                 </div>
+                <div class="stack-dots-bar" id="stack-dots-bar" style="display:none;" role="tablist" aria-label="Fotos im Stapel"></div>
                 <div class="modal-scroll-prompt" id="modal-scroll-prompt" role="button" tabindex="0" aria-label="Scroll down for photo details">
                     <span id="modal-scroll-prompt-text">↓ Scroll for Details, EXIF &amp; Location Map</span>
                 </div>
@@ -1234,6 +1356,28 @@
             let activeIndex = 0;
 
             // --- PROGRESSIVE / UNLIMITED SCROLL LAZY CANVAS LOADER ---
+            function getPhotoStack(p) {
+                if (!p) return [];
+                if (Array.isArray(p.images) && p.images.length > 0) {
+                    return p.images;
+                }
+                if (p.filename) {
+                    return [{
+                        filename: p.filename,
+                        width: p.width,
+                        height: p.height,
+                        aspect_ratio: p.aspect_ratio,
+                        camera: p.camera,
+                        lens: p.lens,
+                        focal_length: p.focal_length,
+                        aperture: p.aperture,
+                        shutter: p.shutter,
+                        iso: p.iso
+                    }];
+                }
+                return [];
+            }
+
             async function loadCardCanvas(card) {
                 const id = card.dataset.id;
                 const photo = photosCatalog.find(p => p.id === id);
@@ -1243,7 +1387,8 @@
                 if (canvas && !canvas.dataset.loaded) {
                     canvas.dataset.loaded = 'loading';
                     try {
-                        const bitmap = await fetchAndUnscramble('/photos/data/' + photo.filename);
+                        const heroFilename = (photo.images && photo.images[0] && photo.images[0].filename) || photo.filename;
+                        const bitmap = await fetchAndUnscramble('/photos/data/' + heroFilename);
                         renderBitmap(canvas, bitmap);
                         canvas.dataset.loaded = 'true';
                     } catch (err) {
@@ -1281,6 +1426,13 @@
             const modalCloseBtn = document.getElementById('modal-close-btn');
             const stagePrevBtn = document.getElementById('stage-prev-btn');
             const stageNextBtn = document.getElementById('stage-next-btn');
+
+            // Stack carousel elements
+            const stageStackBadge = document.getElementById('stage-stack-badge');
+            const stackArrowPrev = document.getElementById('stack-arrow-prev');
+            const stackArrowNext = document.getElementById('stack-arrow-next');
+            const stackDotsBar = document.getElementById('stack-dots-bar');
+            let activeStackIndex = 0;
 
             const modalLikeContainer = document.getElementById('modal-like-container');
             const modalLikeBtn = document.getElementById('modal-like-btn');
@@ -1455,10 +1607,95 @@
                 }, 200);
             }
 
-            async function openModal(index) {
+            async function renderCurrentStackImage(isNewPost = false) {
+                const photo = photosCatalog[activeIndex];
+                if (!photo) return;
+                const stack = getPhotoStack(photo);
+                if (!stack || stack.length === 0) return;
+
+                if (activeStackIndex < 0) activeStackIndex = 0;
+                if (activeStackIndex >= stack.length) activeStackIndex = stack.length - 1;
+
+                const currentImg = stack[activeStackIndex];
+
+                // Stack counter badge
+                if (stageStackBadge) {
+                    if (stack.length > 1) {
+                        stageStackBadge.textContent = `${activeStackIndex + 1} / ${stack.length}`;
+                        stageStackBadge.style.display = 'block';
+                    } else {
+                        stageStackBadge.style.display = 'none';
+                    }
+                }
+
+                // Stack navigation arrows
+                if (stackArrowPrev && stackArrowNext) {
+                    if (stack.length > 1) {
+                        stackArrowPrev.style.display = 'flex';
+                        stackArrowNext.style.display = 'flex';
+                        stackArrowPrev.disabled = (activeStackIndex === 0);
+                        stackArrowNext.disabled = (activeStackIndex === stack.length - 1);
+                    } else {
+                        stackArrowPrev.style.display = 'none';
+                        stackArrowNext.style.display = 'none';
+                    }
+                }
+
+                // Pagination dots
+                if (stackDotsBar && stack.length > 1) {
+                    stackDotsBar.style.display = 'flex';
+                    Array.from(stackDotsBar.children).forEach((dot, i) => {
+                        if (i === activeStackIndex) dot.classList.add('active');
+                        else dot.classList.remove('active');
+                    });
+                } else if (stackDotsBar) {
+                    stackDotsBar.style.display = 'none';
+                }
+
+                // Technical EXIF
+                exifCamera.textContent = currentImg.camera || photo.camera || '—';
+                exifLens.textContent = currentImg.lens || photo.lens || '—';
+                exifFocal.textContent = currentImg.focal_length || photo.focal_length || '—';
+                exifAperture.textContent = currentImg.aperture || photo.aperture || '—';
+                exifShutter.textContent = currentImg.shutter || photo.shutter || '—';
+                const isoVal = currentImg.iso || photo.iso;
+                exifIso.textContent = isoVal ? 'ISO ' + isoVal : '—';
+
+                if (!isNewPost) {
+                    modalCanvas.classList.add('is-changing');
+                }
+
+                try {
+                    const bitmap = await fetchAndUnscramble('/photos/data/' + currentImg.filename);
+                    modalCanvas.width = bitmap.width;
+                    modalCanvas.height = bitmap.height;
+                    modalCanvas.style.aspectRatio = `${bitmap.width} / ${bitmap.height}`;
+
+                    const ctx = modalCanvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(bitmap, 0, 0);
+                } catch (e) {
+                    console.error('Failed to render modal image:', e);
+                } finally {
+                    modalCanvas.classList.remove('is-changing');
+                }
+            }
+
+            function setStackIndex(newIndex) {
+                const photo = photosCatalog[activeIndex];
+                const stack = getPhotoStack(photo);
+                if (newIndex < 0 || newIndex >= stack.length) return;
+                activeStackIndex = newIndex;
+                renderCurrentStackImage(false);
+            }
+
+            async function openModal(index, targetStackIndex = 0) {
                 if (index < 0 || index >= photosCatalog.length) return;
                 activeIndex = index;
+                activeStackIndex = targetStackIndex;
                 const photo = photosCatalog[activeIndex];
+                const stack = getPhotoStack(photo);
 
                 modalCounter.textContent = `[0${activeIndex + 1} / 0${photosCatalog.length}]`.replace(/0(\d\d)/g, '$1');
                 modalTitleTop.textContent = photo.title;
@@ -1555,12 +1792,18 @@
                     modalScrollPromptText.textContent = hasMapCoords ? '↓ Scroll for Details, EXIF & Location Map' : '↓ Scroll for Details & Technical EXIF';
                 }
 
-                exifCamera.textContent = photo.camera || '—';
-                exifLens.textContent = photo.lens || '—';
-                exifFocal.textContent = photo.focal_length || '—';
-                exifAperture.textContent = photo.aperture || '—';
-                exifShutter.textContent = photo.shutter || '—';
-                exifIso.textContent = photo.iso ? 'ISO ' + photo.iso : '—';
+                // Build pagination dots for stack
+                if (stackDotsBar) {
+                    if (stack.length > 1) {
+                        stackDotsBar.innerHTML = stack.map((_, i) =>
+                            `<button type="button" class="stack-dot ${i === activeStackIndex ? 'active' : ''}" data-idx="${i}" aria-label="Foto ${i+1} von ${stack.length}"></button>`
+                        ).join('');
+                        stackDotsBar.style.display = 'flex';
+                    } else {
+                        stackDotsBar.innerHTML = '';
+                        stackDotsBar.style.display = 'none';
+                    }
+                }
 
                 // Ensure modal opens scrolled completely to the top so hero image is immediately in full view
                 if (modalScrollWrap) {
@@ -1570,19 +1813,7 @@
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
 
-                try {
-                    const bitmap = await fetchAndUnscramble('/photos/data/' + photo.filename);
-                    modalCanvas.width = bitmap.width;
-                    modalCanvas.height = bitmap.height;
-                    modalCanvas.style.aspectRatio = `${bitmap.width} / ${bitmap.height}`;
-
-                    const ctx = modalCanvas.getContext('2d');
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-                    ctx.drawImage(bitmap, 0, 0);
-                } catch (e) {
-                    console.error('Failed to render modal image:', e);
-                }
+                await renderCurrentStackImage(true);
 
                 try {
                     history.replaceState(null, '', '#photo-' + photo.id);
@@ -1603,39 +1834,75 @@
                 e.stopPropagation();
                 let prev = activeIndex - 1;
                 if (prev < 0) prev = photosCatalog.length - 1;
-                openModal(prev);
+                openModal(prev, 0);
             });
 
             stageNextBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 let next = activeIndex + 1;
                 if (next >= photosCatalog.length) next = 0;
-                openModal(next);
+                openModal(next, 0);
             });
 
-            // Touch swipe gesture support for mobile photo navigation
+            // Stack carousel arrow click listeners
+            if (stackArrowPrev) {
+                stackArrowPrev.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setStackIndex(activeStackIndex - 1);
+                });
+            }
+
+            if (stackArrowNext) {
+                stackArrowNext.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setStackIndex(activeStackIndex + 1);
+                });
+            }
+
+            // Stack dots click delegation
+            if (stackDotsBar) {
+                stackDotsBar.addEventListener('click', (e) => {
+                    const dot = e.target.closest('.stack-dot');
+                    if (dot && dot.dataset.idx != null) {
+                        e.stopPropagation();
+                        setStackIndex(parseInt(dot.dataset.idx, 10));
+                    }
+                });
+            }
+
+            // Touch swipe gesture support for mobile photo & stack navigation
             let touchStartX = 0;
             let touchStartY = 0;
-            const modalStageEl = document.querySelector('.modal-stage');
-            if (modalStageEl) {
-                modalStageEl.addEventListener('touchstart', (e) => {
+            const stageBoxEl = document.getElementById('stage-canvas-box') || document.querySelector('.modal-hero-stage');
+            if (stageBoxEl) {
+                stageBoxEl.addEventListener('touchstart', (e) => {
                     if (e.touches.length === 1) {
                         touchStartX = e.touches[0].clientX;
                         touchStartY = e.touches[0].clientY;
                     }
                 }, { passive: true });
 
-                modalStageEl.addEventListener('touchend', (e) => {
+                stageBoxEl.addEventListener('touchend', (e) => {
                     if (e.changedTouches.length === 1) {
                         const deltaX = e.changedTouches[0].clientX - touchStartX;
                         const deltaY = e.changedTouches[0].clientY - touchStartY;
-                        if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+                        if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+                            const photo = photosCatalog[activeIndex];
+                            const stack = getPhotoStack(photo);
                             if (deltaX < 0) {
-                                // Swiped left -> next photo
-                                stageNextBtn.click();
+                                // Swiped left -> next photo in stack or next post
+                                if (stack.length > 1 && activeStackIndex < stack.length - 1) {
+                                    setStackIndex(activeStackIndex + 1);
+                                } else {
+                                    stageNextBtn.click();
+                                }
                             } else {
-                                // Swiped right -> prev photo
-                                stagePrevBtn.click();
+                                // Swiped right -> prev photo in stack or prev post
+                                if (stack.length > 1 && activeStackIndex > 0) {
+                                    setStackIndex(activeStackIndex - 1);
+                                } else {
+                                    stagePrevBtn.click();
+                                }
                             }
                         }
                     }
@@ -1644,9 +1911,25 @@
 
             window.addEventListener('keydown', (e) => {
                 if (!modal.classList.contains('active')) return;
-                if (e.key === 'Escape') closeModal();
-                else if (e.key === 'ArrowLeft') stagePrevBtn.click();
-                else if (e.key === 'ArrowRight') stageNextBtn.click();
+                if (e.key === 'Escape') {
+                    closeModal();
+                } else if (e.key === 'ArrowLeft') {
+                    const photo = photosCatalog[activeIndex];
+                    const stack = getPhotoStack(photo);
+                    if (stack.length > 1 && activeStackIndex > 0) {
+                        setStackIndex(activeStackIndex - 1);
+                    } else {
+                        stagePrevBtn.click();
+                    }
+                } else if (e.key === 'ArrowRight') {
+                    const photo = photosCatalog[activeIndex];
+                    const stack = getPhotoStack(photo);
+                    if (stack.length > 1 && activeStackIndex < stack.length - 1) {
+                        setStackIndex(activeStackIndex + 1);
+                    } else {
+                        stageNextBtn.click();
+                    }
+                }
             });
 
             // Global click / tap event delegation

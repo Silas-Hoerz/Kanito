@@ -100,6 +100,82 @@ const LANDING_THEME_STYLES = `
         }
 `;
 
+const ERROR_404_SHADER_PALETTE = `
+vec3 hsl2rgb(vec3 c) {
+    vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+    return c.z + c.y * (rgb - 0.5) * (1.0 - abs(2.0 * c.z - 1.0));
+}
+
+vec3 getPalette(float t) {
+    float h = fract(u_hue);
+    vec3 c_bg = hsl2rgb(vec3(h, 0.65, 0.038));
+    vec3 c_mid = hsl2rgb(vec3(h, 0.90, 0.52));
+    vec3 c_high = hsl2rgb(vec3(h, 0.60, 0.95));
+    if (t < 0.5) return mix(c_bg, c_mid, t * 2.0);
+    return mix(c_mid, c_high, (t - 0.5) * 2.0);
+}
+`;
+
+const ERROR_404_THEME_STYLES = `
+        main {
+            justify-content: center;
+            min-height: calc(100vh - 190px);
+            padding: 0 1.5rem 2rem;
+        }
+        .error-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin: auto 0;
+            padding: 2rem 0;
+            user-select: none;
+        }
+        .error-num {
+            font-family: var(--font-sans);
+            font-size: clamp(7rem, 28vw, 24rem);
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            line-height: 0.85;
+            color: #ffffff;
+            margin: 0;
+            text-shadow: 0 0 50px rgba(255, 255, 255, 0.2), 0 0 120px var(--c-mid-glow, rgba(0, 180, 210, 0.35));
+            transition: text-shadow 0.4s ease;
+        }
+        .error-sub {
+            font-family: var(--font-mono);
+            font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+            font-weight: 700;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--c-mid);
+            margin: 2rem 0 2.5rem 0;
+            opacity: 0.9;
+            transition: color 0.4s ease;
+        }
+        .error-btn {
+            font-family: var(--font-mono);
+            text-decoration: none;
+            padding: 0.75rem 1.6rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
+            transition: all 0.25s ease;
+        }
+        .error-btn:hover {
+            box-shadow: 0 0 25px var(--c-mid-glow, rgba(0, 180, 210, 0.5));
+        }
+        .nav-link:hover {
+            border-color: var(--c-mid);
+            color: var(--c-mid);
+            background: var(--c-mid-glow, rgba(0, 180, 210, 0.12));
+        }
+        footer {
+            transition: color 0.4s ease;
+        }
+`;
+
+
 function renderTemplate(template, {
     title,
     description,
@@ -153,6 +229,17 @@ async function build() {
             PHOTOS = rawJson.photos || [];
             GALLERY_SETTINGS = { ...GALLERY_SETTINGS, ...(rawJson.settings || {}) };
         }
+        PHOTOS = PHOTOS.map(p => {
+            if (!p.images || !Array.isArray(p.images) || p.images.length === 0) {
+                p.images = [{
+                    filename: p.filename,
+                    width: p.width,
+                    height: p.height,
+                    aspect_ratio: p.aspect_ratio
+                }];
+            }
+            return p;
+        });
     } catch (e) {
         console.warn('Note: Could not parse photos.json, defaulting to empty list.');
     }
@@ -189,6 +276,27 @@ async function build() {
         } catch (e) {
             console.log(`Note: Could not generate ${page.file}`);
         }
+    }
+
+    // --- 404 NOT FOUND PAGE ---
+    try {
+        const content404 = await fs.readFile('404.html', 'utf-8');
+        const final404Html = renderTemplate(TEMPLATE, {
+            title: '404 — Page Not Found | Kanito',
+            description: 'The requested page could not be found on Kanito.',
+            image: `${DOMAIN}/logo.png`,
+            url: `${DOMAIN}/404.html`,
+            year: YEAR,
+            jsonLd: '',
+            content: content404,
+            themeStyles: ERROR_404_THEME_STYLES,
+            shaderPalette: ERROR_404_SHADER_PALETTE
+        });
+
+        await fs.writeFile('dist/404.html', final404Html);
+        console.log('Generated 404 Page (dist/404.html)');
+    } catch (e) {
+        console.warn('Note: Could not generate 404.html', e);
     }
 
     // Static assets
@@ -362,26 +470,6 @@ async function build() {
         </section>
 
         <section class="hub-grid">
-            <!-- Photos Card -->
-            <a href="/photos/" class="hub-card hub-card-photos" id="hub-card-photos" title="Explore Photography Portfolio">
-                <div class="hub-card-canvas-wrap">
-                    <canvas id="hub-canvas-photos" class="hub-tile-canvas"></canvas>
-                    <div class="hub-card-tint"></div>
-                </div>
-                <div class="hub-card-inner">
-                    <div class="hub-visual hub-visual-photos">
-                        <div class="hub-frame-preview" id="hub-frame-preview" aria-label="Curated landscape photographs slideshow">
-                            <img class="hub-slide-img is-active" id="hub-slide-a" alt="Curated photograph" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 230 153'%3E%3Crect fill='%230d0c14' width='230' height='153'/%3E%3C/svg%3E">
-                            <img class="hub-slide-img" id="hub-slide-b" alt="Curated photograph">
-                        </div>
-                    </div>
-                    <h2 class="hub-card-title">PHOTOS.</h2>
-                    <p class="hub-card-desc">A space where we simply share our photographs with the world. Feel free to take a look around and explore.</p>
-                    <div class="hub-card-footer">
-                        <span class="btn-card">Explore →</span>
-                    </div>
-                </div>
-            </a>
 
             <!-- Projects Card -->
             <a href="/projects/" class="hub-card hub-card-projects" id="hub-card-projects" title="View Hardware Projects &amp; Documentation">
@@ -404,6 +492,29 @@ async function build() {
                     </div>
                 </div>
             </a>
+
+            <!-- Photos Card -->
+            <a href="/photos/" class="hub-card hub-card-photos" id="hub-card-photos" title="Explore Photography Portfolio">
+                <div class="hub-card-canvas-wrap">
+                    <canvas id="hub-canvas-photos" class="hub-tile-canvas"></canvas>
+                    <div class="hub-card-tint"></div>
+                </div>
+                <div class="hub-card-inner">
+                    <div class="hub-visual hub-visual-photos">
+                        <div class="hub-frame-preview" id="hub-frame-preview" aria-label="Curated landscape photographs slideshow">
+                            <img class="hub-slide-img is-active" id="hub-slide-a" alt="Curated photograph" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 230 153'%3E%3Crect fill='%230d0c14' width='230' height='153'/%3E%3C/svg%3E">
+                            <img class="hub-slide-img" id="hub-slide-b" alt="Curated photograph">
+                        </div>
+                    </div>
+                    <h2 class="hub-card-title">PHOTOS.</h2>
+                    <p class="hub-card-desc">A space where we simply share our photographs with the world. Feel free to take a look around and explore.</p>
+                    <div class="hub-card-footer">
+                        <span class="btn-card">Explore →</span>
+                    </div>
+                </div>
+            </a>
+
+            
         </section>
 
         <script>
@@ -651,11 +762,19 @@ async function build() {
             const descPart = p.description ? ` ${p.description}` : '';
             const locPart = hasLocName ? ` in ${p.location_name}.` : '.';
 
+            const stackCount = (p.images && p.images.length) || 1;
+            const stackBadgeHtml = (stackCount > 1) ? `
+                        <div class="photo-card-stack-badge" aria-label="${stackCount} photos in stack" title="${stackCount} photos in stack">
+                            <svg class="stack-badge-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="14" height="14" rx="2" ry="2"></rect><path d="M3 17V5a2 2 0 0 1 2-2h12"></path></svg>
+                            <span class="stack-badge-count">${stackCount}</span>
+                        </div>` : '';
+
             galleryCardsHtml += `
                 <figure class="photo-item" data-id="${p.id}" data-author="${p.photographer}" tabindex="0" role="button" aria-label="View photo: ${p.title}">
                     <div class="canvas-container-box ${frameClass}" ${frameAttr}>
                         <canvas width="${p.width}" height="${p.height}" aria-hidden="true"></canvas>
                         <div class="photo-shield" title="View details: ${p.title}"></div>
+                        ${stackBadgeHtml}
                     </div>
                     <div class="photo-meta-bar">
                         <div>
