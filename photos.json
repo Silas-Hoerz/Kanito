@@ -218,58 +218,6 @@
       ]
     },
     {
-      "id": "photo-muldrffc-oowt",
-      "title": "Witness to the Night Sky",
-      "photographer": "Silas",
-      "instagram": "@silas.ah",
-      "description": "Silhouette of a person standing in a grassy field, looking up at the stars.",
-      "location_name": "Meßstetten",
-      "has_location": true,
-      "latitude": 48.1809,
-      "longitude": 8.9453,
-      "frame": "none",
-      "frame_width": null,
-      "year": "2026",
-      "date": "2026-09-28",
-      "camera": "Sony A6000",
-      "lens": "Samyang F2.0 12mm",
-      "focal_length": "12mm",
-      "aperture": "",
-      "shutter": "25s",
-      "iso": "1000",
-      "width": 1707,
-      "height": 2560,
-      "aspect_ratio": 0.6668,
-      "filename": "photo-muldrffc-oowt.bin",
-      "likes": 0,
-      "images": [
-        {
-          "filename": "photo-muldrffc-oowt.bin",
-          "width": 1707,
-          "height": 2560,
-          "aspect_ratio": 0.6668,
-          "camera": "Sony A6000",
-          "lens": "Samyang F2.0 12mm",
-          "focal_length": "12mm",
-          "aperture": "",
-          "shutter": "25s",
-          "iso": "1000"
-        },
-        {
-          "filename": "f1b9a842-12ef-41c8-a477-984210e74c82.bin",
-          "width": 848,
-          "height": 1264,
-          "aspect_ratio": 0.6709,
-          "camera": "Sony A6000",
-          "lens": "Samyang F2.0 12mm",
-          "focal_length": "12mm",
-          "aperture": "",
-          "shutter": "20s",
-          "iso": "1250"
-        }
-      ]
-    },
-    {
       "id": "photo-mul7f8x8-8mcp",
       "title": "Meßstetten Milkyway",
       "photographer": "Silas",
