@@ -137,6 +137,32 @@
             object-fit: contain;
         }
 
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            color: var(--c-high);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.45rem 0.9rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            border-color: var(--c-mid);
+            color: var(--c-mid);
+            background: rgba(0, 180, 210, 0.1);
+        }
+
         /* Hero / Page Title */
         .photos-hero {
             text-align: center;
@@ -229,6 +255,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .canvas-container-box.frame-white {
+            border: var(--frame-w, 16px) solid #ffffff !important;
+        }
+
+        .canvas-container-box.frame-black {
+            border: var(--frame-w, 16px) solid #000000 !important;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
         }
 
         .canvas-container-box canvas {
@@ -926,6 +963,10 @@
                     <span>Kanito</span>
                 </a>
             </h2>
+            <nav class="nav-links">
+                <a href="/projects/" class="nav-link" title="Projects & Hardware Engineering">Projects</a>
+                <a href="/photos/" class="nav-link active" title="Photography Portfolio">Photos</a>
+            </nav>
         </header>
 
         <section class="photos-hero">
@@ -968,7 +1009,7 @@
                     <div class="photo-shield" id="modal-shield"></div>
                 </div>
                 <div class="modal-scroll-prompt" id="modal-scroll-prompt" role="button" tabindex="0" aria-label="Scroll down for photo details">
-                    <span>↓ Scroll for Details, EXIF &amp; Location Map</span>
+                    <span id="modal-scroll-prompt-text">↓ Scroll for Details, EXIF &amp; Location Map</span>
                 </div>
             </section>
 
@@ -1041,7 +1082,7 @@
                     </div>
                 </div>
 
-                <div class="detail-section">
+                <div class="detail-section" id="detail-location-section">
                     <div class="section-label">LOCATION &amp; MAP</div>
                     <div class="location-header-row">
                         <span class="location-name" id="detail-location-name">LOCATION NAME</span>
@@ -1059,6 +1100,9 @@
     <!-- Raw Photos Catalog Injected by Build Script -->
     <script id="photos-catalog-data" type="application/json">
         {{PHOTOS_JSON}}
+    </script>
+    <script id="gallery-settings-data" type="application/json">
+        {{SETTINGS_JSON}}
     </script>
 
     <!-- WebGL Ordered Dithering Shader (Exact code from template.html, palette adapted to monochrome B&W) -->
@@ -1182,6 +1226,11 @@
 
             // --- GALLERY INITIALIZATION ---
             const photosCatalog = JSON.parse(document.getElementById('photos-catalog-data').textContent.trim());
+            let gallerySettings = { show_likes: true, default_frame: 'none', frame_width: 16 };
+            try {
+                const rawSettings = document.getElementById('gallery-settings-data').textContent.trim();
+                if (rawSettings) gallerySettings = Object.assign(gallerySettings, JSON.parse(rawSettings));
+            } catch (e) { }
             let activeIndex = 0;
 
             // --- PROGRESSIVE / UNLIMITED SCROLL LAZY CANVAS LOADER ---
@@ -1261,7 +1310,7 @@
                 });
             }
 
-            // --- LIKE SYSTEM (Max 1 Heart per visitor, persisted in localStorage) ---
+            // --- LIKE SYSTEM (Global synchronization with CountAPI + localStorage) ---
             function getLikedPhotos() {
                 try {
                     return JSON.parse(localStorage.getItem('kanito_liked_photos') || '[]');
@@ -1272,16 +1321,50 @@
                 return getLikedPhotos().includes(id);
             }
 
+            async function fetchGlobalLikes() {
+                if ('{{SHOW_LIKES}}' === 'false') return;
+                await Promise.allSettled(photosCatalog.map(async (photo) => {
+                    try {
+                        const cleanId = photo.id.replace(/[^a-zA-Z0-9_-]/g, '_');
+                        const res = await fetch(`https://countapi.mileshilliard.com/api/v1/get/kanito_likes_${cleanId}`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && typeof data.value === 'number') {
+                                photo.likes = Math.max(Number(photo.likes || 0), data.value);
+                            }
+                        }
+                    } catch (e) { }
+                }));
+                syncAllLikeButtons();
+            }
+
             function togglePhotoLike(id) {
                 let liked = getLikedPhotos();
                 const index = liked.indexOf(id);
                 let isNowLiked = false;
+                const photo = photosCatalog.find(p => p.id === id);
+                const cleanId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
+
                 if (index > -1) {
                     liked.splice(index, 1);
                     isNowLiked = false;
+                    if (photo) photo.likes = Math.max(0, (photo.likes || 1) - 1);
                 } else {
                     liked.push(id);
                     isNowLiked = true;
+                    if (photo) {
+                        photo.likes = (photo.likes || 0) + 1;
+                        // Synchronize increment with global CountAPI
+                        fetch(`https://countapi.mileshilliard.com/api/v1/hit/kanito_likes_${cleanId}`)
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data && typeof data.value === 'number') {
+                                    photo.likes = Math.max(photo.likes, data.value);
+                                    updatePhotoLikeUI(id, true);
+                                }
+                            })
+                            .catch(() => {});
+                    }
                 }
                 try {
                     localStorage.setItem('kanito_liked_photos', JSON.stringify(liked));
@@ -1293,9 +1376,7 @@
             function updatePhotoLikeUI(id, isNowLiked) {
                 const photo = photosCatalog.find(p => p.id === id);
                 if (!photo) return;
-
-                const baseLikes = Number(photo.likes || 0);
-                const currentLikes = baseLikes + (isNowLiked ? 1 : 0);
+                const currentLikes = Number(photo.likes || 0);
 
                 // Update card on gallery grid
                 const card = document.querySelector(`.photo-item[data-id="${id}"]`);
@@ -1322,12 +1403,13 @@
                 const liked = getLikedPhotos();
                 document.querySelectorAll('.photo-card-like-btn').forEach(btn => {
                     const id = btn.dataset.id;
-                    const baseLikes = Number(btn.dataset.baseLikes || 0);
+                    const photo = photosCatalog.find(p => p.id === id);
+                    const currentLikes = photo ? Number(photo.likes || 0) : Number(btn.dataset.baseLikes || 0);
                     const isLiked = liked.includes(id);
                     if (isLiked) btn.classList.add('liked');
                     else btn.classList.remove('liked');
                     const countSpan = btn.querySelector('.like-count');
-                    if (countSpan) countSpan.textContent = baseLikes + (isLiked ? 1 : 0);
+                    if (countSpan) countSpan.textContent = currentLikes;
                 });
             }
 
@@ -1399,13 +1481,13 @@
 
                 // Sync like state in modal
                 const isLiked = isPhotoLiked(photo.id);
-                const baseLikes = Number(photo.likes || 0);
+                const currentLikes = Number(photo.likes || 0);
                 if (modalLikeBtn) {
                     if (isLiked) modalLikeBtn.classList.add('liked');
                     else modalLikeBtn.classList.remove('liked');
                 }
                 if (modalLikeText) modalLikeText.textContent = isLiked ? 'Liked' : 'Like';
-                if (modalLikeCount) modalLikeCount.textContent = baseLikes + (isLiked ? 1 : 0);
+                if (modalLikeCount) modalLikeCount.textContent = currentLikes;
 
                 // Global setting check for like visibility
                 const showLikes = '{{SHOW_LIKES}}' !== 'false';
@@ -1413,9 +1495,65 @@
                     modalLikeContainer.style.display = showLikes ? 'inline-flex' : 'none';
                 }
 
-                detailDescription.textContent = photo.description || 'Monochrome architectural framing.';
-                detailLocationName.textContent = photo.location_name || 'Unspecified';
-                detailCoords.textContent = `${Number(photo.latitude).toFixed(4)}° N, ${Number(photo.longitude).toFixed(4)}° E`;
+                // Frame handling
+                const frameStyle = photo.frame || (gallerySettings && gallerySettings.default_frame) || 'none';
+                const frameWidth = (photo.frame_width != null && photo.frame_width !== '') ? Number(photo.frame_width) : Number((gallerySettings && gallerySettings.frame_width) || 16);
+                if (frameStyle === 'white') {
+                    modalCanvas.style.border = `${frameWidth}px solid #ffffff`;
+                    modalCanvas.style.outline = 'none';
+                    modalCanvas.style.boxSizing = 'border-box';
+                } else if (frameStyle === 'black') {
+                    modalCanvas.style.border = `${frameWidth}px solid #000000`;
+                    modalCanvas.style.outline = '1px solid rgba(255, 255, 255, 0.2)';
+                    modalCanvas.style.boxSizing = 'border-box';
+                } else {
+                    modalCanvas.style.border = 'none';
+                    modalCanvas.style.outline = 'none';
+                }
+
+                // Description handling (optional)
+                if (photo.description && photo.description.trim()) {
+                    detailDescription.textContent = photo.description.trim();
+                    detailDescription.style.display = 'block';
+                } else {
+                    detailDescription.textContent = '';
+                    detailDescription.style.display = 'none';
+                }
+
+                // Location & Map handling (optional coordinates and position deactivate)
+                const hasMapCoords = (photo.has_location !== false) &&
+                    photo.latitude != null && photo.longitude != null &&
+                    photo.latitude !== '' && photo.longitude !== '' &&
+                    !isNaN(Number(photo.latitude)) && !isNaN(Number(photo.longitude)) &&
+                    !(Number(photo.latitude) === 0 && Number(photo.longitude) === 0);
+
+                const locName = (photo.location_name || '').trim();
+                const hasLocName = locName !== '' && locName.toLowerCase() !== 'location';
+
+                const locSection = document.getElementById('detail-location-section');
+                const mapEl = document.getElementById('detail-map');
+
+                if (!hasMapCoords && !hasLocName) {
+                    if (locSection) locSection.style.display = 'none';
+                } else {
+                    if (locSection) locSection.style.display = 'block';
+                    detailLocationName.textContent = hasLocName ? locName : 'Coordinates';
+                    if (hasMapCoords) {
+                        detailCoords.textContent = `${Number(photo.latitude).toFixed(4)}° N, ${Number(photo.longitude).toFixed(4)}° E`;
+                        detailCoords.style.display = 'inline-block';
+                        if (mapEl) mapEl.style.display = 'block';
+                        setTimeout(() => initMap(Number(photo.latitude), Number(photo.longitude)), 200);
+                    } else {
+                        detailCoords.textContent = '';
+                        detailCoords.style.display = 'none';
+                        if (mapEl) mapEl.style.display = 'none';
+                    }
+                }
+
+                const modalScrollPromptText = document.getElementById('modal-scroll-prompt-text');
+                if (modalScrollPromptText) {
+                    modalScrollPromptText.textContent = hasMapCoords ? '↓ Scroll for Details, EXIF & Location Map' : '↓ Scroll for Details & Technical EXIF';
+                }
 
                 exifCamera.textContent = photo.camera || '—';
                 exifLens.textContent = photo.lens || '—';
@@ -1445,10 +1583,6 @@
                 } catch (e) {
                     console.error('Failed to render modal image:', e);
                 }
-
-                setTimeout(() => {
-                    initMap(photo.latitude, photo.longitude);
-                }, 200);
 
                 try {
                     history.replaceState(null, '', '#photo-' + photo.id);
@@ -1555,6 +1689,7 @@
             function initApp() {
                 setupInfiniteScroll();
                 syncAllLikeButtons();
+                fetchGlobalLikes();
                 if (window.location.hash && window.location.hash.startsWith('#photo-')) {
                     const id = window.location.hash.replace('#photo-', '');
                     const idx = photosCatalog.findIndex(p => p.id === id);

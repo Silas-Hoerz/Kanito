@@ -152,7 +152,7 @@ async function build() {
         const subpageContent = `
             <div style="width: 100%; max-width: 800px; margin: 0 auto;">
                 <div class="view-controls">
-                    <a href="/" class="btn-back" title="Return to index">← Back</a>
+                    <a href="/projects/" class="btn-back" title="Return to projects">← Back to Projects</a>
                     <a href="https://github.com/${repo}" target="_blank" class="btn-repo" title="View source code on GitHub">View Repository</a>
                 </div>
                 <article>${readmeHtml}</article>
@@ -186,8 +186,8 @@ async function build() {
         sitemapUrls += `<url><loc>${DOMAIN}/${slug}/</loc><priority>0.8</priority></url>\n`;
     }
 
-    // --- INDEX (MAIN PROJECTS) PAGE ---
-    const indexContent = `
+    // --- PROJECTS PAGE (kanito.de/projects/) ---
+    const projectsContent = `
         <section class="hero">
             <h1>Projects.</h1>
             <p class="sr-only">Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components.</p>
@@ -198,24 +198,109 @@ async function build() {
         </section>
     `;
 
+    const projectsJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Kanito Projects",
+        "url": `${DOMAIN}/projects/`,
+        "description": "Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components for hardware projects."
+    };
+
+    let finalProjects = TEMPLATE
+        .replace(/{{TITLE}}/g, 'Projects | Kanito')
+        .replace(/{{DESCRIPTION}}/g, 'Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components for hardware projects.')
+        .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
+        .replace(/{{URL}}/g, `${DOMAIN}/projects/`)
+        .replace(/{{YEAR}}/g, YEAR)
+        .replace('{{JSON_LD}}', `<script type="application/ld+json">\n${JSON.stringify(projectsJsonLd)}\n</script>`)
+        .replace('{{CONTENT}}', projectsContent);
+
+    await fs.mkdir('dist/projects', { recursive: true });
+    await fs.writeFile('dist/projects/index.html', finalProjects);
+    console.log('Generated Projects Page (dist/projects/index.html)');
+
+    sitemapUrls += `<url><loc>${DOMAIN}/projects/</loc><priority>0.9</priority></url>\n`;
+
+    // --- NEW MINIMALIST LANDING PAGE (kanito.de/) ---
+    const landingContent = `
+        <section class="landing-hero">
+            <div class="landing-tag">[ ARCHIVE &amp; PORTFOLIO ]</div>
+            <h1 class="landing-title">Kanito.</h1>
+            <p class="landing-lead">Hardware engineering, embedded systems prototyping, and curated monochrome architectural photography by Silas Hörz.</p>
+        </section>
+
+        <section class="hub-grid">
+            <!-- Photos Card -->
+            <a href="/photos/" class="hub-card" id="hub-card-photos" title="Explore Photography Portfolio">
+                <div class="hub-card-header">
+                    <span class="hub-tag">[01 / VISUALS]</span>
+                    <span class="hub-badge">PHOTOGRAPHY</span>
+                </div>
+                <div class="hub-visual hub-visual-photos">
+                    <div class="hub-frame-preview"></div>
+                </div>
+                <h2 class="hub-card-title">photos.</h2>
+                <p class="hub-card-desc">Curated architectural, structural, and monochrome photography portfolio exploring brutalism, high-contrast light geometry, and fine-art framing.</p>
+                <div class="hub-card-meta">
+                    <span class="hub-meta-item">ARCHITECTURAL</span>
+                    <span class="hub-meta-item">MONOCHROME</span>
+                    <span class="hub-meta-item">LEICA &amp; PRIME</span>
+                </div>
+                <div class="hub-card-footer">
+                    <span class="btn-card">Explore Photos →</span>
+                </div>
+            </a>
+
+            <!-- Projects Card -->
+            <a href="/projects/" class="hub-card" id="hub-card-projects" title="View Hardware Projects & Documentation">
+                <div class="hub-card-header">
+                    <span class="hub-tag">[02 / ENGINEERING]</span>
+                    <span class="hub-badge">HARDWARE &amp; CODE</span>
+                </div>
+                <div class="hub-visual hub-visual-projects">
+                    <div class="hub-code-preview">
+                        <span class="hub-code-line-dim">// Embedded Hardware &amp; Firmware</span>
+                        <span class="hub-code-line-hi">kanito.prototype.init();</span>
+                        <span class="hub-code-line-dim">export const Tally = new Device();</span>
+                    </div>
+                </div>
+                <h2 class="hub-card-title">projects.</h2>
+                <p class="hub-card-desc">Development and distribution of electronic assemblies, microcontroller accessories, open-source hardware, and technical schematics.</p>
+                <div class="hub-card-meta">
+                    <span class="hub-meta-item">MICROCONTROLLERS</span>
+                    <span class="hub-meta-item">HARDWARE PROTOTYPES</span>
+                    <span class="hub-meta-item">OPEN SOURCE</span>
+                </div>
+                <div class="hub-card-footer">
+                    <span class="btn-card">View Projects →</span>
+                </div>
+            </a>
+        </section>
+
+        <div class="hub-extensible-note">
+            <span>More disciplines &amp; archives upcoming</span>
+        </div>
+    `;
+
     const indexJsonLd = {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "Kanito",
         "url": DOMAIN,
-        "description": "Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components."
+        "description": "Hardware engineering, embedded systems prototyping, and curated monochrome architectural photography by Silas Hörz."
     };
 
     let finalIndex = TEMPLATE
-        .replace(/{{TITLE}}/g, 'Kanito | Electronics & Prototyping')
-        .replace(/{{DESCRIPTION}}/g, 'Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components for hardware projects.')
+        .replace(/{{TITLE}}/g, 'Kanito | Engineering & Fine-Art Photography')
+        .replace(/{{DESCRIPTION}}/g, 'Hardware engineering, embedded systems prototyping, and curated architectural photography by Silas Hörz.')
         .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
         .replace(/{{URL}}/g, `${DOMAIN}/`)
         .replace(/{{YEAR}}/g, YEAR)
         .replace('{{JSON_LD}}', `<script type="application/ld+json">\n${JSON.stringify(indexJsonLd)}\n</script>`)
-        .replace('{{CONTENT}}', indexContent);
+        .replace('{{CONTENT}}', landingContent);
 
     await fs.writeFile('dist/index.html', finalIndex);
+    console.log('Generated Minimalist Landing Page (dist/index.html)');
 
     // --- PHOTOS GALLERY PAGE (kanito.de/photos) ---
     try {
@@ -232,9 +317,26 @@ async function build() {
                             </button>
             ` : '';
 
+            const pFrame = p.frame || GALLERY_SETTINGS.default_frame || 'none';
+            const pFrameWidth = (p.frame_width != null && p.frame_width !== '') ? Number(p.frame_width) : Number(GALLERY_SETTINGS.frame_width || 16);
+            let frameClass = '';
+            let frameAttr = `style="aspect-ratio: ${p.width} / ${p.height};"`;
+            if (pFrame === 'white') {
+                frameClass = 'frame-white';
+                frameAttr = `style="aspect-ratio: ${p.width} / ${p.height}; --frame-w: ${pFrameWidth}px;"`;
+            } else if (pFrame === 'black') {
+                frameClass = 'frame-black';
+                frameAttr = `style="aspect-ratio: ${p.width} / ${p.height}; --frame-w: ${pFrameWidth}px;"`;
+            }
+
+            const hasLocName = Boolean(p.location_name && p.location_name.trim() && p.location_name.toLowerCase() !== 'location');
+            const locTagHtml = (hasLocName && p.has_location !== false) ? `<div class="photo-location-tag">${p.location_name}</div>` : '';
+            const descPart = p.description ? ` ${p.description}` : '';
+            const locPart = hasLocName ? ` in ${p.location_name}.` : '.';
+
             galleryCardsHtml += `
                 <figure class="photo-item" data-id="${p.id}" data-author="${p.photographer}" tabindex="0" role="button" aria-label="View photo: ${p.title}">
-                    <div class="canvas-container-box" style="aspect-ratio: ${p.width} / ${p.height};">
+                    <div class="canvas-container-box ${frameClass}" ${frameAttr}>
                         <canvas width="${p.width}" height="${p.height}" aria-hidden="true"></canvas>
                         <div class="photo-shield" title="View details: ${p.title}"></div>
                     </div>
@@ -244,13 +346,13 @@ async function build() {
                             <div class="photo-author">${p.photographer}${igBadge}</div>
                         </div>
                         <div class="photo-meta-right">
-                            <div class="photo-location-tag">${p.location_name}</div>
+                            ${locTagHtml}
                             ${likeBtnHtml}
                         </div>
                     </div>
                     <figcaption class="sr-only">
                         <h3>${p.title}</h3>
-                        <p>Fine art monochrome photograph by ${p.photographer} (${p.instagram || ''}) in ${p.location_name}. ${p.description || ''} Camera: ${p.camera || 'Leica'}, Lens: ${p.lens || 'Prime'}.</p>
+                        <p>Fine art monochrome photograph by ${p.photographer} (${p.instagram || ''})${locPart}${descPart} Camera: ${p.camera || 'Leica'}, Lens: ${p.lens || 'Prime'}.</p>
                     </figcaption>
                 </figure>
             `;

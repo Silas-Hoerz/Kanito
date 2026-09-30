@@ -576,14 +576,30 @@
             <div class="card">
                 <h2>2. Global Gallery Settings</h2>
                 <p style="color:var(--muted); margin-bottom:1rem; font-size:12px;">
-                    Toggle public visibility of like counters and heart buttons across the entire photography section.
+                    Configure global settings for public photo display, frame borders, and like visibility.
                 </p>
                 <div class="setting-toggle-row">
                     <label class="switch-label" for="setting-show-likes">
                         <input type="checkbox" id="setting-show-likes" checked>
                         <span>Display Like buttons &amp; heart counts on public photo pages</span>
                     </label>
-                    <button type="button" class="primary" id="save-settings-btn">Save Settings</button>
+                </div>
+                <div class="row" style="margin-top:1.25rem;">
+                    <div class="col">
+                        <label>Default Global Frame Style</label>
+                        <select id="setting-default-frame">
+                            <option value="none">No Frame (Borderless)</option>
+                            <option value="white">White Frame (Passepartout)</option>
+                            <option value="black">Black Frame</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>Global Frame Width (px)</label>
+                        <input type="number" id="setting-frame-width" min="0" max="100" value="16">
+                    </div>
+                    <div class="col" style="align-self:flex-end;">
+                        <button type="button" class="primary" id="save-settings-btn" style="width:100%; height:38px;">Save Settings</button>
+                    </div>
                 </div>
                 <div class="status-box" id="settings-status-box">Status: Ready</div>
             </div>
@@ -638,27 +654,53 @@
 
                     <div class="row">
                         <div class="col">
-                            <label>Description</label>
-                            <textarea id="input-desc" rows="2" placeholder="Brutalist architectural framing..."></textarea>
+                            <label>Description <span style="font-size:11px; color:var(--muted);">(Optional)</span></label>
+                            <textarea id="input-desc" rows="2" placeholder="Architectural framing and context (optional)..."></textarea>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col">
-                            <label>Location (Name)</label>
-                            <input type="text" id="input-loc-name" placeholder="e.g. Berlin, Kreuzberg">
+                            <label>Frame / Border Style</label>
+                            <select id="input-frame">
+                                <option value="default">Global Default</option>
+                                <option value="none">No Frame</option>
+                                <option value="white">White Frame</option>
+                                <option value="black">Black Frame</option>
+                            </select>
                         </div>
                         <div class="col">
-                            <label>Latitude</label>
-                            <input type="number" step="0.0001" id="input-lat">
-                        </div>
-                        <div class="col">
-                            <label>Longitude</label>
-                            <input type="number" step="0.0001" id="input-lng">
+                            <label>Custom Frame Width (px, optional)</label>
+                            <input type="number" id="input-frame-width" min="0" max="100" placeholder="Leave empty for global width">
                         </div>
                     </div>
 
-                    <div id="picker-map"></div>
+                    <div style="margin-top:1.5rem; padding:1.2rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                            <label class="switch-label" for="input-has-location" style="font-weight:600; font-size:13px; color:#ffffff;">
+                                <input type="checkbox" id="input-has-location" checked>
+                                <span>Enable Location &amp; Map Display</span>
+                            </label>
+                            <span style="font-size:11px; color:var(--muted); font-family:var(--font-mono);">🔒 Exif GPS stripped on upload</span>
+                        </div>
+                        <div id="location-fields-wrap">
+                            <div class="row">
+                                <div class="col">
+                                    <label>Location Name <span style="font-size:11px; color:var(--muted);">(Optional)</span></label>
+                                    <input type="text" id="input-loc-name" placeholder="e.g. Berlin, Germany">
+                                </div>
+                                <div class="col">
+                                    <label>Latitude <span style="font-size:11px; color:var(--muted);">(Optional)</span></label>
+                                    <input type="number" step="0.0001" id="input-lat" placeholder="Leave empty for no coordinates">
+                                </div>
+                                <div class="col">
+                                    <label>Longitude <span style="font-size:11px; color:var(--muted);">(Optional)</span></label>
+                                    <input type="number" step="0.0001" id="input-lng" placeholder="Leave empty for no coordinates">
+                                </div>
+                            </div>
+                            <div id="picker-map" style="margin-top:1rem;"></div>
+                        </div>
+                    </div>
 
                     <div style="margin-top:1.5rem;">
                         <label style="margin-bottom:0.5rem;">EXIF Metadata (Editable)</label>
@@ -706,6 +748,7 @@
                             <th>Title</th>
                             <th>Photographer</th>
                             <th>Instagram</th>
+                            <th>Frame</th>
                             <th>Location</th>
                             <th style="width:130px; text-align:right;">Actions</th>
                         </tr>
@@ -750,6 +793,8 @@
             const saveTokenBtn = document.getElementById('save-token-btn');
 
             const settingShowLikes = document.getElementById('setting-show-likes');
+            const settingDefaultFrame = document.getElementById('setting-default-frame');
+            const settingFrameWidth = document.getElementById('setting-frame-width');
             const saveSettingsBtn = document.getElementById('save-settings-btn');
             const settingsStatusBox = document.getElementById('settings-status-box');
 
@@ -771,9 +816,38 @@
             const photographerList = document.getElementById('photographer-list');
             const instagramList = document.getElementById('instagram-list');
             const inputDesc = document.getElementById('input-desc');
+            const inputFrame = document.getElementById('input-frame');
+            const inputFrameWidth = document.getElementById('input-frame-width');
+            const inputHasLocation = document.getElementById('input-has-location');
+            const locationFieldsWrap = document.getElementById('location-fields-wrap');
             const inputLocName = document.getElementById('input-loc-name');
             const inputLat = document.getElementById('input-lat');
             const inputLng = document.getElementById('input-lng');
+
+            function updatePreviewFrame() {
+                const f = inputFrame.value === 'default' ? (currentSettings.default_frame || 'none') : inputFrame.value;
+                const w = inputFrameWidth.value ? parseInt(inputFrameWidth.value, 10) : (currentSettings.frame_width || 16);
+                previewThumb.style.boxSizing = 'border-box';
+                if (f === 'white') {
+                    previewThumb.style.border = `${w}px solid #ffffff`;
+                    previewThumb.style.outline = 'none';
+                } else if (f === 'black') {
+                    previewThumb.style.border = `${w}px solid #000000`;
+                    previewThumb.style.outline = '1px solid rgba(255, 255, 255, 0.2)';
+                } else {
+                    previewThumb.style.border = 'none';
+                    previewThumb.style.outline = 'none';
+                }
+            }
+
+            inputFrame.addEventListener('change', updatePreviewFrame);
+            inputFrameWidth.addEventListener('input', updatePreviewFrame);
+            inputHasLocation.addEventListener('change', () => {
+                locationFieldsWrap.style.display = inputHasLocation.checked ? 'block' : 'none';
+                if (inputHasLocation.checked && inputLat.value && inputLng.value) {
+                    setTimeout(() => initPickerMap(parseFloat(inputLat.value), parseFloat(inputLng.value)), 100);
+                }
+            });
 
             const inputCamera = document.getElementById('input-camera');
             const inputLens = document.getElementById('input-lens');
@@ -969,19 +1043,26 @@
                     if (exif.ExposureTime) inputShutter.value = exif.ExposureTime < 1 ? `1/${Math.round(1 / exif.ExposureTime)}s` : `${exif.ExposureTime}s`;
                     if (exif.ISO) inputIso.value = exif.ISO;
 
-                    let lat = parseFloat(inputLat.value) || 52.5200;
-                    let lng = parseFloat(inputLng.value) || 13.4050;
-                    if (exif.latitude && exif.longitude) {
-                        lat = exif.latitude;
-                        lng = exif.longitude;
+                    if (exif.latitude != null && exif.longitude != null && !isNaN(exif.latitude) && !isNaN(exif.longitude)) {
+                        inputLat.value = Number(exif.latitude).toFixed(4);
+                        inputLng.value = Number(exif.longitude).toFixed(4);
+                        inputHasLocation.checked = true;
+                        locationFieldsWrap.style.display = 'block';
                         if (!inputLocName.value) inputLocName.value = 'GPS Location';
+                        setTimeout(() => initPickerMap(exif.latitude, exif.longitude), 100);
+                    } else {
+                        inputLat.value = '';
+                        inputLng.value = '';
+                        inputHasLocation.checked = false;
+                        locationFieldsWrap.style.display = 'none';
                     }
-                    inputLat.value = lat.toFixed(4);
-                    inputLng.value = lng.toFixed(4);
-
-                    setTimeout(() => initPickerMap(lat, lng), 100);
+                    updatePreviewFrame();
                 } catch (e) {
-                    initPickerMap(parseFloat(inputLat.value) || 52.5200, parseFloat(inputLng.value) || 13.4050);
+                    inputLat.value = '';
+                    inputLng.value = '';
+                    inputHasLocation.checked = false;
+                    locationFieldsWrap.style.display = 'none';
+                    updatePreviewFrame();
                 }
             }
 
@@ -1020,6 +1101,8 @@
                     let fileContent = JSON.parse(decodeURIComponent(escape(window.atob(catData.content))));
 
                     currentSettings.show_likes = settingShowLikes.checked;
+                    currentSettings.default_frame = settingDefaultFrame.value;
+                    currentSettings.frame_width = parseInt(settingFrameWidth.value, 10) || 16;
 
                     let payload = {};
                     if (Array.isArray(fileContent)) {
@@ -1082,8 +1165,16 @@
                 inputInstagram.value = photo.instagram || '';
                 inputDesc.value = photo.description || '';
                 inputLocName.value = photo.location_name || '';
-                inputLat.value = photo.latitude || 0;
-                inputLng.value = photo.longitude || 0;
+
+                const hasLoc = photo.has_location !== false && photo.latitude != null && photo.longitude != null && !isNaN(photo.latitude) && !isNaN(photo.longitude) && !(Number(photo.latitude) === 0 && Number(photo.longitude) === 0);
+                inputHasLocation.checked = hasLoc;
+                inputLat.value = (photo.latitude != null && !isNaN(photo.latitude)) ? photo.latitude : '';
+                inputLng.value = (photo.longitude != null && !isNaN(photo.longitude)) ? photo.longitude : '';
+                locationFieldsWrap.style.display = hasLoc ? 'block' : 'none';
+
+                inputFrame.value = photo.frame || 'default';
+                inputFrameWidth.value = photo.frame_width != null ? photo.frame_width : '';
+                updatePreviewFrame();
 
                 inputCamera.value = photo.camera || '';
                 inputLens.value = photo.lens || '';
@@ -1101,7 +1192,7 @@
                 fetchExistingAssetPreview(photo.filename);
 
                 setTimeout(() => {
-                    initPickerMap(photo.latitude, photo.longitude);
+                    if (hasLoc) initPickerMap(photo.latitude, photo.longitude);
                 }, 100);
 
                 document.getElementById('photo-form-card').scrollIntoView({ behavior: 'smooth' });
@@ -1150,13 +1241,20 @@
                 // Clear fields
                 inputTitle.value = '';
                 inputDesc.value = '';
+                inputFrame.value = 'default';
+                inputFrameWidth.value = '';
+                inputHasLocation.checked = true;
+                locationFieldsWrap.style.display = 'block';
                 inputLocName.value = '';
+                inputLat.value = '';
+                inputLng.value = '';
                 inputCamera.value = '';
                 inputLens.value = '';
                 inputFocal.value = '';
                 inputAperture.value = '';
                 inputShutter.value = '';
                 inputIso.value = '';
+                updatePreviewFrame();
             }
 
             cancelEditBtn.addEventListener('click', cancelEdit);
@@ -1275,6 +1373,10 @@
                         }
                     }
 
+                    const hasLoc = inputHasLocation.checked && inputLat.value.trim() !== '' && inputLng.value.trim() !== '';
+                    const frameChoice = inputFrame.value === 'default' ? 'none' : inputFrame.value;
+                    const frameW = inputFrameWidth.value.trim() !== '' ? parseInt(inputFrameWidth.value, 10) : null;
+
                     if (editingPhotoId) {
                         // Update existing entry
                         const targetIdx = rawPhotos.findIndex(p => p.id === editingPhotoId);
@@ -1287,9 +1389,12 @@
                             photographer: inputPhotographer.value.trim() || 'Silas Hörz',
                             instagram: inputInstagram.value.trim(),
                             description: inputDesc.value.trim(),
-                            location_name: inputLocName.value.trim() || 'Location',
-                            latitude: parseFloat(inputLat.value) || 0,
-                            longitude: parseFloat(inputLng.value) || 0,
+                            location_name: inputLocName.value.trim(),
+                            has_location: hasLoc,
+                            latitude: hasLoc ? parseFloat(inputLat.value) : null,
+                            longitude: hasLoc ? parseFloat(inputLng.value) : null,
+                            frame: frameChoice,
+                            frame_width: frameW,
                             camera: inputCamera.value.trim(),
                             lens: inputLens.value.trim(),
                             focal_length: inputFocal.value.trim(),
@@ -1314,9 +1419,12 @@
                             photographer: inputPhotographer.value.trim() || 'Silas Hörz',
                             instagram: inputInstagram.value.trim(),
                             description: inputDesc.value.trim(),
-                            location_name: inputLocName.value.trim() || 'Location',
-                            latitude: parseFloat(inputLat.value) || 0,
-                            longitude: parseFloat(inputLng.value) || 0,
+                            location_name: inputLocName.value.trim(),
+                            has_location: hasLoc,
+                            latitude: hasLoc ? parseFloat(inputLat.value) : null,
+                            longitude: hasLoc ? parseFloat(inputLng.value) : null,
+                            frame: frameChoice,
+                            frame_width: frameW,
                             year: new Date().getFullYear().toString(),
                             date: new Date().toISOString().split('T')[0],
                             camera: inputCamera.value.trim(),
@@ -1439,6 +1547,14 @@
                         ? `<a href="https://instagram.com/${p.instagram.replace(/^@/, '')}" target="_blank" rel="noopener noreferrer" style="color:var(--muted); text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>${p.instagram} ↗</a>`
                         : '<span style="color:var(--muted);">—</span>';
 
+                    const frameBadge = p.frame === 'white' ? `<span style="background:#fff; color:#000; padding:1px 6px; border-radius:3px; font-size:10px; font-weight:700;">WHITE${p.frame_width ? ` (${p.frame_width}px)` : ''}</span>`
+                        : p.frame === 'black' ? `<span style="background:#111; color:#fff; border:1px solid #444; padding:1px 6px; border-radius:3px; font-size:10px; font-weight:700;">BLACK${p.frame_width ? ` (${p.frame_width}px)` : ''}</span>`
+                        : `<span style="color:var(--muted); font-size:11px;">None</span>`;
+
+                    const locDisplay = (p.has_location !== false && p.latitude != null && p.longitude != null && !isNaN(p.latitude) && !isNaN(p.longitude) && !(Number(p.latitude) === 0 && Number(p.longitude) === 0))
+                        ? (p.location_name || 'Mapped')
+                        : (p.location_name ? `${p.location_name} <span style="color:var(--muted); font-size:10px;">(No Map)</span>` : '<span style="color:var(--muted);">—</span>');
+
                     tr.innerHTML = `
                         <td style="color:var(--muted); font-size:11px;">${idx + 1}</td>
                         <td style="white-space:nowrap;">
@@ -1449,7 +1565,8 @@
                         <td><strong>${p.title}</strong></td>
                         <td>${p.photographer}</td>
                         <td>${igDisplay}</td>
-                        <td>${p.location_name}</td>
+                        <td>${frameBadge}</td>
+                        <td>${locDisplay}</td>
                         <td style="text-align:right; white-space:nowrap;">
                             <button type="button" class="edit-action-btn" data-id="${p.id}" title="Edit metadata &amp; details">✎ Edit</button>
                             <button type="button" class="danger delete-btn" data-id="${p.id}" title="Delete photo">Delete</button>
@@ -1586,6 +1703,8 @@
                     }
 
                     settingShowLikes.checked = currentSettings.show_likes !== false;
+                    settingDefaultFrame.value = currentSettings.default_frame || 'none';
+                    settingFrameWidth.value = currentSettings.frame_width || 16;
 
                     // Enrich photographer registry
                     currentCatalog.forEach(p => {
