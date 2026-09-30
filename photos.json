@@ -2,7 +2,7 @@
   "settings": {
     "show_likes": true,
     "default_frame": "none",
-    "frame_width": 16
+    "frame_width": 8
   },
   "photos": [
     {
@@ -15,7 +15,7 @@
       "has_location": false,
       "latitude": null,
       "longitude": null,
-      "frame": "none",
+      "frame": "white",
       "frame_width": null,
       "year": "2026",
       "date": "2026-09-28",
