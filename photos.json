@@ -6,6 +6,56 @@
   },
   "photos": [
     {
+      "id": "photo-muo6uz2l-poeo",
+      "title": "Heart of the Volcano",
+      "photographer": "Samuel",
+      "instagram": "@m77samy",
+      "description": "",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-09-30",
+      "camera": "Sony A6000",
+      "lens": "Viltrox 35mm F1.7 E",
+      "focal_length": "35mm",
+      "aperture": "f/5",
+      "shutter": "1s",
+      "iso": "1600",
+      "filename": "photo-muo6uz2l-poeo.bin",
+      "width": 1707,
+      "height": 2560,
+      "aspect_ratio": 0.6668,
+      "images": [
+        {
+          "filename": "photo-muo6uz2l-poeo.bin",
+          "width": 1707,
+          "height": 2560,
+          "aspect_ratio": 0.6668,
+          "lens": "Viltrox 35mm F1.7 E",
+          "focal_length": "35mm",
+          "aperture": "f/5",
+          "shutter": "1s",
+          "iso": "1600"
+        },
+        {
+          "filename": "photo-muo6v1li-jr1h.bin",
+          "width": 1707,
+          "height": 2560,
+          "aspect_ratio": 0.6668,
+          "lens": "Viltrox 35mm F1.7 E",
+          "focal_length": "35mm",
+          "aperture": "f/5",
+          "shutter": "1s",
+          "iso": "1600"
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-mulexw9o-lqy7",
       "title": "Blue Hour on the Ground",
       "photographer": "Silas",
