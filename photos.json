@@ -6,6 +6,43 @@
   },
   "photos": [
     {
+      "id": "photo-muo727vt-umps",
+      "title": "Sunset",
+      "photographer": "Silas",
+      "instagram": "@silas.ah",
+      "description": "",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-09-30",
+      "camera": "Sony A6000",
+      "lens": "Samyang F2.0 12mm",
+      "focal_length": "12mm",
+      "aperture": "",
+      "shutter": "1/800s",
+      "iso": "100",
+      "filename": "photo-muo727vt-umps.bin",
+      "width": 1706,
+      "height": 2560,
+      "aspect_ratio": 0.6664,
+      "images": [
+        {
+          "filename": "photo-muo727vt-umps.bin",
+          "width": 1706,
+          "height": 2560,
+          "aspect_ratio": 0.6664,
+          "lens": "----",
+          "shutter": "1/800s",
+          "iso": "100"
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-muo6uz2l-poeo",
       "title": "Heart of the Volcano",
       "photographer": "Samuel",
