@@ -6,6 +6,41 @@
   },
   "photos": [
     {
+      "id": "photo-mup7j74t-gp43",
+      "title": "Hen",
+      "photographer": "Samuel",
+      "instagram": "@m77samy",
+      "description": "",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-10-01",
+      "camera": "Nikon [Analog]",
+      "lens": "",
+      "focal_length": "",
+      "aperture": "",
+      "shutter": "",
+      "iso": "400",
+      "filename": "photo-mup7j74t-gp43.bin",
+      "width": 2560,
+      "height": 1697,
+      "aspect_ratio": 1.5085,
+      "images": [
+        {
+          "filename": "photo-mup7j74t-gp43.bin",
+          "width": 2560,
+          "height": 1697,
+          "aspect_ratio": 1.5085,
+          "camera": "NORITSU KOKI EZ Controller"
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-muo756y6-ytua",
       "title": "Peak",
       "photographer": "Silas",
