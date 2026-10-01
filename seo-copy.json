@@ -1,0 +1,36 @@
+{
+  "brand": {
+    "name": "Kanito",
+    "legalName": "Silas Hörz - Kanito",
+    "alternateNames": ["Kanito Studio", "Kanito Engineering", "Kanito Photography"],
+    "tagline": "Hardware Engineering, Embedded Electronics, CAD & Photography",
+    "description": "Kanito is an open, independent platform exploring custom hardware design, embedded firmware, CAD engineering, and creative photography shared with close friends.",
+    "founder": "Silas Hörz",
+    "website": "https://kanito.de",
+    "socialProfiles": [
+      "https://github.com/Silas-Hoerz",
+      "https://instagram.com/silas.ah"
+    ]
+  },
+  "pages": {
+    "landing": {
+      "title": "Kanito — Hardware Engineering & Photography",
+      "metaDescription": "Open engineering & photography showcase: Custom embedded electronics, CAD hardware prototyping, firmware, and photo series.",
+      "heroSubtitle": "Development and distribution of electronic assemblies, microcontroller accessories, and photography.",
+      "aboutTitle": "About Kanito",
+      "aboutIntro": "Welcome to Kanito.",
+      "aboutSnippet": "Kanito is a space dedicated to building and sharing projects for the pure joy of creating — spanning electronics design, embedded firmware, CAD mechanical design, and photography shared with a good friend. Everything here is open to explore, learn from, and collaborate on.",
+      "keywords": "Kanito, Kanito Engineering, Kanito Photography, Hardware Prototyping, Embedded Systems, Microcontroller Accessories, ESP32, Capacitive Touch"
+    },
+    "projects": {
+      "title": "Projects & Hardware Engineering | Kanito",
+      "metaDescription": "Open-source electronics, microcontroller accessories, and hardware prototypes developed by Kanito. Explore documentation, schematics, and code.",
+      "heroSubtitle": "Engineering and prototyping: custom PCB designs, microcontroller modules, and mechanical solutions."
+    },
+    "photos": {
+      "title": "Photos & Gallery | Kanito",
+      "metaDescription": "A curated photography portfolio and visual collection by Kanito and collaborating friends.",
+      "heroSubtitle": "A collection of photographs capturing moments, perspectives, and visual impressions."
+    }
+  }
+}

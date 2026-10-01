@@ -217,6 +217,12 @@ async function build() {
     console.log('Starting Kanito portfolio build...');
     const TEMPLATE = await fs.readFile('template.html', 'utf-8');
     const PROJECTS = JSON.parse(await fs.readFile('projects.json', 'utf-8'));
+    let SEO_DATA = null;
+    try {
+        SEO_DATA = JSON.parse(await fs.readFile('seo-copy.json', 'utf-8'));
+    } catch (e) {
+        console.warn('Note: Could not parse seo-copy.json, using defaults.');
+    }
     const YEAR = new Date().getFullYear().toString();
 
     let PHOTOS = [];
@@ -319,24 +325,79 @@ async function build() {
     let indexCardsHtml = '';
     let sitemapUrls = `<url><loc>${DOMAIN}/</loc><priority>1.0</priority></url>\n`;
 
+    // Mapping for local offline repositories inside 'aktuelle repos'
+    const LOCAL_REPOS_MAP = {
+        'Silas-Hoerz/Kanito-Tally': {
+            dir: 'aktuelle repos/Kanito-Tally-main/Kanito-Tally-main',
+            title: 'Kanito-Tally',
+            name: 'Kanito-Tally',
+            description: 'Ultra-compact wireless tally light system for live video production featuring ESP32-C6, WiFi 6 and 10+ hours battery life.'
+        },
+        'Silas-Hoerz/Scrollwheel': {
+            dir: 'aktuelle repos/Scrollwheel-main/Scrollwheel-main',
+            title: 'Scrollwheel',
+            name: 'Scrollwheel',
+            description: 'High-precision capacitive radial touch slider PCB (CY8CMBR3106S) with advanced physics kinematics and gesture algorithms.'
+        }
+    };
+
     // --- GITHUB PROJECT PAGES ---
     for (const repo of PROJECTS) {
         console.log(`Processing project ${repo}...`);
 
-        const headers = process.env.GITHUB_TOKEN
-            ? { 'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
-            : { 'Accept': 'application/vnd.github.v3+json' };
+        let title = repo.split('/')[1] || repo;
+        let desc = `Technical documentation and source code for ${title}.`;
+        let md = null;
+        const localCfg = LOCAL_REPOS_MAP[repo];
 
-        const apiRes = await fetch(`https://api.github.com/repos/${repo}`, { headers });
-        const data = await apiRes.json();
+        if (localCfg) {
+            try {
+                const localReadmePath = `${localCfg.dir}/README.md`;
+                md = await fs.readFile(localReadmePath, 'utf-8');
+                title = localCfg.title;
+                desc = localCfg.description;
+                console.log(`-> Loaded ${repo} from local repo: ${localCfg.dir}`);
 
-        const branch = data.default_branch || 'main';
-        const desc = data.description || `Technical documentation and source code for ${data.name}.`;
-        const title = data.name;
+                // Copy local images folder to dist/<slug>/images so all assets are self-contained
+                const localImgDir = `${localCfg.dir}/images`;
+                try {
+                    await copyDir(localImgDir, `dist/${title}/images`);
+                    console.log(`-> Copied local images to dist/${title}/images`);
+                } catch (e) {
+                    console.warn(`-> No local images found in ${localImgDir}`);
+                }
+            } catch (err) {
+                console.warn(`Could not read local repo for ${repo}, falling back to GitHub API`, err);
+            }
+        }
+
+        if (!md) {
+            const headers = process.env.GITHUB_TOKEN
+                ? { 'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
+                : { 'Accept': 'application/vnd.github.v3+json' };
+
+            let branch = 'main';
+            try {
+                const apiRes = await fetch(`https://api.github.com/repos/${repo}`, { headers });
+                if (apiRes.ok) {
+                    const data = await apiRes.json();
+                    branch = data.default_branch || 'main';
+                    desc = data.description || desc;
+                    title = data.name || title;
+                }
+            } catch (e) { }
+
+            const readmeRes = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/README.md`);
+            md = readmeRes.ok ? await readmeRes.text() : 'No README found.';
+        }
+
         const slug = title;
 
-        const readmeRes = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/README.md`);
-        let md = readmeRes.ok ? await readmeRes.text() : 'No README found.';
+        // Clean up any git merge conflict artifacts if present in README
+        md = md.replace(/<<<<<<< HEAD[\s\S]*?=======[\s\S]*?>>>>>>> [a-f0-9]+/g, (match) => {
+            const headPart = match.split('=======')[0].replace('<<<<<<< HEAD', '').trim();
+            return headPart;
+        });
 
         let imageUrl = null;
         const mdMatch = md.match(/!\[.*?\]\((.*?)\)/);
@@ -347,11 +408,20 @@ async function build() {
             if (htmlMatch) imageUrl = htmlMatch[1];
         }
 
-        if (imageUrl && !imageUrl.startsWith('http')) {
-            imageUrl = `https://raw.githubusercontent.com/${repo}/${branch}/${imageUrl.replace(/^\.\//, '')}`;
+        if (imageUrl && !imageUrl.startsWith('http') && !localCfg) {
+            imageUrl = `https://raw.githubusercontent.com/${repo}/main/${imageUrl.replace(/^\.\//, '')}`;
+        } else if (imageUrl && !imageUrl.startsWith('http') && localCfg) {
+            // Local relative path: normalize to /slug/images/...
+            const imgFile = imageUrl.replace(/^\/?(images\/|\.\/images\/)/, '');
+            imageUrl = `/${slug}/images/${imgFile}`;
         }
 
-        md = md.replace(/!\[([^\]]*)\]\((?!http)(.*?)\)/g, `![$1](https://raw.githubusercontent.com/${repo}/${branch}/$2)`);
+        // Fix markdown relative image links
+        if (localCfg) {
+            md = md.replace(/!\[([^\]]*)\]\((?!http)(?:\.?\/?images\/)?(.*?)\)/g, `![$1](/${slug}/images/$2)`);
+        } else {
+            md = md.replace(/!\[([^\]]*)\]\((?!http)(.*?)\)/g, `![$1](https://raw.githubusercontent.com/${repo}/main/$2)`);
+        }
 
         // --- MATH FIX START ---
         md = md.replace(/\$`(.*?)`\$/g, '$$$1$$');
@@ -398,14 +468,15 @@ async function build() {
             "codeRepository": `https://github.com/${repo}`,
             "author": {
                 "@type": "Person",
-                "name": "Kanito"
+                "name": "Silas Hörz",
+                "sameAs": "https://github.com/Silas-Hoerz"
             }
         };
 
         let pageHtml = renderTemplate(TEMPLATE, {
             title: `${title} | Kanito`,
             description: desc.replace(/"/g, '&quot;'),
-            image: imageUrl || `${DOMAIN}/logo.png`,
+            image: imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${DOMAIN}${imageUrl}`) : `${DOMAIN}/logo.png`,
             url: `${DOMAIN}/${slug}/`,
             year: YEAR,
             jsonLd: `<script type="application/ld+json">\n${JSON.stringify(jsonLd)}\n</script>`,
@@ -432,21 +503,29 @@ async function build() {
         </section>
     `;
 
+    const projTitle = (SEO_DATA && SEO_DATA.pages && SEO_DATA.pages.projects && SEO_DATA.pages.projects.title) || 'Projects & Hardware Engineering | Kanito';
+    const projDesc = (SEO_DATA && SEO_DATA.pages && SEO_DATA.pages.projects && SEO_DATA.pages.projects.metaDescription) || 'Open-source electronics, microcontroller accessories, and hardware prototypes developed by Kanito. Explore documentation, schematics, and code.';
+
     const projectsJsonLd = {
         "@context": "https://schema.org",
-        "@type": "WebSite",
+        "@type": "CollectionPage",
         "name": "Kanito Projects",
         "url": `${DOMAIN}/projects/`,
-        "description": "Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components for hardware projects."
+        "description": projDesc,
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "Kanito",
+            "url": DOMAIN
+        }
     };
 
     let finalProjects = renderTemplate(TEMPLATE, {
-        title: 'Projects | Kanito',
-        description: 'Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components for hardware projects.',
+        title: projTitle,
+        description: projDesc,
         image: `${DOMAIN}/logo.png`,
         url: `${DOMAIN}/projects/`,
         year: YEAR,
-        jsonLd: `<script type="application/ld+json">\n${JSON.stringify(projectsJsonLd)}\n</script>`,
+        jsonLd: `<script type="application/ld+json">\n${JSON.stringify(projectsJsonLd, null, 2)}\n</script>`,
         content: projectsContent,
         themeStyles: '',
         shaderPalette: DEFAULT_SHADER_PALETTE
@@ -515,6 +594,27 @@ async function build() {
             </a>
 
             
+        </section>
+
+        <section class="landing-about" aria-label="About Kanito">
+            <h2 class="landing-about-intro">${(SEO_DATA && SEO_DATA.pages && SEO_DATA.pages.landing && SEO_DATA.pages.landing.aboutIntro) || "Welcome to Kanito."}</h2>
+            <p class="landing-about-text">${(SEO_DATA && SEO_DATA.pages && SEO_DATA.pages.landing && SEO_DATA.pages.landing.aboutSnippet) || "Kanito is a space dedicated to building and sharing projects for the pure joy of creating — spanning electronics design, embedded firmware, CAD mechanical design, and photography shared with a good friend. Everything here is open to explore, learn from, and collaborate on."}</p>
+            <div class="landing-about-links">
+                <a href="https://github.com/Silas-Hoerz" target="_blank" rel="noopener noreferrer" title="GitHub Profile">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <span>GitHub</span>
+                </a>
+                <a href="https://instagram.com/silas.ah" target="_blank" rel="noopener noreferrer" title="Instagram Profile">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    <span>Instagram</span>
+                </a>
+                <a href="/projects/" title="Explore all engineering projects">
+                    <span>Projects →</span>
+                </a>
+                <a href="/photos/" title="Explore photo portfolio">
+                    <span>Photography →</span>
+                </a>
+            </div>
         </section>
 
         <script>
@@ -707,21 +807,55 @@ async function build() {
         </script>
     `;
 
+    const landingTitle = (SEO_DATA && SEO_DATA.pages && SEO_DATA.pages.landing && SEO_DATA.pages.landing.title) || 'Kanito — Hardware Engineering & Photography';
+    const landingDesc = (SEO_DATA && SEO_DATA.pages && SEO_DATA.pages.landing && SEO_DATA.pages.landing.metaDescription) || 'Personal engineering & creative portfolio of Silas Hörz: Custom embedded electronics, CAD hardware prototyping, and curated fine-art photography.';
+
     const indexJsonLd = {
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Kanito",
-        "url": DOMAIN,
-        "description": "Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components."
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": `${DOMAIN}/#website`,
+                "url": DOMAIN,
+                "name": "Kanito",
+                "description": landingDesc,
+                "publisher": {
+                    "@id": `${DOMAIN}/#organization`
+                },
+                "inLanguage": "en"
+            },
+            {
+                "@type": "Organization",
+                "@id": `${DOMAIN}/#organization`,
+                "name": (SEO_DATA && SEO_DATA.brand && SEO_DATA.brand.name) || "Kanito",
+                "alternateName": (SEO_DATA && SEO_DATA.brand && SEO_DATA.brand.alternateNames) || ["Kanito Studio", "Kanito Engineering", "Kanito Photography"],
+                "url": DOMAIN,
+                "logo": `${DOMAIN}/logo.png`,
+                "image": `${DOMAIN}/logo.png`,
+                "description": (SEO_DATA && SEO_DATA.brand && SEO_DATA.brand.description) || landingDesc,
+                "founder": {
+                    "@type": "Person",
+                    "name": (SEO_DATA && SEO_DATA.brand && SEO_DATA.brand.founder) || "Silas Hörz",
+                    "sameAs": [
+                        "https://github.com/Silas-Hoerz",
+                        "https://instagram.com/silas.ah"
+                    ]
+                },
+                "sameAs": (SEO_DATA && SEO_DATA.brand && SEO_DATA.brand.socialProfiles) || [
+                    "https://github.com/Silas-Hoerz",
+                    "https://instagram.com/silas.ah"
+                ]
+            }
+        ]
     };
 
     let finalIndex = renderTemplate(TEMPLATE, {
-        title: 'Kanito | Engineering & Photography',
-        description: 'Development and distribution of electronic assemblies, microcontroller accessories, and prototyping components.',
+        title: landingTitle,
+        description: landingDesc,
         image: `${DOMAIN}/logo.png`,
         url: `${DOMAIN}/`,
         year: YEAR,
-        jsonLd: `<script type="application/ld+json">\n${JSON.stringify(indexJsonLd)}\n</script>`,
+        jsonLd: `<script type="application/ld+json">\n${JSON.stringify(indexJsonLd, null, 2)}\n</script>`,
         content: landingContent,
         themeStyles: LANDING_THEME_STYLES,
         shaderPalette: LANDING_SHADER_PALETTE
@@ -794,23 +928,22 @@ async function build() {
             `;
         }
 
+        const photosTitle = (SEO_DATA && SEO_DATA.pages && SEO_DATA.pages.photos && SEO_DATA.pages.photos.title) || 'Photos & Gallery | Kanito';
+        const photosDesc = (SEO_DATA && SEO_DATA.pages && SEO_DATA.pages.photos && SEO_DATA.pages.photos.metaDescription) || 'A curated photography portfolio and visual collection by Kanito and collaborating friends.';
+
         const photosJsonLd = {
             "@context": "https://schema.org",
             "@type": "ImageGallery",
             "name": "Kanito Photos",
             "url": `${DOMAIN}/photos/`,
-            "description": "Curated architectural and monochrome photography portfolio by Silas Hörz and collaborative photographers.",
-            "author": {
-                "@type": "Person",
-                "name": "Silas Hörz"
-            },
+            "description": photosDesc,
             "hasPart": PHOTOS.map(p => ({
                 "@type": "Photograph",
                 "name": p.title,
-                "description": p.description,
+                "description": p.description || p.title,
                 "author": {
                     "@type": "Person",
-                    "name": p.photographer,
+                    "name": p.photographer || "Kanito",
                     ...(p.instagram ? { "sameAs": `https://instagram.com/${p.instagram.replace(/^@/, '')}` } : {})
                 },
                 "contentLocation": p.location_name,
@@ -819,8 +952,8 @@ async function build() {
         };
 
         const finalPhotosHtml = PHOTOS_TEMPLATE
-            .replace(/{{TITLE}}/g, 'Photos | Kanito')
-            .replace(/{{DESCRIPTION}}/g, 'Curated fine-art architectural and monochrome photography portfolio by Silas Hörz and collaborative photographers.')
+            .replace(/{{TITLE}}/g, photosTitle)
+            .replace(/{{DESCRIPTION}}/g, photosDesc)
             .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
             .replace(/{{URL}}/g, `${DOMAIN}/photos/`)
             .replace(/{{YEAR}}/g, YEAR)
@@ -840,14 +973,13 @@ async function build() {
     }
 
     // --- CURATOR STUDIO & ADMIN (kanito.de/photos/edit) ---
+    // Security & Crawling Hygiene: Kept strictly unindexed (noindex, nofollow) and excluded from sitemap!
     try {
         const EDIT_TEMPLATE = await fs.readFile('photos/template-edit.html', 'utf-8');
         const finalEditHtml = EDIT_TEMPLATE.replace(/{{YEAR}}/g, YEAR);
         await fs.mkdir('dist/photos/edit', { recursive: true });
         await fs.writeFile('dist/photos/edit/index.html', finalEditHtml);
-        console.log('Generated Curator Studio & Admin (dist/photos/edit/index.html)');
-
-        sitemapUrls += `<url><loc>${DOMAIN}/photos/edit/</loc><priority>0.2</priority></url>\n`;
+        console.log('Generated Curator Studio & Admin (dist/photos/edit/index.html) [NOINDEX]');
     } catch (e) {
         console.error('Error generating photos edit page:', e);
     }
@@ -859,7 +991,7 @@ async function build() {
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}</urlset>`;
     await fs.writeFile('dist/sitemap.xml', sitemap);
 
-    const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: ${DOMAIN}/sitemap.xml`;
+    const robotsTxt = `User-agent: *\nAllow: /\nDisallow: /photos/edit/\nDisallow: /sys/\n\nSitemap: ${DOMAIN}/sitemap.xml`;
     await fs.writeFile('dist/robots.txt', robotsTxt);
 
     console.log('Build successful! ✅ All pages generated.');

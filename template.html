@@ -8,18 +8,28 @@
     <title>{{TITLE}}</title>
     <meta name="description" content="{{DESCRIPTION}}">
     <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#08060e">
 
     <link rel="icon" type="image/svg+xml" href="/logo/favicon.svg">
     <link rel="icon" type="image/png" href="/logo.png">
     <link rel="apple-touch-icon" href="/logo.png">
 
     <link rel="canonical" href="{{URL}}">
+    <link rel="alternate" hreflang="x-default" href="{{URL}}">
+    <link rel="alternate" hreflang="en" href="{{URL}}">
+    <link rel="alternate" hreflang="de" href="{{URL}}">
 
+    <meta property="og:site_name" content="Kanito">
     <meta property="og:title" content="{{TITLE}}">
     <meta property="og:description" content="{{DESCRIPTION}}">
     <meta property="og:image" content="{{IMAGE}}">
     <meta property="og:url" content="{{URL}}">
     <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{TITLE}}">
+    <meta name="twitter:description" content="{{DESCRIPTION}}">
+    <meta name="twitter:image" content="{{IMAGE}}">
 
     {{JSON_LD}}
 
@@ -562,6 +572,57 @@
             letter-spacing: 0.1em;
             text-transform: uppercase;
             margin-top: 1rem;
+        }
+
+        .landing-about {
+            width: 100%;
+            max-width: 820px;
+            margin: 1.5rem auto 2.5rem;
+            padding: 1.75rem 2rem;
+            background: rgba(10, 16, 22, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .landing-about-intro {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--c-high);
+            margin: 0 0 0.75rem 0;
+            letter-spacing: 0.02em;
+        }
+
+        .landing-about-text {
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: rgba(230, 255, 255, 0.78);
+            margin: 0 0 1.2rem 0;
+        }
+
+        .landing-about-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .landing-about-links a {
+            color: var(--c-mid);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: color 0.2s, opacity 0.2s;
+        }
+
+        .landing-about-links a:hover {
+            color: #ffffff;
         }
 
         @media (max-width: 850px) {
