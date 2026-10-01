@@ -325,16 +325,16 @@ async function build() {
     let indexCardsHtml = '';
     let sitemapUrls = `<url><loc>${DOMAIN}/</loc><priority>1.0</priority></url>\n`;
 
-    // Mapping for local offline repositories inside 'aktuelle repos'
+    // Mapping for local offline repositories inside 'repos'
     const LOCAL_REPOS_MAP = {
         'Silas-Hoerz/Kanito-Tally': {
-            dir: 'aktuelle repos/Kanito-Tally-main/Kanito-Tally-main',
+            dir: 'repos/Kanito-Tally-main/Kanito-Tally-main',
             title: 'Kanito-Tally',
             name: 'Kanito-Tally',
             description: 'Ultra-compact wireless tally light system for live video production featuring ESP32-C6, WiFi 6 and 10+ hours battery life.'
         },
         'Silas-Hoerz/Scrollwheel': {
-            dir: 'aktuelle repos/Scrollwheel-main/Scrollwheel-main',
+            dir: 'repos/Scrollwheel-main/Scrollwheel-main',
             title: 'Scrollwheel',
             name: 'Scrollwheel',
             description: 'High-precision capacitive radial touch slider PCB (CY8CMBR3106S) with advanced physics kinematics and gesture algorithms.'
@@ -348,6 +348,7 @@ async function build() {
         let title = repo.split('/')[1] || repo;
         let desc = `Technical documentation and source code for ${title}.`;
         let md = null;
+        let defaultBranch = 'main';
         const localCfg = LOCAL_REPOS_MAP[repo];
 
         if (localCfg) {
@@ -376,18 +377,17 @@ async function build() {
                 ? { 'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
                 : { 'Accept': 'application/vnd.github.v3+json' };
 
-            let branch = 'main';
             try {
                 const apiRes = await fetch(`https://api.github.com/repos/${repo}`, { headers });
                 if (apiRes.ok) {
                     const data = await apiRes.json();
-                    branch = data.default_branch || 'main';
+                    defaultBranch = data.default_branch || 'main';
                     desc = data.description || desc;
                     title = data.name || title;
                 }
             } catch (e) { }
 
-            const readmeRes = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/README.md`);
+            const readmeRes = await fetch(`https://raw.githubusercontent.com/${repo}/${defaultBranch}/README.md`);
             md = readmeRes.ok ? await readmeRes.text() : 'No README found.';
         }
 
@@ -399,6 +399,20 @@ async function build() {
             return headPart;
         });
 
+        // Function to resolve relative paths
+        const resolveImgUrl = (rawPath) => {
+            if (!rawPath || rawPath.startsWith('http://') || rawPath.startsWith('https://') || rawPath.startsWith('data:')) {
+                return rawPath;
+            }
+            // Strip leading ./ or /
+            const cleanPath = rawPath.replace(/^\.?\//, '');
+            if (localCfg) {
+                return `/${slug}/${cleanPath}`;
+            } else {
+                return `https://raw.githubusercontent.com/${repo}/${defaultBranch}/${cleanPath}`;
+            }
+        };
+
         let imageUrl = null;
         const mdMatch = md.match(/!\[.*?\]\((.*?)\)/);
         if (mdMatch) {
@@ -408,20 +422,23 @@ async function build() {
             if (htmlMatch) imageUrl = htmlMatch[1];
         }
 
-        if (imageUrl && !imageUrl.startsWith('http') && !localCfg) {
-            imageUrl = `https://raw.githubusercontent.com/${repo}/main/${imageUrl.replace(/^\.\//, '')}`;
-        } else if (imageUrl && !imageUrl.startsWith('http') && localCfg) {
-            // Local relative path: normalize to /slug/images/...
-            const imgFile = imageUrl.replace(/^\/?(images\/|\.\/images\/)/, '');
-            imageUrl = `/${slug}/images/${imgFile}`;
+        if (imageUrl) {
+            imageUrl = resolveImgUrl(imageUrl);
         }
 
-        // Fix markdown relative image links
-        if (localCfg) {
-            md = md.replace(/!\[([^\]]*)\]\((?!http)(?:\.?\/?images\/)?(.*?)\)/g, `![$1](/${slug}/images/$2)`);
-        } else {
-            md = md.replace(/!\[([^\]]*)\]\((?!http)(.*?)\)/g, `![$1](https://raw.githubusercontent.com/${repo}/main/$2)`);
-        }
+        // Fix markdown relative image links: ![alt](path)
+        md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, rawPath) => {
+            const trimmed = rawPath.trim();
+            const urlPart = trimmed.split(' ')[0];
+            const titlePart = trimmed.slice(urlPart.length).trim();
+            const resolved = resolveImgUrl(urlPart);
+            return titlePart ? `![${alt}](${resolved} ${titlePart})` : `![${alt}](${resolved})`;
+        });
+
+        // Fix HTML relative image links: <img src="path" ...>
+        md = md.replace(/(<img\b[^>]*?\bsrc=["'])([^"']+)(["'][^>]*>)/gi, (match, prefix, rawPath, suffix) => {
+            return `${prefix}${resolveImgUrl(rawPath)}${suffix}`;
+        });
 
         // --- MATH FIX START ---
         md = md.replace(/\$`(.*?)`\$/g, '$$$1$$');
