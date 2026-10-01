@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tally Control Unit | ESP32-C6</title>
+    <style>
+        /* themes/broadcast.css */
+        :root {
+            --bg-base: #1e1f22;
+            --bg-panel: #2a2c30;
+            --bg-card: #32353a;
+            --text-main: #d0d3d8;
+            --text-muted: #888888;
+            --text-heading: #ffffff;
+            --border-color: #111111;
+            --accent-primary: #ff9900;
+            --shadow-panel: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 6px rgba(0, 0, 0, 0.3);
+            --shadow-card: inset 0 1px 1px rgba(255, 255, 255, 0.1), inset 0 -2px 4px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.2);
+            --control-bg: #111111;
+            --control-border: #000000;
+            --control-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+            --btn-bg: #3a3d42;
+            --btn-bg-hover: #45494e;
+            --shadow-btn: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -3px 5px rgba(0, 0, 0, 0.6);
+            --shadow-btn-active: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+            --radius-panel: 6px;
+            --radius-btn: 4px;
+            --fader-track: #0a0a0a;
+            --fader-thumb: linear-gradient(to bottom, #999, #555);
+            --signal-program: #ff2a2a;
+            --signal-preview: #00c853;
+            --signal-warning: #ffc400;
+            --signal-error: #ff2a2a;
+        }
+
+        /* Globals (Ebene 0 - Der Tisch) */
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Layout Grid */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: grid;
+            gap: 20px;
+        }
+
+        /* Ebene 1 - Das Gehäuse (Panels) */
+        .panel {
+            background-color: var(--bg-panel);
+            box-shadow: var(--shadow-panel);
+            border-radius: var(--radius-panel);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+        }
+
+        /* Navigation / Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--control-bg);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Knöpfe (Buttons - Regel 4) */
+        button {
+            background-color: var(--btn-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-btn);
+            padding: 10px 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: var(--shadow-btn);
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--btn-bg-hover);
+        }
+
+        button:active,
+        button.active {
+            box-shadow: var(--shadow-btn-active);
+            transform: translateY(1px);
+            color: var(--accent-primary);
+        }
+
+        button.signal-error {
+            color: var(--signal-error);
+        }
+
+        button.signal-preview {
+            color: var(--signal-preview);
+        }
+
+        /* Seiten verstecken/anzeigen */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Ebene 2 - Die Module (Cards) */
+        .card {
+            background-color: var(--bg-card);
+            box-shadow: var(--shadow-card);
+            border-radius: var(--radius-panel);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .card-header {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-heading);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        /* Ebene -1 - Fräsungen (Inputs - Regel 2 & 6) */
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select,
+        textarea {
+            background-color: var(--control-bg);
+            border: 1px solid var(--control-border);
+            box-shadow: var(--control-shadow);
+            color: var(--accent-primary);
+            /* Akzent für Eingaben */
+            font-family: 'Courier New', Courier, monospace;
+            /* Typografie der Techniker */
+            font-size: 14px;
+            padding: 10px;
+            border-radius: var(--radius-btn);
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Fader (Regel 7) */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 10px;
+            background: var(--fader-track);
+            border: 1px solid var(--control-border);
+            box-shadow: var(--control-shadow);
+            border-radius: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 12px;
+            background: var(--fader-thumb);
+            border: 1px solid var(--border-color);
+            border-radius: 2px;
+            margin-top: -8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .value-display {
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--signal-warning);
+            font-size: 14px;
+            background: var(--control-bg);
+            padding: 2px 6px;
+            border-radius: 2px;
+            box-shadow: var(--control-shadow);
+            border: 1px solid var(--control-border);
+        }
+
+        /* Spezifische Layouts */
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-box {
+            height: 200px;
+            resize: vertical;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Status LEDs */
+        .led {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #333;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+            margin-right: 5px;
+        }
+
+        .led.program {
+            background-color: var(--signal-program);
+            box-shadow: 0 0 5px var(--signal-program);
+        }
+
+        .led.preview {
+            background-color: var(--signal-preview);
+            box-shadow: 0 0 5px var(--signal-preview);
+        }
+
+        .led.warning {
+            background-color: var(--signal-warning);
+            box-shadow: 0 0 5px var(--signal-warning);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="panel">
+            <div class="flex-row" style="margin-bottom: 15px;">
+                <div style="font-weight: bold; color: var(--text-heading); letter-spacing: 2px;">TALLY_UNIT_C6</div>
+                <div><span class="led program" id="status-led"></span> <span
+                        style="font-size: 10px; text-transform: uppercase; color: var(--text-muted);">SYS STATUS</span>
+                </div>
+            </div>
+
+            <nav class="tabs">
+                <button class="tab-btn active" onclick="switchTab('settings', this)">Config</button>
+                <button class="tab-btn" onclick="switchTab('debug', this)">Debug</button>
+                <button class="tab-btn" onclick="switchTab('logs', this)">System Logs</button>
+            </nav>
+
+            <main id="settings" class="page active">
+                <div class="card">
+                    <div class="card-header">Network Settings</div>
+                    <div class="form-group">
+                        <label>SSID (Local Network)</label>
+                        <input type="text" id="ssid" value="Studio_Net_5G">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" value="********">
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Hardware Config</div>
+                    <div class="form-group">
+                        <div class="flex-row">
+                            <label>Max LED Brightness</label>
+                            <span class="value-display" id="brightness-val">80%</span>
+                        </div>
+                        <input type="range" id="brightness" min="0" max="100" value="80"
+                            oninput="document.getElementById('brightness-val').innerText = this.value + '%'">
+                    </div>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>Control Protocol</label>
+                        <select id="protocol">
+                            <option value="tsl31">TSL UMD 3.1</option>
+                            <option value="tsl50">TSL UMD 5.0</option>
+                            <option value="bmd">Blackmagic SDI</option>
+                            <option value="vmix">vMix TCP API</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="saveSettings()">Save Configuration</button>
+            </main>
+
+            <main id="debug" class="page">
+                <div class="card">
+                    <div class="card-header">Module Tests</div>
+                    <div class="form-group">
+                        <label>Hardware LED Test</label>
+                        <div style="display: flex; gap: 10px; margin-top: 5px;">
+                            <button class="signal-error" onclick="testTally('program')">Force PGM (Red)</button>
+                            <button class="signal-preview" onclick="testTally('preview')">Force PVW (Green)</button>
+                            <button onclick="testTally('off')">Turn Off</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">System Readouts</div>
+                    <div class="form-group">
+                        <label>Current IP Address</label>
+                        <input type="text" readonly value="192.168.178.42" style="color: var(--text-muted);">
+                    </div>
+                    <div class="form-group">
+                        <label>Uptime</label>
+                        <input type="text" readonly value="04:12:33:01" style="color: var(--text-muted);">
+                    </div>
+                </div>
+            </main>
+
+            <main id="logs" class="page">
+                <div class="card">
+                    <div class="card-header">System Event Log</div>
+                    <div class="form-group">
+                        <textarea id="logArea" class="log-box" readonly>
+[14:02:11] SYS_BOOT: ESP32-C6 Initialized
+[14:02:12] WIFI: Connecting to Studio_Net_5G...
+[14:02:15] WIFI: Connected. IP: 192.168.178.42
+[14:02:16] TALLY: TSL 3.1 Listener started on port 4000
+[14:05:22] TALLY_UPDATE: Index 4 -> PGM (Red)
+[14:45:10] WARN: Packet drop detected from switcher.
+                    </textarea>
+                    </div>
+                    <button onclick="copyLogs()">Copy to Clipboard</button>
+                </div>
+
+                <div class="card" style="border-color: var(--signal-error);">
+                    <div class="card-header" style="color: var(--signal-error);">Submit Bug Report</div>
+                    <div class="form-group">
+                        <label>Describe the issue</label>
+                        <textarea id="bugMessage" rows="3" placeholder="What went wrong?"></textarea>
+                    </div>
+                    <button class="signal-error" onclick="sendBugReport()">Send to GitHub</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        // Settings
+        function saveSettings() {
+            const ssid = document.getElementById('ssid').value;
+            const pwd = document.getElementById('password').value;
+            const bright = document.getElementById('brightness').value;
+            const proto = document.getElementById('protocol').value;
+
+            // Hier würde der Fetch-Call an den ESP32 gehen, z.B.:
+            // fetch('/api/save', { method: 'POST', body: JSON.stringify({ssid, pwd, bright, proto}) })
+
+            alert(`SAVED:\nSSID: ${ssid}\nBrightness: ${bright}%\nProtocol: ${proto}`);
+            addLog(`SYS_CONFIG: Settings saved. Protocol set to ${proto}`);
+        }
+
+        // Debug
+        function testTally(state) {
+            // Fetch Call an ESP32 um die echte Hardware LED zu steuern
+            addLog(`DEBUG: Forced Tally State -> ${state.toUpperCase()}`);
+        }
+
+        // Logs
+        function addLog(msg) {
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            const logArea = document.getElementById('logArea');
+            logArea.value += `\n[${timeStr}] ${msg}`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function copyLogs() {
+            const logArea = document.getElementById('logArea');
+            logArea.select();
+            document.execCommand('copy');
+            alert("Logs copied to clipboard.");
+        }
+
+        // Bug Report zu GitHub
+        async function sendBugReport() {
+            const userMsg = document.getElementById('bugMessage').value;
+            const logs = document.getElementById('logArea').value;
+
+            if (!userMsg) {
+                alert("Please provide a description of the issue.");
+                return;
+            }
+
+            const btn = event.target;
+            btn.innerText = "SENDING...";
+
+            // ACHTUNG: Lies den Hinweis unter dem Codeblock bezüglich Sicherheit!
+            /*
+            const repo = "DEIN_GITHUB_NAME/DEIN_REPO";
+            const token = "DEIN_GITHUB_PERSONAL_ACCESS_TOKEN"; // GEFÄHRLICH IM FRONTEND!
+    
+            try {
+                const response = await fetch(`https://api.github.com/repos/${repo}/issues`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        title: `Bug Report from Tally C6: ${userMsg.substring(0, 30)}...`,
+                        body: `**User Message:**\n${userMsg}\n\n**System Logs:**\n\`\`\`text\n${logs}\n\`\`\``
+                    })
+                });
+    
+                if(response.ok) {
+                    alert("Bug report sent successfully!");
+                    document.getElementById('bugMessage').value = '';
+                } else {
+                    alert("Failed to send bug report.");
+                }
+            } catch (error) {
+                console.error("Error sending report:", error);
+                alert("Network error while sending.");
+            }
+            */
+
+            // Dummy timeout für die Demo
+            setTimeout(() => {
+                alert("Bug report payload prepared! (See comments in code for API execution)");
+                btn.innerText = "SEND TO GITHUB";
+            }, 1000);
+        }
+    </script>
+
+</body>
+
+</html>

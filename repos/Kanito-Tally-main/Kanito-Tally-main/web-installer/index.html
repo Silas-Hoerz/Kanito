@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kanito Tally - Web Installer</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent: #ff3b30;
+            --accent-hover: #d32f2f;
+            --border: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            /* Gleiche kompakte Breite wie die Config */
+            border-radius: 16px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-box {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .info-box p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .info-box .note {
+            font-size: 0.8rem;
+            font-style: italic;
+            color: #777777;
+        }
+
+        /* Der Container für den ESP Web Tools Button */
+        .install-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        esp-web-install-button {
+            --esp-tools-button-color: var(--accent);
+            --esp-tools-button-text-color: #ffffff;
+            --esp-tools-button-border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Kanito Tally Installer</h2>
+        <p class="subtitle">Web Firmware Flasher</p>
+
+        <div class="info-box">
+            <p>Connect your ESP32-C6 to your PC via USB-C and click the button below to install the latest firmware
+                directly from your browser.</p>
+            <p class="note">Requires Google Chrome or Microsoft Edge.</p>
+        </div>
+
+        <div class="install-wrapper">
+            <script type="module"
+                src="https://unpkg.com/esp-web-tools@8.0.1/dist/web/install-button.js?module"></script>
+            <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
+        </div>
+    </div>
+
+</body>
+
+</html>

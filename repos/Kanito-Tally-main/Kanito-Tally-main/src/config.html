@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kanito Tally Configuration</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent: #ff3b30; 
+            --accent-hover: #d32f2f;
+            --border: #333333;
+            --input-bg: #2a2a2a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            appearance: none; 
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+        
+        .select-wrapper::after {
+            content: "▼";
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:active {
+            background-color: var(--accent-hover);
+            transform: scale(0.98);
+        }
+
+        .wifi-scan {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .scan-btn {
+            background: none;
+            color: var(--accent);
+            border: none;
+            padding: 0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+            text-transform: uppercase;
+        }
+        
+        #status-msg {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Kanito Tally Configuration</h2>
+        <p class="subtitle">Wireless Device Setup</p>
+
+        <form id="configForm">
+            <div class="form-group">
+                <div class="wifi-scan">
+                    <label style="margin:0;">WiFi SSID</label>
+                    <button type="button" class="scan-btn" onclick="scanWifi()">Scan Networks</button>
+                </div>
+                <input type="text" id="ssid" placeholder="Production_Network" required>
+            </div>
+
+            <div class="form-group">
+                <label>WiFi Password</label>
+                <input type="password" id="password" placeholder="••••••••">
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--border); margin: 25px 0;">
+
+            <div class="form-group">
+                <label>Operation Mode</label>
+                <div class="select-wrapper">
+                    <select id="mode" onchange="updateLabels()">
+                        <option value="arbiter">TallyArbiter (Recommended)</option>
+                        <option value="atem">Native Blackmagic ATEM</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label id="ip-label">Server IP Address</label>
+                <input type="text" id="server-ip" placeholder="192.168.1.100" pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$" required title="Please enter a valid IP address format">
+            </div>
+
+            <div class="form-group">
+                <label>Camera ID</label>
+                <input type="number" id="cam-id" placeholder="e.g., 3" min="1" max="99" required>
+            </div>
+
+            <button type="submit" id="saveBtn">Save & Reboot</button>
+            <p id="status-msg">Configuration saved. Rebooting device...</p>
+        </form>
+    </div>
+
+    <script>
+        /**
+         * Updates the IP input label based on the selected operation mode.
+         */
+        function updateLabels() {
+            const mode = document.getElementById('mode').value;
+            const ipLabel = document.getElementById('ip-label');
+            if(mode === 'atem') {
+                ipLabel.innerText = "ATEM Switcher IP Address";
+            } else {
+                ipLabel.innerText = "TallyArbiter IP Address";
+            }
+        }
+
+        /**
+         * Initiates a network scan by requesting available SSIDs from the ESP32.
+         * Currently simulated for frontend testing.
+         */
+        function scanWifi() {
+            const scanBtn = document.querySelector('.scan-btn');
+            scanBtn.innerText = "Scanning...";
+            
+            // TODO: Replace with actual GET request to ESP32 (e.g., /api/scan)
+            setTimeout(() => {
+                document.getElementById('ssid').value = "Production_Network_5G";
+                scanBtn.innerText = "Found!";
+                setTimeout(() => scanBtn.innerText = "Rescan", 2000);
+            }, 1000);
+        }
+
+        /**
+         * Handles the configuration form submission.
+         * Prevents default reload and transmits payload to the microcontroller.
+         */
+        document.getElementById('configForm').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            const saveBtn = document.getElementById('saveBtn');
+            const statusMsg = document.getElementById('status-msg');
+            
+            const configPayload = {
+                ssid: document.getElementById('ssid').value,
+                pass: document.getElementById('password').value,
+                mode: document.getElementById('mode').value,
+                ip: document.getElementById('server-ip').value,
+                camId: document.getElementById('cam-id').value
+            };
+
+            // UI Feedback
+            saveBtn.innerText = "Saving...";
+            saveBtn.style.opacity = "0.7";
+
+            // TODO: Replace with actual POST request to ESP32 (e.g., /api/save)
+            console.log("Transmitting payload to ESP32:", configPayload);
+
+            setTimeout(() => {
+                saveBtn.style.display = 'none';
+                statusMsg.style.display = 'block';
+                statusMsg.style.color = '#4cd964'; // Success indicator
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

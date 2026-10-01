@@ -1,0 +1,4 @@
+protocol.v1.NetworkConfig.ssid         max_size:33  
+protocol.v1.NetworkConfig.password     max_size:65  
+protocol.v1.DeviceConfig.device_name   max_size:32  
+protocol.v1.TallyToHub.error_message   max_size:64  

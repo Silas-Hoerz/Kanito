@@ -1,0 +1,8 @@
+#ifndef KANITO_TALLY_VERSION_H_
+#define KANITO_TALLY_VERSION_H_
+
+#define KANITO_VERSION "0.1.0"
+#define KANITO_BUILD_DATE __DATE__
+#define KANITO_PROJECT_NAME "Kanito Tally"
+
+#endif  // KANITO_TALLY_VERSION_H_

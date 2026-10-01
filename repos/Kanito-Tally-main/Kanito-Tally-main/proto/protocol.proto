@@ -1,0 +1,72 @@
+// nanopb_generator protocol.proto
+// protoc --python_out=. protocol.proto
+
+syntax = "proto3";
+
+package protocol.v1;
+
+enum State {
+  STATE_UNSPECIFIED = 0; 
+  STATE_BOOT = 1;
+  STATE_STANDBY = 2;
+  STATE_PREVIEW = 3;     
+  STATE_LIVE = 4;
+  STATE_CONFIG = 5;
+  STATE_SHUTDOWN = 6;
+  STATE_ERROR = 7;
+}
+
+enum PowerMode {
+  POWER_MODE_UNSPECIFIED = 0;
+  POWER_MODE_NORMAL = 1;
+  POWER_MODE_ECO = 2;
+  POWER_MODE_SLEEP = 3;
+}
+
+enum ChargeState {
+  CHARGE_STATE_UNSPECIFIED = 0;
+  CHARGE_STATE_DISCHARGING = 1;
+  CHARGE_STATE_CHARGING = 2;
+  CHARGE_STATE_FULL = 3;
+}
+
+message NetworkConfig {
+  optional string ssid = 1;
+  optional string password = 2;
+  // Hier könnten später static_ip, gateway, subnet_mask hinzukommen
+}
+
+message DeviceConfig {
+  optional string device_name = 1;        // z.B. "Cam 1"
+  optional int32 master_brightness = 2;   // 0-100%
+  optional PowerMode power_mode = 3;
+}
+
+message Telemetry {
+  int32 battery_percentage = 1;
+  ChargeState charge_state = 2;
+  int32 rssi = 3;
+  float temperature_c = 4;
+  uint32 uptime_seconds = 5;
+  float battery_voltage = 6; //mv
+}
+
+message HubToTally {
+  uint32 message_id = 1;
+
+  optional State set_state = 2;
+  optional NetworkConfig set_network = 3;
+  optional DeviceConfig set_device = 4;
+  
+  optional bool trigger_identify = 5; // Tally blinkt kurz
+  optional bool trigger_reboot = 6;   // Tally startet neu
+}
+
+
+message TallyToHub {
+  State current_state = 1;
+  Telemetry telemetry = 2;
+  
+  optional uint32 ack_message_id = 3; 
+  optional string error_message = 4;
+}
