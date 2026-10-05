@@ -6,6 +6,40 @@
   },
   "photos": [
     {
+      "id": "photo-muvrvgq6-kc4a",
+      "title": "DEAD TREE",
+      "photographer": "Samuel",
+      "instagram": "@m77samy",
+      "description": "",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-10-05",
+      "camera": "Nikon F-601",
+      "lens": "Tamron",
+      "focal_length": "50",
+      "aperture": "",
+      "shutter": "",
+      "iso": "Kodak gold 200",
+      "filename": "photo-muvrvgq6-kc4a.bin",
+      "width": 1716,
+      "height": 2560,
+      "aspect_ratio": 0.6703,
+      "images": [
+        {
+          "filename": "photo-muvrvgq6-kc4a.bin",
+          "width": 1716,
+          "height": 2560,
+          "aspect_ratio": 0.6703
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-muvrq5i9-f9cx",
       "title": "CAT",
       "photographer": "Samuel",
