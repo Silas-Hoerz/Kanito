@@ -6,6 +6,52 @@
   },
   "photos": [
     {
+      "id": "photo-muvs93jx-yb05",
+      "title": "SKY IS THE LIMIT?",
+      "photographer": "Samuel",
+      "instagram": "@m77samy",
+      "description": "",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-10-05",
+      "camera": "Nikon F601",
+      "lens": "Tamron",
+      "focal_length": "300",
+      "aperture": "",
+      "shutter": "",
+      "iso": "Kodak Gold 200",
+      "filename": "photo-muvs93jx-yb05.bin",
+      "width": 1716,
+      "height": 2560,
+      "aspect_ratio": 0.6703,
+      "images": [
+        {
+          "filename": "photo-muvs93jx-yb05.bin",
+          "width": 1716,
+          "height": 2560,
+          "aspect_ratio": 0.6703
+        },
+        {
+          "filename": "photo-muvs95nx-mk7i.bin",
+          "width": 2560,
+          "height": 1716,
+          "aspect_ratio": 1.4918
+        },
+        {
+          "filename": "photo-muvs97wr-ujsv.bin",
+          "width": 2560,
+          "height": 1716,
+          "aspect_ratio": 1.4918
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-muvrvgq6-kc4a",
       "title": "DEAD TREE",
       "photographer": "Samuel",
