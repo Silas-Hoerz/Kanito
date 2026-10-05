@@ -8,8 +8,8 @@
     {
       "id": "photo-muvrq5i9-f9cx",
       "title": "CAT",
-      "photographer": "Silas Hörz",
-      "instagram": "",
+      "photographer": "Samuel",
+      "instagram": "@m77samy",
       "description": "Raww",
       "location_name": "",
       "has_location": false,
@@ -34,7 +34,11 @@
           "filename": "photo-muvrq5i9-f9cx.bin",
           "width": 2560,
           "height": 1716,
-          "aspect_ratio": 1.4918
+          "aspect_ratio": 1.4918,
+          "camera": "Nikon F-601",
+          "lens": "Tamron",
+          "focal_length": "50",
+          "iso": "Fuiji 200"
         }
       ],
       "likes": 0
