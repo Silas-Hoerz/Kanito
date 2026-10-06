@@ -498,7 +498,7 @@
       "has_location": false,
       "latitude": null,
       "longitude": null,
-      "frame": "white",
+      "frame": "none",
       "frame_width": null,
       "year": "2026",
       "date": "2026-09-28",
