@@ -13,8 +13,8 @@
       "description": "",
       "location_name": "Rio Marina",
       "has_location": true,
-      "latitude": 4248546,
-      "longitude": 1025529,
+      "latitude": 42.8153,
+      "longitude": 1025290.4313,
       "frame": "none",
       "frame_width": null,
       "year": "2026",
@@ -34,7 +34,12 @@
           "filename": "photo-muyg75zt-g37i.bin",
           "width": 2560,
           "height": 1706,
-          "aspect_ratio": 1.5006
+          "aspect_ratio": 1.5006,
+          "camera": "Sony A6000",
+          "lens": "Samyang F2.0 12mm",
+          "focal_length": "12mm",
+          "shutter": "20s",
+          "iso": "100"
         }
       ],
       "likes": 0
