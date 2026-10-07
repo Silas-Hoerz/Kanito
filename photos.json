@@ -6,6 +6,40 @@
   },
   "photos": [
     {
+      "id": "photo-muyi1wg8-g1nr",
+      "title": "Deer",
+      "photographer": "Samuel",
+      "instagram": "@m77samy",
+      "description": "eigentlich nur ein Hirsch.",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-10-07",
+      "camera": "Nikon F601",
+      "lens": "Tamron",
+      "focal_length": "300",
+      "aperture": "",
+      "shutter": "",
+      "iso": "Fuji 200",
+      "filename": "photo-muyi1wg8-g1nr.bin",
+      "width": 2560,
+      "height": 1716,
+      "aspect_ratio": 1.4918,
+      "images": [
+        {
+          "filename": "photo-muyi1wg8-g1nr.bin",
+          "width": 2560,
+          "height": 1716,
+          "aspect_ratio": 1.4918
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-muyg75zt-g37i",
       "title": "Torre - Punto Panoramico",
       "photographer": "Silas",
