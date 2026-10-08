@@ -6,6 +6,45 @@
   },
   "photos": [
     {
+      "id": "photo-muz8vevw-4vim",
+      "title": "🌊",
+      "photographer": "Silas",
+      "instagram": "@silas.ah",
+      "description": "",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-10-08",
+      "camera": "Sony A6000",
+      "lens": "Viltrox 35mm F1.7 E",
+      "focal_length": "35mm",
+      "aperture": "f/1.7",
+      "shutter": "1/125s",
+      "iso": "3200",
+      "filename": "photo-muz8vevw-4vim.bin",
+      "width": 2560,
+      "height": 1706,
+      "aspect_ratio": 1.5006,
+      "images": [
+        {
+          "filename": "photo-muz8vevw-4vim.bin",
+          "width": 2560,
+          "height": 1706,
+          "aspect_ratio": 1.5006,
+          "lens": "Viltrox 35mm F1.7 E",
+          "focal_length": "35mm",
+          "aperture": "f/1.7000000476837158",
+          "shutter": "1/125s",
+          "iso": "3200"
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-muyi1wg8-g1nr",
       "title": "Deer",
       "photographer": "Samuel",
