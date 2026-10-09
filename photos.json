@@ -6,6 +6,43 @@
   },
   "photos": [
     {
+      "id": "photo-mv0vc0as-c0uj",
+      "title": "SLOPE",
+      "photographer": "Silas",
+      "instagram": "@silas.ah",
+      "description": "",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-10-09",
+      "camera": "Sony A6000",
+      "lens": "Samyang F2.0 12mm",
+      "focal_length": "12mm",
+      "aperture": "",
+      "shutter": "15s",
+      "iso": "100",
+      "filename": "photo-mv0vc0as-c0uj.bin",
+      "width": 2560,
+      "height": 1706,
+      "aspect_ratio": 1.5006,
+      "images": [
+        {
+          "filename": "photo-mv0vc0as-c0uj.bin",
+          "width": 2560,
+          "height": 1706,
+          "aspect_ratio": 1.5006,
+          "lens": "----",
+          "shutter": "15s",
+          "iso": "100"
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-muz8vevw-4vim",
       "title": "🌊",
       "photographer": "Silas",
