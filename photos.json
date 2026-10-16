@@ -6,6 +6,55 @@
   },
   "photos": [
     {
+      "id": "photo-mvb7u0ch-fcpj",
+      "title": "BLOSSOM",
+      "photographer": "Samuel",
+      "instagram": "@m77samy",
+      "description": "Here you can see the beautiful harmony of wild greenery, light pink, and the lovely blue of the sky.",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-10-16",
+      "camera": "Nikon f601",
+      "lens": "Tamron",
+      "focal_length": "25-70",
+      "aperture": "",
+      "shutter": "",
+      "iso": "Fuji 400",
+      "filename": "photo-mvb7u0ch-fcpj.bin",
+      "width": 2560,
+      "height": 1697,
+      "aspect_ratio": 1.5085,
+      "images": [
+        {
+          "filename": "photo-mvb7u0ch-fcpj.bin",
+          "width": 2560,
+          "height": 1697,
+          "aspect_ratio": 1.5085,
+          "camera": "NORITSU KOKI EZ Controller"
+        },
+        {
+          "filename": "photo-mvb7u2hr-teq7.bin",
+          "width": 1697,
+          "height": 2560,
+          "aspect_ratio": 0.6629,
+          "camera": "NORITSU KOKI EZ Controller"
+        },
+        {
+          "filename": "photo-mvb7u4z8-htt9.bin",
+          "width": 2560,
+          "height": 1697,
+          "aspect_ratio": 1.5085,
+          "camera": "NORITSU KOKI EZ Controller"
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-mv0vc0as-c0uj",
       "title": "SLOPE",
       "photographer": "Silas",
