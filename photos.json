@@ -174,7 +174,7 @@
     },
     {
       "id": "photo-muyi1wg8-g1nr",
-      "title": "Deer",
+      "title": "DEER",
       "photographer": "Samuel",
       "instagram": "@m77samy",
       "description": "eigentlich nur ein Hirsch.",
@@ -201,7 +201,11 @@
           "filename": "photo-muyi1wg8-g1nr.bin",
           "width": 2560,
           "height": 1716,
-          "aspect_ratio": 1.4918
+          "aspect_ratio": 1.4918,
+          "camera": "Nikon F601",
+          "lens": "Tamron",
+          "focal_length": "300",
+          "iso": "Fuji 200"
         }
       ],
       "likes": 0
