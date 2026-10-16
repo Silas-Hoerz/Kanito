@@ -6,6 +6,41 @@
   },
   "photos": [
     {
+      "id": "photo-mvb80zlv-94qn",
+      "title": "WATER DROP",
+      "photographer": "Samuel",
+      "instagram": "@m77samy",
+      "description": "",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "year": "2026",
+      "date": "2026-10-16",
+      "camera": "Nikon f601",
+      "lens": "Tamron",
+      "focal_length": "300",
+      "aperture": "",
+      "shutter": "",
+      "iso": "Fuji 200",
+      "filename": "photo-mvb80zlv-94qn.bin",
+      "width": 2560,
+      "height": 1697,
+      "aspect_ratio": 1.5085,
+      "images": [
+        {
+          "filename": "photo-mvb80zlv-94qn.bin",
+          "width": 2560,
+          "height": 1697,
+          "aspect_ratio": 1.5085,
+          "camera": "NORITSU KOKI EZ Controller"
+        }
+      ],
+      "likes": 0
+    },
+    {
       "id": "photo-mvb7wmyv-j7i7",
       "title": "SHROOMS",
       "photographer": "Samuel",
