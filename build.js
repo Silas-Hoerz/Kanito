@@ -956,7 +956,7 @@ async function build() {
                         </div>` : '';
 
             const isAnalog = p.medium === 'analog' || Boolean(p.film);
-            const mediumTag = isAnalog ? `<div class="photo-medium-badge-card">🎞️ ${p.film || 'Analog Film'}</div>` : '';
+            const mediumTag = isAnalog ? `<div class="photo-medium-badge-card">${p.film || 'Analog Film'}</div>` : '';
             const viewsCount = Number(p.views || 0);
             const viewsTagHtml = `<span class="card-views-tag" title="${viewsCount} Views">👁️ <span class="view-num">${viewsCount}</span></span>`;
             const scoreVal = calculateRankingScore(p);

@@ -2513,19 +2513,6 @@
                 }, { passive: true });
             }
 
-            // Scroll Prompt click to scroll down to details
-            const modalScrollPrompt = document.getElementById('modal-scroll-prompt');
-            if (modalScrollPrompt) {
-                modalScrollPrompt.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const detailsSection = document.getElementById('detail-location-section') || document.querySelector('.modal-details-container') || document.querySelector('.modal-info-panel');
-                    if (detailsSection) {
-                        detailsSection.scrollIntoView({ behavior: 'smooth' });
-                    } else if (modalScrollWrap) {
-                        modalScrollWrap.scrollTo({ top: window.innerHeight * 0.85, behavior: 'smooth' });
-                    }
-                });
-            }
 
             // --- FULLSCREEN ZOOM & PAN ENGINE (DESKTOP + MOBILE) ---
             let currentScale = 1;
