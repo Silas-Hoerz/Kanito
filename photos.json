@@ -716,7 +716,7 @@
     {
       "id": "photo-muvkqkvr-pvz4",
       "title": "Lighthouse",
-      "photographer": "Silas Hörz",
+      "photographer": "Silas",
       "instagram": "@silas.ah",
       "description": "",
       "location_name": "",
@@ -743,10 +743,11 @@
           "width": 1706,
           "height": 2560,
           "aspect_ratio": 0.6664,
+          "camera": "Sony A6000",
           "lens": "----",
+          "focal_length": "12mm",
           "shutter": "1/200s",
-          "iso": "100",
-          "medium": "digital"
+          "iso": "100"
         }
       ],
       "likes": 0,
