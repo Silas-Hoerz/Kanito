@@ -702,7 +702,8 @@
             <div class="card">
                 <h2>1. GitHub Authentication (Personal Access Token)</h2>
                 <p style="color:var(--muted); margin-bottom:0.8rem; font-size:12px;">
-                    Enter a token with <em>contents:write</em> permission for <strong>Silas-Hoerz/Kanito</strong>. Stored safely in local browser storage.
+                    Enter a token with <em>contents:write</em> permission for <strong>Silas-Hoerz/Kanito</strong>.
+                    Stored safely in local browser storage.
                 </p>
                 <div style="display:flex; gap:0.5rem;">
                     <input type="password" id="pat-input" placeholder="github_pat_...">
@@ -736,7 +737,8 @@
                         <input type="number" id="setting-frame-width" min="0" max="100" value="16">
                     </div>
                     <div class="col" style="align-self:flex-end;">
-                        <button type="button" class="primary" id="save-settings-btn" style="width:100%; height:38px;">Save Settings</button>
+                        <button type="button" class="primary" id="save-settings-btn"
+                            style="width:100%; height:38px;">Save Settings</button>
                     </div>
                 </div>
                 <div class="status-box" id="settings-status-box">Status: Ready</div>
@@ -753,25 +755,32 @@
                         <span id="editing-photo-title" style="color:#ffffff;"></span>
                         <span id="editing-photo-id" style="color:var(--muted); font-size:11px; margin-left:6px;"></span>
                     </div>
-                    <button type="button" id="cancel-edit-btn" style="padding:0.35rem 0.75rem; font-size:11px;">✕ Cancel Edit</button>
+                    <button type="button" id="cancel-edit-btn" style="padding:0.35rem 0.75rem; font-size:11px;">✕ Cancel
+                        Edit</button>
                 </div>
 
                 <div class="file-drop" id="file-drop">
-                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/tiff,.tif,.tiff" multiple style="display:none;">
-                    <div id="drop-label">📁 Drag &amp; drop photo(s) here or click to browse (supports JPG, PNG, WebP, TIFF)</div>
+                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/tiff,.tif,.tiff"
+                        multiple style="display:none;">
+                    <div id="drop-label">📁 Drag &amp; drop photo(s) here or click to browse (supports JPG, PNG, WebP,
+                        TIFF)</div>
                 </div>
 
                 <!-- Interactive Stack Manager -->
                 <div id="stack-manager-section" style="display:none; margin-top:1.25rem;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
-                        <label style="font-weight:600; font-size:13px; color:#ffffff; margin:0; display:flex; align-items:center; gap:6px;">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+                        <label
+                            style="font-weight:600; font-size:13px; color:#ffffff; margin:0; display:flex; align-items:center; gap:6px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <rect x="7" y="7" width="14" height="14" rx="2" ry="2"></rect>
                                 <path d="M3 17V5a2 2 0 0 1 2-2h12"></path>
                             </svg>
                             Photo Stack (<span id="stack-count-label">0</span>)
                         </label>
-                        <button type="button" id="stack-add-more-btn" style="padding:0.4rem 0.85rem; font-size:11px; background:rgba(255,255,255,0.08); border:1px dashed rgba(255,255,255,0.35); border-radius:4px; color:#fff; cursor:pointer;">
+                        <button type="button" id="stack-add-more-btn"
+                            style="padding:0.4rem 0.85rem; font-size:11px; background:rgba(255,255,255,0.08); border:1px dashed rgba(255,255,255,0.35); border-radius:4px; color:#fff; cursor:pointer;">
                             + Add more photos to stack
                         </button>
                     </div>
@@ -808,8 +817,10 @@
 
                     <div class="row">
                         <div class="col">
-                            <label>Description <span style="font-size:11px; color:var(--muted);">(Optional)</span></label>
-                            <textarea id="input-desc" rows="2" placeholder="Architectural framing and context (optional)..."></textarea>
+                            <label>Description <span
+                                    style="font-size:11px; color:var(--muted);">(Optional)</span></label>
+                            <textarea id="input-desc" rows="2"
+                                placeholder="Architectural framing and context (optional)..."></textarea>
                         </div>
                     </div>
 
@@ -825,31 +836,41 @@
                         </div>
                         <div class="col">
                             <label>Custom Frame Width (px, optional)</label>
-                            <input type="number" id="input-frame-width" min="0" max="100" placeholder="Leave empty for global width">
+                            <input type="number" id="input-frame-width" min="0" max="100"
+                                placeholder="Leave empty for global width">
                         </div>
                     </div>
 
-                    <div style="margin-top:1.5rem; padding:1.2rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-                            <label class="switch-label" for="input-has-location" style="font-weight:600; font-size:13px; color:#ffffff;">
+                    <div
+                        style="margin-top:1.5rem; padding:1.2rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                            <label class="switch-label" for="input-has-location"
+                                style="font-weight:600; font-size:13px; color:#ffffff;">
                                 <input type="checkbox" id="input-has-location" checked>
                                 <span>Enable Location &amp; Map Display</span>
                             </label>
-                            <span style="font-size:11px; color:var(--muted); font-family:var(--font-mono);">🔒 Exif GPS stripped on upload</span>
+                            <span style="font-size:11px; color:var(--muted); font-family:var(--font-mono);">🔒 Exif GPS
+                                stripped on upload</span>
                         </div>
                         <div id="location-fields-wrap">
                             <div class="row">
                                 <div class="col">
-                                    <label>Location Name <span style="font-size:11px; color:var(--muted);">(Optional)</span></label>
+                                    <label>Location Name <span
+                                            style="font-size:11px; color:var(--muted);">(Optional)</span></label>
                                     <input type="text" id="input-loc-name" placeholder="e.g. Berlin, Germany">
                                 </div>
                                 <div class="col">
-                                    <label>Latitude <span style="font-size:11px; color:var(--muted);">(Optional)</span></label>
-                                    <input type="number" step="0.0001" id="input-lat" placeholder="Leave empty for no coordinates">
+                                    <label>Latitude <span
+                                            style="font-size:11px; color:var(--muted);">(Optional)</span></label>
+                                    <input type="number" step="0.0001" id="input-lat"
+                                        placeholder="Leave empty for no coordinates">
                                 </div>
                                 <div class="col">
-                                    <label>Longitude <span style="font-size:11px; color:var(--muted);">(Optional)</span></label>
-                                    <input type="number" step="0.0001" id="input-lng" placeholder="Leave empty for no coordinates">
+                                    <label>Longitude <span
+                                            style="font-size:11px; color:var(--muted);">(Optional)</span></label>
+                                    <input type="number" step="0.0001" id="input-lng"
+                                        placeholder="Leave empty for no coordinates">
                                 </div>
                             </div>
                             <div id="picker-map" style="margin-top:1rem;"></div>
@@ -859,19 +880,22 @@
                     <div style="margin-top:1.5rem;">
                         <label style="margin-bottom:0.5rem;">EXIF Metadata &amp; Capture Type</label>
 
-                        <div id="scanner-detected-notice" style="display:none; margin-bottom:1rem; padding:0.75rem 1rem; border-radius:4px; background:rgba(255, 170, 50, 0.12); border:1px solid rgba(255, 170, 50, 0.4); font-size:12px; color:#ffb347;"></div>
+                        <div id="scanner-detected-notice"
+                            style="display:none; margin-bottom:1rem; padding:0.75rem 1rem; border-radius:4px; background:rgba(255, 170, 50, 0.12); border:1px solid rgba(255, 170, 50, 0.4); font-size:12px; color:#ffb347;">
+                        </div>
 
                         <div class="row" style="margin-bottom:0.8rem;">
                             <div class="col">
                                 <label>Medium / Capture Type</label>
                                 <select id="input-medium">
-                                    <option value="digital">📷 Digital</option>
-                                    <option value="analog">🎞️ Analog Film</option>
+                                    <option value="digital">Digital</option>
+                                    <option value="analog">Analog</option>
                                 </select>
                             </div>
                             <div class="col" id="col-film-stock" style="display:none;">
                                 <label>Film Stock</label>
-                                <input type="text" id="input-film" list="film-stock-list" placeholder="e.g. Kodak Gold 200, Fujicolor Superia 400..." autocomplete="off">
+                                <input type="text" id="input-film" list="film-stock-list"
+                                    placeholder="e.g. Kodak Gold 200, Fujicolor Superia 400..." autocomplete="off">
                                 <datalist id="film-stock-list"></datalist>
                             </div>
                         </div>
@@ -879,12 +903,14 @@
                         <div class="row">
                             <div class="col">
                                 <label>Camera</label>
-                                <input type="text" id="input-camera" list="camera-list" placeholder="e.g. Nikon F601, Sony Alpha 6000..." autocomplete="off">
+                                <input type="text" id="input-camera" list="camera-list"
+                                    placeholder="e.g. Nikon F601, Sony Alpha 6000..." autocomplete="off">
                                 <datalist id="camera-list"></datalist>
                             </div>
                             <div class="col">
                                 <label>Lens</label>
-                                <input type="text" id="input-lens" list="lens-list" placeholder="e.g. Tamron, Samyang 12mm..." autocomplete="off">
+                                <input type="text" id="input-lens" list="lens-list"
+                                    placeholder="e.g. Tamron, Samyang 12mm..." autocomplete="off">
                                 <datalist id="lens-list"></datalist>
                             </div>
                             <div class="col"><label>Focal Length</label><input type="text" id="input-focal"></div>
@@ -1687,6 +1713,17 @@
                 }
             }
 
+            // --- BOM-SAFE GITHUB BASE64 JSON DECODER ---
+            function decodeGitHubBase64Json(base64Content) {
+                if (!base64Content) return null;
+                const cleanB64 = base64Content.replace(/\s+/g, '');
+                let str = decodeURIComponent(escape(window.atob(cleanB64)));
+                if (str.charCodeAt(0) === 0xFEFF) {
+                    str = str.slice(1);
+                }
+                return JSON.parse(str.trim());
+            }
+
             // --- GLOBAL SETTINGS SAVE ---
             saveSettingsBtn.addEventListener('click', async () => {
                 if (!token) return alert('Please enter and save your GitHub Personal Access Token above first.');
@@ -1700,7 +1737,7 @@
                     if (!catRes.ok) throw new Error('Could not read photos.json from GitHub');
 
                     const catData = await catRes.json();
-                    let fileContent = JSON.parse(decodeURIComponent(escape(window.atob(catData.content))));
+                    let fileContent = decodeGitHubBase64Json(catData.content);
 
                     currentSettings.show_likes = settingShowLikes.checked;
                     currentSettings.default_frame = settingDefaultFrame.value;
@@ -1999,8 +2036,7 @@
                     if (catRes.ok) {
                         catalogData = await catRes.json();
                         catSha = catalogData.sha;
-                        const str = decodeURIComponent(escape(window.atob(catalogData.content)));
-                        const parsed = JSON.parse(str);
+                        const parsed = decodeGitHubBase64Json(catalogData.content);
                         if (Array.isArray(parsed)) {
                             rawPhotos = parsed;
                         } else if (parsed && typeof parsed === 'object') {
@@ -2206,7 +2242,7 @@
 
                     const frameBadge = p.frame === 'white' ? `<span style="background:#fff; color:#000; padding:1px 6px; border-radius:3px; font-size:10px; font-weight:700;">WHITE${p.frame_width ? ` (${p.frame_width}px)` : ''}</span>`
                         : p.frame === 'black' ? `<span style="background:#111; color:#fff; border:1px solid #444; padding:1px 6px; border-radius:3px; font-size:10px; font-weight:700;">BLACK${p.frame_width ? ` (${p.frame_width}px)` : ''}</span>`
-                        : `<span style="color:var(--muted); font-size:11px;">None</span>`;
+                            : `<span style="color:var(--muted); font-size:11px;">None</span>`;
 
                     const locDisplay = (p.has_location !== false && p.latitude != null && p.longitude != null && !isNaN(p.latitude) && !isNaN(p.longitude) && !(Number(p.latitude) === 0 && Number(p.longitude) === 0))
                         ? (p.location_name || 'Mapped')
@@ -2270,7 +2306,7 @@
                                 headers: { 'Authorization': 'Bearer ' + token }
                             });
                             const catData = await catRes.json();
-                            const raw = JSON.parse(decodeURIComponent(escape(window.atob(catData.content))));
+                            const raw = decodeGitHubBase64Json(catData.content);
 
                             let photosList = Array.isArray(raw) ? raw : (raw.photos || []);
                             let settingsObj = Array.isArray(raw) ? currentSettings : (raw.settings || currentSettings);
@@ -2384,7 +2420,9 @@
 
                 try {
                     const res = await fetch('/photos.json?' + Date.now());
-                    const data = await res.json();
+                    let text = await res.text();
+                    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+                    const data = JSON.parse(text);
 
                     if (Array.isArray(data)) {
                         currentCatalog = data;

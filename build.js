@@ -215,11 +215,20 @@ async function copyDir(src, dest) {
 
 async function build() {
     console.log('Starting Kanito portfolio build...');
-    const TEMPLATE = await fs.readFile('template.html', 'utf-8');
-    const PROJECTS = JSON.parse(await fs.readFile('projects.json', 'utf-8'));
+
+    async function readCleanText(filePath) {
+        let text = await fs.readFile(filePath, 'utf-8');
+        if (text.charCodeAt(0) === 0xFEFF) {
+            text = text.slice(1);
+        }
+        return text;
+    }
+
+    const TEMPLATE = await readCleanText('template.html');
+    const PROJECTS = JSON.parse(await readCleanText('projects.json'));
     let SEO_DATA = null;
     try {
-        SEO_DATA = JSON.parse(await fs.readFile('seo-copy.json', 'utf-8'));
+        SEO_DATA = JSON.parse(await readCleanText('seo-copy.json'));
     } catch (e) {
         console.warn('Note: Could not parse seo-copy.json, using defaults.');
     }
@@ -228,7 +237,7 @@ async function build() {
     let PHOTOS = [];
     let GALLERY_SETTINGS = { show_likes: true };
     try {
-        const rawJson = JSON.parse(await fs.readFile('photos.json', 'utf-8'));
+        const rawJson = JSON.parse(await readCleanText('photos.json'));
         if (Array.isArray(rawJson)) {
             PHOTOS = rawJson;
         } else if (rawJson && typeof rawJson === 'object') {
@@ -246,8 +255,10 @@ async function build() {
             }
             return p;
         });
+        console.log(`Successfully loaded ${PHOTOS.length} frames from photos.json.`);
     } catch (e) {
-        console.warn('Note: Could not parse photos.json, defaulting to empty list.');
+        console.error('CRITICAL ERROR: Failed to parse photos.json!', e);
+        throw e;
     }
 
     await fs.rm('dist', { recursive: true, force: true }).catch(() => { });
@@ -883,7 +894,7 @@ async function build() {
 
     // --- PHOTOS GALLERY PAGE (kanito.de/photos) ---
     try {
-        const PHOTOS_TEMPLATE = await fs.readFile('photos/template-photos.html', 'utf-8');
+        const PHOTOS_TEMPLATE = await readCleanText('photos/template-photos.html');
 
         // Smart Ranking Index calculation (Freshness boost + engagement time decay)
         function calculateRankingScore(photo) {
@@ -1008,11 +1019,11 @@ async function build() {
             .replace(/{{IMAGE}}/g, `${DOMAIN}/logo.png`)
             .replace(/{{URL}}/g, `${DOMAIN}/photos/`)
             .replace(/{{YEAR}}/g, YEAR)
-            .replace('{{JSON_LD}}', `<script type="application/ld+json">\n${JSON.stringify(photosJsonLd, null, 2)}\n</script>`)
-            .replace('{{GALLERY_ITEMS}}', galleryCardsHtml)
-            .replace('{{PHOTOS_JSON}}', JSON.stringify(PHOTOS))
+            .replace('{{JSON_LD}}', () => `<script type="application/ld+json">\n${JSON.stringify(photosJsonLd, null, 2)}\n</script>`)
+            .replace('{{GALLERY_ITEMS}}', () => galleryCardsHtml)
+            .replace('{{PHOTOS_JSON}}', () => JSON.stringify(PHOTOS))
             .replace('{{SHOW_LIKES}}', GALLERY_SETTINGS.show_likes !== false ? 'true' : 'false')
-            .replace('{{SETTINGS_JSON}}', JSON.stringify(GALLERY_SETTINGS));
+            .replace('{{SETTINGS_JSON}}', () => JSON.stringify(GALLERY_SETTINGS));
 
         await fs.mkdir('dist/photos', { recursive: true });
         await fs.writeFile('dist/photos/index.html', finalPhotosHtml);
@@ -1026,7 +1037,7 @@ async function build() {
     // --- CURATOR STUDIO & ADMIN (kanito.de/photos/edit) ---
     // Security & Crawling Hygiene: Kept strictly unindexed (noindex, nofollow) and excluded from sitemap!
     try {
-        const EDIT_TEMPLATE = await fs.readFile('photos/template-edit.html', 'utf-8');
+        const EDIT_TEMPLATE = await readCleanText('photos/template-edit.html');
         const finalEditHtml = EDIT_TEMPLATE.replace(/{{YEAR}}/g, YEAR);
         await fs.mkdir('dist/photos/edit', { recursive: true });
         await fs.writeFile('dist/photos/edit/index.html', finalEditHtml);

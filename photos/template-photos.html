@@ -1714,7 +1714,15 @@
             }
 
             // --- GALLERY INITIALIZATION ---
-            const photosCatalog = JSON.parse(document.getElementById('photos-catalog-data').textContent.trim());
+            let photosCatalog = [];
+            try {
+                const catalogEl = document.getElementById('photos-catalog-data');
+                if (catalogEl && catalogEl.textContent.trim()) {
+                    photosCatalog = JSON.parse(catalogEl.textContent.trim());
+                }
+            } catch (e) {
+                console.error('Failed to parse photos catalog data:', e);
+            }
             let gallerySettings = { show_likes: true, default_frame: 'none', frame_width: 16 };
             try {
                 const rawSettings = document.getElementById('gallery-settings-data').textContent.trim();
