@@ -1,8 +1,8 @@
 {
   "settings": {
     "show_likes": true,
-    "show_like_counts": true,
-    "show_views": true,
+    "show_like_counts": false,
+    "show_views": false,
     "default_frame": "white",
     "frame_width": 8
   },
