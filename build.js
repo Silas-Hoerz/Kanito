@@ -885,6 +885,30 @@ async function build() {
     try {
         const PHOTOS_TEMPLATE = await fs.readFile('photos/template-photos.html', 'utf-8');
 
+        // Smart Ranking Index calculation (Freshness boost + engagement time decay)
+        function calculateRankingScore(photo) {
+            const likes = Number(photo.likes || 0);
+            const views = Number(photo.views || 0);
+            let photoTime = Date.now();
+            if (photo.date) {
+                const parsed = Date.parse(photo.date);
+                if (!isNaN(parsed)) photoTime = parsed;
+            } else if (photo.year) {
+                const parsed = Date.parse(photo.year + '-01-01');
+                if (!isNaN(parsed)) photoTime = parsed;
+            }
+            const ageInDays = Math.max(0, (Date.now() - photoTime) / (1000 * 60 * 60 * 24));
+            // Freshness bonus: 60 points on Day 0, decaying with half-life ~21-28 days
+            const freshnessBonus = 60 * Math.exp(-ageInDays / 28);
+            // 1 Like = 7 Views
+            const engagement = (likes * 7) + (views * 1);
+            const ageFactor = Math.pow((ageInDays + 14) / 14, 0.55);
+            return Number((freshnessBonus + (engagement / ageFactor)).toFixed(2));
+        }
+
+        // Pre-sort photos by smart ranking index for static render
+        PHOTOS.sort((a, b) => calculateRankingScore(b) - calculateRankingScore(a));
+
         let galleryCardsHtml = '';
         const igSvg = `<svg class="ig-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
         for (const p of PHOTOS) {
@@ -920,8 +944,14 @@ async function build() {
                             <span class="stack-badge-count">${stackCount}</span>
                         </div>` : '';
 
+            const isAnalog = p.medium === 'analog' || Boolean(p.film);
+            const mediumTag = isAnalog ? `<div class="photo-medium-badge-card">🎞️ ${p.film || 'Analog Film'}</div>` : '';
+            const viewsCount = Number(p.views || 0);
+            const viewsTagHtml = `<span class="card-views-tag" title="${viewsCount} Views">👁️ <span class="view-num">${viewsCount}</span></span>`;
+            const scoreVal = calculateRankingScore(p);
+
             galleryCardsHtml += `
-                <figure class="photo-item" data-id="${p.id}" data-author="${p.photographer}" tabindex="0" role="button" aria-label="View photo: ${p.title}">
+                <figure class="photo-item" data-id="${p.id}" data-author="${p.photographer}" data-medium="${isAnalog ? 'analog' : 'digital'}" data-date="${p.date || p.year || ''}" data-likes="${p.likes || 0}" data-views="${viewsCount}" data-score="${scoreVal}" tabindex="0" role="button" aria-label="View photo: ${p.title}">
                     <div class="canvas-container-box ${frameClass}" ${frameAttr}>
                         <canvas width="${p.width}" height="${p.height}" aria-hidden="true"></canvas>
                         <div class="photo-shield" title="View details: ${p.title}"></div>
@@ -931,15 +961,19 @@ async function build() {
                         <div>
                             <div class="photo-title">${p.title}</div>
                             <div class="photo-author">${p.photographer}${igBadge}</div>
+                            ${mediumTag}
                         </div>
                         <div class="photo-meta-right">
                             ${locTagHtml}
-                            ${likeBtnHtml}
+                            <div class="card-stats-row">
+                                ${viewsTagHtml}
+                                ${likeBtnHtml}
+                            </div>
                         </div>
                     </div>
                     <figcaption class="sr-only">
                         <h3>${p.title}</h3>
-                        <p>Fine art monochrome photograph by ${p.photographer} (${p.instagram || ''})${locPart}${descPart} Camera: ${p.camera || 'Leica'}, Lens: ${p.lens || 'Prime'}.</p>
+                        <p>Fine art monochrome photograph by ${p.photographer} (${p.instagram || ''})${locPart}${descPart} Medium: ${isAnalog ? 'Analog ' + (p.film || 'Film') : 'Digital'}. Camera: ${p.camera || 'Leica'}, Lens: ${p.lens || 'Prime'}.</p>
                     </figcaption>
                 </figure>
             `;

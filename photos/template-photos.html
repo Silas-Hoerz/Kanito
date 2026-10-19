@@ -157,7 +157,8 @@
             transition: all 0.2s ease;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             border-color: var(--c-mid);
             color: var(--c-mid);
             background: rgba(0, 180, 210, 0.1);
@@ -191,6 +192,167 @@
             text-transform: uppercase;
             color: var(--c-mid);
             margin: 0;
+        }
+
+        /* Gallery Controls: Filter Chips & Sort Select */
+        .gallery-controls-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--c-border);
+        }
+
+        .gallery-filter-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(10, 10, 14, 0.65);
+            backdrop-filter: blur(8px);
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid var(--c-border);
+        }
+
+        .filter-chip {
+            background: transparent;
+            border: none;
+            color: var(--c-mid);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.45rem 0.85rem;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-chip:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .filter-chip.active {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
+        }
+
+        .gallery-sort-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sort-label {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--c-mid);
+        }
+
+        .sort-select {
+            background: #000000;
+            border: 1px solid var(--c-border);
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            padding: 0.45rem 0.8rem;
+            border-radius: 3px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .sort-select:hover,
+        .sort-select:focus {
+            border-color: #ffffff;
+        }
+
+        .photo-medium-badge-card {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--c-mid);
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0.85;
+        }
+
+        .card-stats-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--c-mid);
+        }
+
+        .card-views-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--c-mid);
+            opacity: 0.8;
+            padding: 0.15rem 0.35rem;
+            border-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Detail EXIF Enhancements */
+        .section-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .exif-medium-badge {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .exif-medium-badge.is-analog {
+            border-color: rgba(255, 170, 50, 0.45);
+            background: rgba(255, 170, 50, 0.12);
+            color: #ffb347;
+        }
+
+        .detail-views-badge {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--c-mid);
+            border: 1px solid var(--c-border);
+            padding: 0.65rem 0.9rem;
+            border-radius: 3px;
+            background: #000000;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         /* Masonry Grid */
@@ -494,6 +656,10 @@
         }
 
         .modal-top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 56px;
             padding: 0 1.5rem;
             border-bottom: 1px solid var(--c-border);
@@ -504,7 +670,15 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             flex-shrink: 0;
-            z-index: 50;
+            z-index: 60;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+        }
+
+        #detail-modal.is-idle:not(.is-scrolled-details) .modal-top-bar,
+        #detail-modal.ui-hidden .modal-top-bar {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
         }
 
         .modal-counter {
@@ -564,9 +738,8 @@
 
         /* Natural Scroll Wrap for the entire modal */
         .modal-scroll-wrap {
-            flex: 1;
             width: 100%;
-            height: calc(100vh - 56px);
+            height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
@@ -576,20 +749,21 @@
         /* Hero Stage: Photo is presented detailed and in full resolution */
         .modal-hero-stage {
             width: 100%;
-            min-height: calc(100vh - 56px);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 2rem 1.5rem 1.5rem;
+            padding: 56px 1.5rem 1.5rem;
             position: relative;
             overflow: hidden;
+            box-sizing: border-box;
         }
 
         .stage-canvas-box {
             position: relative;
             max-width: 95vw;
-            max-height: 84vh;
+            max-height: calc(100vh - 100px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -646,23 +820,40 @@
             -webkit-user-drag: none;
         }
 
-        /* Floating Zoom Control Bar */
+        /* Floating Zoom Control Bar: Minimalist pill, hidden at 100%, active only when zoomed */
         .stage-zoom-controls {
             position: absolute;
-            bottom: 14px;
-            right: 14px;
-            z-index: 9;
+            bottom: 16px;
+            right: 16px;
+            z-index: 12;
             display: flex;
             align-items: center;
-            gap: 2px;
-            background: rgba(10, 10, 14, 0.75);
+            gap: 3px;
+            background: rgba(10, 10, 14, 0.72);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             padding: 3px 6px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
             user-select: none;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px) scale(0.92);
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .stage-zoom-controls.is-active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        #detail-modal.is-idle .stage-zoom-controls,
+        #detail-modal.ui-hidden .stage-zoom-controls {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: translateY(8px) scale(0.92) !important;
         }
 
         .stage-zoom-btn {
@@ -715,7 +906,7 @@
             user-select: none;
             animation: bouncePrompt 2s infinite ease-in-out;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: opacity 0.3s ease, color 0.2s ease, border-color 0.2s ease;
         }
 
         .modal-scroll-prompt:hover {
@@ -723,9 +914,21 @@
             border-color: #ffffff;
         }
 
+        #detail-modal.is-idle .modal-scroll-prompt,
+        #detail-modal.ui-hidden .modal-scroll-prompt {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
         @keyframes bouncePrompt {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(4px); }
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(4px);
+            }
         }
 
         /* Stack Navigation inside Stage (Instagram-style Carousel) */
@@ -746,8 +949,16 @@
             letter-spacing: 0.08em;
             pointer-events: none;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+            transition: opacity 0.3s ease;
         }
 
+        #detail-modal.is-idle .stage-stack-badge,
+        #detail-modal.ui-hidden .stage-stack-badge {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* Minimalist desktop slide buttons: unobtrusive, subtle resting state, hidden when zoomed or idle */
         .stack-arrow-btn {
             position: absolute;
             top: 50%;
@@ -755,35 +966,48 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: rgba(10, 10, 14, 0.65);
+            background: rgba(10, 10, 14, 0.42);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: var(--font-mono);
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             line-height: 1;
             cursor: pointer;
             z-index: 8;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.7);
+            opacity: 0.35;
+            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
             user-select: none;
         }
 
+        .stage-canvas-box:hover .stack-arrow-btn {
+            opacity: 0.85;
+        }
+
         .stack-arrow-btn:hover:not(:disabled) {
+            opacity: 1 !important;
             background: rgba(255, 255, 255, 0.2);
             border-color: #ffffff;
             transform: translateY(-50%) scale(1.08);
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 26px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 255, 255, 0.25);
         }
 
         .stack-arrow-btn:disabled {
-            opacity: 0.2;
+            opacity: 0.15;
             cursor: not-allowed;
             pointer-events: none;
+        }
+
+        .stage-zoom-container.is-zoomed ~ .stack-arrow-btn,
+        #detail-modal.is-idle .stack-arrow-btn,
+        #detail-modal.ui-hidden .stack-arrow-btn {
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         .stack-arrow-prev {
@@ -803,6 +1027,13 @@
             margin-top: 1.15rem;
             z-index: 6;
             min-height: 16px;
+            transition: opacity 0.3s ease;
+        }
+
+        #detail-modal.is-idle .stack-dots-bar,
+        #detail-modal.ui-hidden .stack-dots-bar {
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         .stack-dot {
@@ -1178,6 +1409,25 @@
 
         <section class="photos-hero">
             <h1>Photos.</h1>
+            <div class="gallery-controls-bar">
+                <div class="gallery-filter-group" role="tablist" aria-label="Filter gallery by medium">
+                    <button type="button" class="filter-chip active" data-filter="all" role="tab"
+                        aria-selected="true">All</button>
+                    <button type="button" class="filter-chip" data-filter="analog" role="tab"
+                        aria-selected="false">Analog</button>
+                    <button type="button" class="filter-chip" data-filter="digital" role="tab"
+                        aria-selected="false">Digital</button>
+                </div>
+                <div class="gallery-sort-group">
+                    <label for="gallery-sort-select" class="sort-label">Sort By:</label>
+                    <select id="gallery-sort-select" class="sort-select" aria-label="Sort photos">
+                        <option value="score" selected>Relevance</option>
+                        <option value="newest">Newest</option>
+                        <option value="likes">Most Likes</option>
+                        <option value="views">Most Views</option>
+                    </select>
+                </div>
+            </div>
         </section>
 
         <main>
@@ -1203,9 +1453,12 @@
             <span class="modal-counter" id="modal-counter">[01 / 06]</span>
             <span class="modal-title-top" id="modal-title-top">PHOTO TITLE</span>
             <div class="modal-top-actions">
-                <button type="button" class="modal-action-btn" id="stage-prev-btn" aria-label="Previous photo">← Prev</button>
-                <button type="button" class="modal-action-btn" id="stage-next-btn" aria-label="Next photo">Next →</button>
-                <button type="button" class="modal-action-btn modal-close-btn" id="modal-close-btn" aria-label="Close photo view">✕ Close</button>
+                <button type="button" class="modal-action-btn" id="stage-prev-btn" aria-label="Previous photo">←
+                    Prev</button>
+                <button type="button" class="modal-action-btn" id="stage-next-btn" aria-label="Next photo">Next
+                    →</button>
+                <button type="button" class="modal-action-btn modal-close-btn" id="modal-close-btn"
+                    aria-label="Close photo view">✕ Close</button>
             </div>
         </header>
 
@@ -1216,17 +1469,24 @@
                         <canvas id="modal-canvas"></canvas>
                         <div class="photo-shield" id="modal-shield"></div>
                     </div>
-                    <button type="button" class="stack-arrow-btn stack-arrow-prev" id="stack-arrow-prev" aria-label="Vorheriges Foto im Stapel" style="display:none;">‹</button>
-                    <button type="button" class="stack-arrow-btn stack-arrow-next" id="stack-arrow-next" aria-label="Nächstes Foto im Stapel" style="display:none;">›</button>
+                    <button type="button" class="stack-arrow-btn stack-arrow-prev" id="stack-arrow-prev"
+                        aria-label="Vorheriges Foto im Stapel" style="display:none;">‹</button>
+                    <button type="button" class="stack-arrow-btn stack-arrow-next" id="stack-arrow-next"
+                        aria-label="Nächstes Foto im Stapel" style="display:none;">›</button>
                     <div class="stage-stack-badge" id="stage-stack-badge" style="display:none;">1 / 1</div>
                     <div class="stage-zoom-controls" id="stage-zoom-controls" aria-label="Zoom controls">
-                        <button type="button" class="stage-zoom-btn" id="zoom-out-btn" aria-label="Zoom out" title="Zoom out (−)">−</button>
-                        <button type="button" class="stage-zoom-btn stage-zoom-level" id="zoom-reset-btn" aria-label="Reset zoom" title="Reset zoom (100%)">100%</button>
-                        <button type="button" class="stage-zoom-btn" id="zoom-in-btn" aria-label="Zoom in" title="Zoom in (+)">+</button>
+                        <button type="button" class="stage-zoom-btn" id="zoom-out-btn" aria-label="Zoom out"
+                            title="Zoom out (−)">−</button>
+                        <button type="button" class="stage-zoom-btn stage-zoom-level" id="zoom-reset-btn"
+                            aria-label="Reset zoom" title="Reset zoom (100%)">100%</button>
+                        <button type="button" class="stage-zoom-btn" id="zoom-in-btn" aria-label="Zoom in"
+                            title="Zoom in (+)">+</button>
                     </div>
                 </div>
-                <div class="stack-dots-bar" id="stack-dots-bar" style="display:none;" role="tablist" aria-label="Fotos im Stapel"></div>
-                <div class="modal-scroll-prompt" id="modal-scroll-prompt" role="button" tabindex="0" aria-label="Scroll down for photo details">
+                <div class="stack-dots-bar" id="stack-dots-bar" style="display:none;" role="tablist"
+                    aria-label="Fotos im Stapel"></div>
+                <div class="modal-scroll-prompt" id="modal-scroll-prompt" role="button" tabindex="0"
+                    aria-label="Scroll down for photo details">
                     <span id="modal-scroll-prompt-text">↓ Scroll for Details, EXIF &amp; Location Map</span>
                 </div>
             </section>
@@ -1239,10 +1499,11 @@
                         <div class="detail-author-group">
                             <span class="detail-author" id="detail-author">PHOTOGRAPHER</span>
                             <a href="#" id="detail-instagram" target="_blank" rel="noopener noreferrer"
-                                class="detail-ig-link" style="display:none;" aria-label="Photographer Instagram Profile">
+                                class="detail-ig-link" style="display:none;"
+                                aria-label="Photographer Instagram Profile">
                                 <svg class="ig-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                    aria-hidden="true">
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" aria-hidden="true">
                                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
@@ -1252,11 +1513,14 @@
                         </div>
 
                         <div class="detail-like-wrapper" id="modal-like-container">
+                            <span class="detail-views-badge" id="modal-views-badge" title="Gesamtaufrufe">
+                                👁️ <span id="modal-views-count">0</span> Aufrufe
+                            </span>
                             <button type="button" class="detail-like-btn" id="modal-like-btn"
                                 aria-label="Like this photo">
                                 <svg class="heart-icon" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                    aria-hidden="true">
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" aria-hidden="true">
                                     <path
                                         d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
                                     </path>
@@ -1271,8 +1535,15 @@
                 <p class="detail-description" id="detail-description">Description text.</p>
 
                 <div class="detail-section">
-                    <div class="section-label">TECHNICAL EXIF</div>
+                    <div class="section-label-row">
+                        <div class="section-label" style="margin-bottom:0;">TECHNICAL EXIF</div>
+                        <div class="exif-medium-badge" id="exif-medium-badge">📷 DIGITAL</div>
+                    </div>
                     <div class="exif-grid">
+                        <div class="exif-item" id="exif-film-item" style="display:none;">
+                            <span class="exif-label">FILM STOCK</span>
+                            <span class="exif-val" id="exif-film">—</span>
+                        </div>
                         <div class="exif-item">
                             <span class="exif-label">CAMERA</span>
                             <span class="exif-val" id="exif-camera">—</span>
@@ -1558,7 +1829,7 @@
                 });
             }
 
-            // --- LIKE SYSTEM (Global synchronization with CountAPI + localStorage) ---
+            // --- STATS & ENGAGEMENT SYSTEM (Likes + Views with CountAPI & localStorage) ---
             function getLikedPhotos() {
                 try {
                     return JSON.parse(localStorage.getItem('kanito_liked_photos') || '[]');
@@ -1569,20 +1840,58 @@
                 return getLikedPhotos().includes(id);
             }
 
-            async function fetchGlobalLikes() {
-                if ('{{SHOW_LIKES}}' === 'false') return;
+            function calculatePhotoScore(photo) {
+                const likes = Number(photo.likes || 0);
+                const views = Number(photo.views || 0);
+                let photoTime = Date.now();
+                if (photo.date) {
+                    const parsed = Date.parse(photo.date);
+                    if (!isNaN(parsed)) photoTime = parsed;
+                } else if (photo.year) {
+                    const parsed = Date.parse(photo.year + '-01-01');
+                    if (!isNaN(parsed)) photoTime = parsed;
+                }
+                const ageInDays = Math.max(0, (Date.now() - photoTime) / (1000 * 60 * 60 * 24));
+                // Freshness bonus: 60 points on Day 0, decaying with half-life ~28 days
+                const freshnessBonus = 60 * Math.exp(-ageInDays / 28);
+                // 1 Like = 7 Views
+                const engagement = (likes * 7) + (views * 1);
+                const ageFactor = Math.pow((ageInDays + 14) / 14, 0.55);
+                return Number((freshnessBonus + (engagement / ageFactor)).toFixed(2));
+            }
+
+            async function fetchGlobalStats() {
                 await Promise.allSettled(photosCatalog.map(async (photo) => {
+                    const cleanId = photo.id.replace(/[^a-zA-Z0-9_-]/g, '_');
+                    // Likes
+                    if ('{{SHOW_LIKES}}' !== 'false') {
+                        try {
+                            const resLikes = await fetch(`https://countapi.mileshilliard.com/api/v1/get/kanito_likes_${cleanId}`);
+                            if (resLikes.ok) {
+                                const data = await resLikes.json();
+                                if (data && typeof data.value === 'number') {
+                                    photo.likes = Math.max(Number(photo.likes || 0), data.value);
+                                }
+                            }
+                        } catch (e) { }
+                    }
+                    // Views
                     try {
-                        const cleanId = photo.id.replace(/[^a-zA-Z0-9_-]/g, '_');
-                        const res = await fetch(`https://countapi.mileshilliard.com/api/v1/get/kanito_likes_${cleanId}`);
-                        if (res.ok) {
-                            const data = await res.json();
+                        const resViews = await fetch(`https://countapi.mileshilliard.com/api/v1/get/kanito_views_${cleanId}`);
+                        if (resViews.ok) {
+                            const data = await resViews.json();
                             if (data && typeof data.value === 'number') {
-                                photo.likes = Math.max(Number(photo.likes || 0), data.value);
+                                photo.views = Math.max(Number(photo.views || 0), data.value);
                             }
                         }
                     } catch (e) { }
                 }));
+
+                // Update UI on cards
+                photosCatalog.forEach(photo => {
+                    updatePhotoLikeUI(photo.id, isPhotoLiked(photo.id));
+                    updatePhotoViewsUI(photo.id);
+                });
                 syncAllLikeButtons();
             }
 
@@ -1611,7 +1920,7 @@
                                     updatePhotoLikeUI(id, true);
                                 }
                             })
-                            .catch(() => {});
+                            .catch(() => { });
                     }
                 }
                 try {
@@ -1619,6 +1928,28 @@
                 } catch (e) { }
 
                 updatePhotoLikeUI(id, isNowLiked);
+            }
+
+            function trackPhotoView(id) {
+                const photo = photosCatalog.find(p => p.id === id);
+                if (!photo) return;
+                const cleanId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
+                const sessionKey = 'kanito_viewed_' + cleanId;
+                if (!sessionStorage.getItem(sessionKey)) {
+                    sessionStorage.setItem(sessionKey, '1');
+                    photo.views = (photo.views || 0) + 1;
+                    updatePhotoViewsUI(id);
+                    // Hit global CountAPI for views
+                    fetch(`https://countapi.mileshilliard.com/api/v1/hit/kanito_views_${cleanId}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data && typeof data.value === 'number') {
+                                photo.views = Math.max(photo.views, data.value);
+                                updatePhotoViewsUI(id);
+                            }
+                        })
+                        .catch(() => { });
+                }
             }
 
             function updatePhotoLikeUI(id, isNowLiked) {
@@ -1629,6 +1960,8 @@
                 // Update card on gallery grid
                 const card = document.querySelector(`.photo-item[data-id="${id}"]`);
                 if (card) {
+                    card.dataset.likes = currentLikes;
+                    card.dataset.score = calculatePhotoScore(photo);
                     const cardBtn = card.querySelector('.photo-card-like-btn');
                     const countSpan = card.querySelector('.like-count');
                     if (cardBtn) {
@@ -1647,6 +1980,23 @@
                 }
             }
 
+            function updatePhotoViewsUI(id) {
+                const photo = photosCatalog.find(p => p.id === id);
+                if (!photo) return;
+                const viewsCount = Number(photo.views || 0);
+                const card = document.querySelector(`.photo-item[data-id="${id}"]`);
+                if (card) {
+                    card.dataset.views = viewsCount;
+                    card.dataset.score = calculatePhotoScore(photo);
+                    const viewNum = card.querySelector('.card-views-tag .view-num');
+                    if (viewNum) viewNum.textContent = viewsCount;
+                }
+                if (modal.classList.contains('active') && photosCatalog[activeIndex] && photosCatalog[activeIndex].id === id) {
+                    const modalViewsCount = document.getElementById('modal-views-count');
+                    if (modalViewsCount) modalViewsCount.textContent = viewsCount;
+                }
+            }
+
             function syncAllLikeButtons() {
                 const liked = getLikedPhotos();
                 document.querySelectorAll('.photo-card-like-btn').forEach(btn => {
@@ -1658,6 +2008,64 @@
                     else btn.classList.remove('liked');
                     const countSpan = btn.querySelector('.like-count');
                     if (countSpan) countSpan.textContent = currentLikes;
+                });
+            }
+
+            // --- GALLERY FILTER & SORT ENGINE ---
+            let currentFilter = 'all'; // 'all', 'analog', 'digital'
+            let currentSort = 'score';  // 'score', 'newest', 'likes', 'views'
+
+            function applyGalleryFilterAndSort() {
+                const grid = document.getElementById('photo-grid');
+                if (!grid) return;
+                const cards = Array.from(grid.querySelectorAll('.photo-item'));
+
+                // Sort cards
+                cards.sort((a, b) => {
+                    if (currentSort === 'likes') {
+                        return (Number(b.dataset.likes) || 0) - (Number(a.dataset.likes) || 0);
+                    }
+                    if (currentSort === 'views') {
+                        return (Number(b.dataset.views) || 0) - (Number(a.dataset.views) || 0);
+                    }
+                    if (currentSort === 'newest') {
+                        const dateA = a.dataset.date ? Date.parse(a.dataset.date) || 0 : 0;
+                        const dateB = b.dataset.date ? Date.parse(b.dataset.date) || 0 : 0;
+                        return dateB - dateA;
+                    }
+                    // Default: smart ranking score
+                    return (parseFloat(b.dataset.score) || 0) - (parseFloat(a.dataset.score) || 0);
+                });
+
+                // Apply filter visibility & reorder in DOM
+                cards.forEach(card => {
+                    const medium = card.dataset.medium || 'digital';
+                    const matches = (currentFilter === 'all') || (medium === currentFilter);
+                    card.style.display = matches ? '' : 'none';
+                    grid.appendChild(card);
+                });
+            }
+
+            // Bind filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-chip').forEach(c => {
+                        c.classList.remove('active');
+                        c.setAttribute('aria-selected', 'false');
+                    });
+                    chip.classList.add('active');
+                    chip.setAttribute('aria-selected', 'true');
+                    currentFilter = chip.dataset.filter || 'all';
+                    applyGalleryFilterAndSort();
+                });
+            });
+
+            // Bind sort select
+            const sortSelect = document.getElementById('gallery-sort-select');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', (e) => {
+                    currentSort = e.target.value;
+                    applyGalleryFilterAndSort();
                 });
             }
 
@@ -1748,14 +2156,51 @@
                     stackDotsBar.style.display = 'none';
                 }
 
-                // Technical EXIF
-                exifCamera.textContent = currentImg.camera || photo.camera || '—';
+                // Technical EXIF & Medium / Scanner sanitation
+                const SCANNER_REGEX = /(noritsu|ez\s*controller|frontier|sp-?\d{3,4}|pakon|coolscan|flextight|epson\s*v\d{3}|perfection|opticfilm|qsf)/i;
+                const isAnalog = photo.medium === 'analog' || Boolean(photo.film) || Boolean(currentImg.film);
+                const filmStock = currentImg.film || photo.film;
+
+                const mediumBadge = document.getElementById('exif-medium-badge');
+                if (mediumBadge) {
+                    if (isAnalog) {
+                        mediumBadge.className = 'exif-medium-badge is-analog';
+                        mediumBadge.textContent = '🎞️ ANALOG FILM';
+                    } else {
+                        mediumBadge.className = 'exif-medium-badge';
+                        mediumBadge.textContent = '📷 DIGITAL';
+                    }
+                }
+
+                const filmItem = document.getElementById('exif-film-item');
+                const exifFilm = document.getElementById('exif-film');
+                if (filmItem && exifFilm) {
+                    if (isAnalog && filmStock) {
+                        filmItem.style.display = 'flex';
+                        exifFilm.textContent = filmStock;
+                    } else {
+                        filmItem.style.display = 'none';
+                        exifFilm.textContent = '—';
+                    }
+                }
+
+                let cameraVal = currentImg.camera || photo.camera || '';
+                if (SCANNER_REGEX.test(cameraVal)) {
+                    cameraVal = isAnalog ? 'Analog 35mm Body' : '—';
+                }
+                exifCamera.textContent = cameraVal || '—';
                 exifLens.textContent = currentImg.lens || photo.lens || '—';
                 exifFocal.textContent = currentImg.focal_length || photo.focal_length || '—';
                 exifAperture.textContent = currentImg.aperture || photo.aperture || '—';
                 exifShutter.textContent = currentImg.shutter || photo.shutter || '—';
-                const isoVal = currentImg.iso || photo.iso;
-                exifIso.textContent = isoVal ? 'ISO ' + isoVal : '—';
+
+                let rawIso = (currentImg.iso || photo.iso || '').toString().trim();
+                if (/fuji|kodak|ilford/i.test(rawIso)) {
+                    const numMatch = rawIso.match(/\d{2,5}/);
+                    if (numMatch) rawIso = numMatch[0];
+                }
+                rawIso = rawIso.replace(/^iso\s*/i, '');
+                exifIso.textContent = rawIso ? 'ISO ' + rawIso : '—';
 
                 if (!isNewPost) {
                     modalCanvas.classList.add('is-changing');
@@ -1823,6 +2268,13 @@
                 }
                 if (modalLikeText) modalLikeText.textContent = isLiked ? 'Liked' : 'Like';
                 if (modalLikeCount) modalLikeCount.textContent = currentLikes;
+
+                // Sync views state in modal and track view
+                trackPhotoView(photo.id);
+                const modalViewsCount = document.getElementById('modal-views-count');
+                if (modalViewsCount) {
+                    modalViewsCount.textContent = Number(photo.views || 0);
+                }
 
                 // Global setting check for like visibility
                 const showLikes = '{{SHOW_LIKES}}' !== 'false';
@@ -1894,7 +2346,7 @@
                 if (stackDotsBar) {
                     if (stack.length > 1) {
                         stackDotsBar.innerHTML = stack.map((_, i) =>
-                            `<button type="button" class="stack-dot ${i === activeStackIndex ? 'active' : ''}" data-idx="${i}" aria-label="Foto ${i+1} von ${stack.length}"></button>`
+                            `<button type="button" class="stack-dot ${i === activeStackIndex ? 'active' : ''}" data-idx="${i}" aria-label="Foto ${i + 1} von ${stack.length}"></button>`
                         ).join('');
                         stackDotsBar.style.display = 'flex';
                     } else {
@@ -1908,8 +2360,11 @@
                     modalScrollWrap.scrollTop = 0;
                 }
 
+                modal.classList.remove('ui-hidden', 'is-idle', 'is-scrolled-details');
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
+
+                resetIdleTimer();
 
                 await renderCurrentStackImage(true);
 
@@ -1919,9 +2374,12 @@
             }
 
             function closeModal() {
-                modal.classList.remove('active');
+                modal.classList.remove('active', 'ui-hidden', 'is-idle', 'is-scrolled-details');
                 document.body.style.overflow = '';
                 resetZoom(false);
+                clearIdleTimer();
+                clearTimeout(singleClickTimer);
+                clearTimeout(singleTapTimer);
                 try {
                     history.replaceState(null, '', window.location.pathname + window.location.search);
                 } catch (e) { }
@@ -1969,6 +2427,98 @@
                 });
             }
 
+            // --- ZEN MODE / AUTO-DIMMING & FULL-FORMAT (CLEAN VIEW) ---
+            let idleTimer = null;
+            const IDLE_DELAY = 2600; // auto-fade controls after 2.6s of inactivity
+            let singleClickTimer = null;
+            let singleTapTimer = null;
+
+            function clearIdleTimer() {
+                if (idleTimer) {
+                    clearTimeout(idleTimer);
+                    idleTimer = null;
+                }
+            }
+
+            function resetIdleTimer() {
+                clearIdleTimer();
+                if (!modal.classList.contains('active')) return;
+                if (modal.classList.contains('ui-hidden')) return; // already in explicit clean mode
+
+                idleTimer = setTimeout(() => {
+                    // Only dim controls if modal is active and user is viewing the hero stage (not scrolled down into text details)
+                    if (modal.classList.contains('active') && !modal.classList.contains('is-scrolled-details')) {
+                        modal.classList.add('is-idle');
+                    }
+                }, IDLE_DELAY);
+            }
+
+            function wakeFromIdle() {
+                if (modal.classList.contains('is-idle')) {
+                    modal.classList.remove('is-idle');
+                }
+                resetIdleTimer();
+            }
+
+            function toggleCleanMode() {
+                const isClean = modal.classList.toggle('ui-hidden');
+                if (isClean) {
+                    clearIdleTimer();
+                    modal.classList.remove('is-idle');
+                } else {
+                    wakeFromIdle();
+                }
+            }
+
+            function showUI() {
+                modal.classList.remove('ui-hidden');
+                wakeFromIdle();
+            }
+
+            // Waking from idle on mouse movement and touch
+            modal.addEventListener('mousemove', (e) => {
+                if (modal.classList.contains('ui-hidden')) {
+                    // In explicit clean mode, hovering near top edge reveals top bar
+                    if (e.clientY < 56) {
+                        showUI();
+                    }
+                    return;
+                }
+                wakeFromIdle();
+            });
+
+            modal.addEventListener('touchstart', () => {
+                if (!modal.classList.contains('ui-hidden')) {
+                    wakeFromIdle();
+                }
+            }, { passive: true });
+
+            if (modalScrollWrap) {
+                modalScrollWrap.addEventListener('scroll', () => {
+                    if (modalScrollWrap.scrollTop > 80) {
+                        modal.classList.add('is-scrolled-details');
+                        modal.classList.remove('is-idle');
+                    } else {
+                        modal.classList.remove('is-scrolled-details');
+                    }
+                    resetIdleTimer();
+                }, { passive: true });
+            }
+
+            // Scroll Prompt click to scroll down to details
+            const modalScrollPrompt = document.getElementById('modal-scroll-prompt');
+            if (modalScrollPrompt) {
+                modalScrollPrompt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const detailsSection = document.getElementById('detail-location-section') || document.querySelector('.modal-details-container') || document.querySelector('.modal-info-panel');
+                    if (detailsSection) {
+                        detailsSection.scrollIntoView({ behavior: 'smooth' });
+                    } else if (modalScrollWrap) {
+                        modalScrollWrap.scrollTo({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+                    }
+                });
+            }
+
             // --- FULLSCREEN ZOOM & PAN ENGINE (DESKTOP + MOBILE) ---
             let currentScale = 1;
             let panX = 0;
@@ -2010,6 +2560,7 @@
             function updateTransform(smooth = false) {
                 const zoomWrap = document.getElementById('stage-zoom-container');
                 const zoomLevelEl = document.getElementById('zoom-reset-btn');
+                const zoomControls = document.getElementById('stage-zoom-controls');
                 if (!zoomWrap) return;
 
                 if (smooth) {
@@ -2024,10 +2575,12 @@
                     panY = 0;
                     zoomWrap.style.transform = '';
                     zoomWrap.classList.remove('is-zoomed');
+                    if (zoomControls) zoomControls.classList.remove('is-active');
                     if (zoomLevelEl) zoomLevelEl.textContent = '100%';
                 } else {
                     zoomWrap.style.transform = `translate3d(${panX.toFixed(1)}px, ${panY.toFixed(1)}px, 0) scale(${currentScale.toFixed(3)})`;
                     zoomWrap.classList.add('is-zoomed');
+                    if (zoomControls) zoomControls.classList.add('is-active');
                     if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(currentScale * 100)}%`;
                 }
             }
@@ -2070,22 +2623,25 @@
                 updateTransform(smooth);
             }
 
-            // Desktop Mouse Drag to Pan
+            // Desktop Mouse Drag to Pan & Single Click to toggle clean mode
             let isMouseDragging = false;
             let mouseStartX = 0;
             let mouseStartY = 0;
             let mouseStartPanX = 0;
             let mouseStartPanY = 0;
+            let mouseMovedDist = 0;
 
             if (stageBoxEl) {
                 stageBoxEl.addEventListener('mousedown', (e) => {
                     if (e.button !== 0) return;
                     if (e.target.closest('.stack-arrow-btn') || e.target.closest('.stage-zoom-controls')) return;
 
+                    mouseStartX = e.clientX;
+                    mouseStartY = e.clientY;
+                    mouseMovedDist = 0;
+
                     if (currentScale > 1.05) {
                         isMouseDragging = true;
-                        mouseStartX = e.clientX;
-                        mouseStartY = e.clientY;
                         mouseStartPanX = panX;
                         mouseStartPanY = panY;
                         const zoomWrap = document.getElementById('stage-zoom-container');
@@ -2095,6 +2651,9 @@
                 });
 
                 window.addEventListener('mousemove', (e) => {
+                    if (mouseStartX !== 0 || mouseStartY !== 0) {
+                        mouseMovedDist = Math.hypot(e.clientX - mouseStartX, e.clientY - mouseStartY);
+                    }
                     if (!isMouseDragging) return;
                     panX = mouseStartPanX + (e.clientX - mouseStartX);
                     panY = mouseStartPanY + (e.clientY - mouseStartY);
@@ -2110,10 +2669,27 @@
                     }
                 });
 
+                // Desktop Single Click to toggle clean full-format view
+                stageBoxEl.addEventListener('click', (e) => {
+                    if (e.target.closest('.stack-arrow-btn') || e.target.closest('.stage-zoom-controls')) return;
+                    if (mouseMovedDist > 6) return; // ignore drags
+
+                    if (currentScale > 1.05) {
+                        // When zoomed in, keep view stable for inspection
+                        return;
+                    }
+
+                    clearTimeout(singleClickTimer);
+                    singleClickTimer = setTimeout(() => {
+                        toggleCleanMode();
+                    }, 240);
+                });
+
                 // Desktop Double click to toggle zoom
                 stageBoxEl.addEventListener('dblclick', (e) => {
                     if (e.target.closest('.stack-arrow-btn') || e.target.closest('.stage-zoom-controls')) return;
                     e.preventDefault();
+                    clearTimeout(singleClickTimer);
                     if (currentScale > 1.1) {
                         resetZoom(true);
                     } else {
@@ -2124,6 +2700,8 @@
                 // Desktop Wheel / Trackpad pinch zoom & Pan
                 stageBoxEl.addEventListener('wheel', (e) => {
                     if (e.target.closest('.stack-arrow-btn') || e.target.closest('.stage-zoom-controls')) return;
+
+                    wakeFromIdle();
 
                     if (e.ctrlKey) {
                         // Trackpad pinch OR Ctrl + Mouse Wheel
@@ -2156,6 +2734,7 @@
 
                 stageBoxEl.addEventListener('touchstart', (e) => {
                     if (e.target.closest('.stack-arrow-btn') || e.target.closest('.stage-zoom-controls')) return;
+                    clearTimeout(singleTapTimer);
 
                     if (e.touches.length === 2) {
                         hadMultiTouch = true;
@@ -2225,7 +2804,7 @@
                         const now = Date.now();
                         const touchDuration = now - touchStartTime;
 
-                        // Double tap detection
+                        // Tap detection (Single tap to toggle clean mode, Double tap to zoom)
                         if (!hadMultiTouch && e.changedTouches.length === 1) {
                             const tapX = e.changedTouches[0].clientX;
                             const tapY = e.changedTouches[0].clientY;
@@ -2233,16 +2812,25 @@
 
                             if (distFromStart < 15 && touchDuration < 300) {
                                 if (now - lastTapTime < 320) {
+                                    // Double tap!
                                     e.preventDefault();
+                                    clearTimeout(singleTapTimer);
+                                    lastTapTime = 0;
                                     if (currentScale > 1.1) {
                                         resetZoom(true);
                                     } else {
                                         applyZoomAt(tapX, tapY, 2.5, true);
                                     }
-                                    lastTapTime = 0;
                                     return;
                                 }
                                 lastTapTime = now;
+
+                                if (currentScale <= 1.05) {
+                                    clearTimeout(singleTapTimer);
+                                    singleTapTimer = setTimeout(() => {
+                                        toggleCleanMode();
+                                    }, 280);
+                                }
                             }
                         }
 
@@ -2320,8 +2908,13 @@
             window.addEventListener('keydown', (e) => {
                 if (!modal.classList.contains('active')) return;
                 if (e.key === 'Escape') {
-                    closeModal();
+                    if (modal.classList.contains('ui-hidden')) {
+                        showUI();
+                    } else {
+                        closeModal();
+                    }
                 } else if (e.key === 'ArrowLeft') {
+                    showUI();
                     const photo = photosCatalog[activeIndex];
                     const stack = getPhotoStack(photo);
                     if (stack.length > 1 && activeStackIndex > 0) {
@@ -2330,6 +2923,7 @@
                         stagePrevBtn.click();
                     }
                 } else if (e.key === 'ArrowRight') {
+                    showUI();
                     const photo = photosCatalog[activeIndex];
                     const stack = getPhotoStack(photo);
                     if (stack.length > 1 && activeStackIndex < stack.length - 1) {
@@ -2380,7 +2974,7 @@
             function initApp() {
                 setupInfiniteScroll();
                 syncAllLikeButtons();
-                fetchGlobalLikes();
+                fetchGlobalStats();
                 if (window.location.hash && window.location.hash.startsWith('#photo-')) {
                     const id = window.location.hash.replace('#photo-', '');
                     const idx = photosCatalog.findIndex(p => p.id === id);

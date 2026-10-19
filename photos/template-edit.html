@@ -857,10 +857,36 @@
                     </div>
 
                     <div style="margin-top:1.5rem;">
-                        <label style="margin-bottom:0.5rem;">EXIF Metadata (Editable)</label>
+                        <label style="margin-bottom:0.5rem;">EXIF Metadata &amp; Capture Type</label>
+
+                        <div id="scanner-detected-notice" style="display:none; margin-bottom:1rem; padding:0.75rem 1rem; border-radius:4px; background:rgba(255, 170, 50, 0.12); border:1px solid rgba(255, 170, 50, 0.4); font-size:12px; color:#ffb347;"></div>
+
+                        <div class="row" style="margin-bottom:0.8rem;">
+                            <div class="col">
+                                <label>Medium / Capture Type</label>
+                                <select id="input-medium">
+                                    <option value="digital">📷 Digital</option>
+                                    <option value="analog">🎞️ Analog Film</option>
+                                </select>
+                            </div>
+                            <div class="col" id="col-film-stock" style="display:none;">
+                                <label>Film Stock</label>
+                                <input type="text" id="input-film" list="film-stock-list" placeholder="e.g. Kodak Gold 200, Fujicolor Superia 400..." autocomplete="off">
+                                <datalist id="film-stock-list"></datalist>
+                            </div>
+                        </div>
+
                         <div class="row">
-                            <div class="col"><label>Camera</label><input type="text" id="input-camera"></div>
-                            <div class="col"><label>Lens</label><input type="text" id="input-lens"></div>
+                            <div class="col">
+                                <label>Camera</label>
+                                <input type="text" id="input-camera" list="camera-list" placeholder="e.g. Nikon F601, Sony Alpha 6000..." autocomplete="off">
+                                <datalist id="camera-list"></datalist>
+                            </div>
+                            <div class="col">
+                                <label>Lens</label>
+                                <input type="text" id="input-lens" list="lens-list" placeholder="e.g. Tamron, Samyang 12mm..." autocomplete="off">
+                                <datalist id="lens-list"></datalist>
+                            </div>
                             <div class="col"><label>Focal Length</label><input type="text" id="input-focal"></div>
                         </div>
                         <div class="row">
@@ -885,10 +911,17 @@
                 <div
                     style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.6rem; flex-wrap:wrap; gap:0.5rem;">
                     <h2 style="margin:0; border:none; padding:0;">4. Catalog &amp; Custom Order</h2>
-                    <button type="button" class="primary" id="save-order-btn"
-                        style="display:none; font-size:11px; padding:0.4rem 0.85rem;">
-                        💾 Save Order
-                    </button>
+                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                        <button type="button" id="auto-sort-ranking-btn"
+                            style="font-size:11px; padding:0.4rem 0.85rem; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.25); color:#ffffff; cursor:pointer;"
+                            title="Sort catalog automatically by freshness decay + views & likes">
+                            ⚡ Nach Relevanz-Index sortieren
+                        </button>
+                        <button type="button" class="primary" id="save-order-btn"
+                            style="display:none; font-size:11px; padding:0.4rem 0.85rem;">
+                            💾 Save Order
+                        </button>
+                    </div>
                 </div>
                 <p style="color:var(--muted); font-size:12px; margin-bottom:1.25rem;">
                     The order defines the exact arrangement on the public website. Use <strong>▲ / ▼</strong> or
@@ -1006,6 +1039,19 @@
                 }
             });
 
+            const inputMedium = document.getElementById('input-medium');
+            const colFilmStock = document.getElementById('col-film-stock');
+            const inputFilm = document.getElementById('input-film');
+            const filmStockList = document.getElementById('film-stock-list');
+            const cameraList = document.getElementById('camera-list');
+            const lensList = document.getElementById('lens-list');
+            const scannerNotice = document.getElementById('scanner-detected-notice');
+            const autoSortRankingBtn = document.getElementById('auto-sort-ranking-btn');
+
+            inputMedium.addEventListener('change', () => {
+                colFilmStock.style.display = (inputMedium.value === 'analog') ? 'block' : 'none';
+            });
+
             const inputCamera = document.getElementById('input-camera');
             const inputLens = document.getElementById('input-lens');
             const inputFocal = document.getElementById('input-focal');
@@ -1020,6 +1066,7 @@
             // --- PHOTOGRAPHER & INSTAGRAM AUTO-COMPLETE & PERSISTENCE ---
             const DEFAULT_PHOTOGRAPHERS = {
                 'Silas Hörz': '@silas.hoerz',
+                'Samuel Hörz': '@samuel.hoerz',
                 'Partner Photographer': '@partner.photo'
             };
 
@@ -1042,6 +1089,90 @@
                 updateDatalists();
             }
 
+            // --- GEAR MEMORY & PRESETS (Cameras, Lenses, Film Stocks per Photographer) ---
+            const DEFAULT_GEAR = {
+                photographers: {
+                    'Samuel Hörz': {
+                        medium: 'analog',
+                        camera: 'Nikon F601',
+                        lens: 'Tamron',
+                        film: 'Fujicolor Superia 400'
+                    },
+                    'Silas Hörz': {
+                        medium: 'digital',
+                        camera: 'Sony Alpha 6000',
+                        lens: 'Samyang 12mm f/2.0 NCS CS',
+                        film: ''
+                    }
+                },
+                cameras: ['Nikon F601', 'Sony Alpha 6000', 'Leica M6', 'Canon AE-1', 'Contax T2', 'Fujifilm X-T5'],
+                lenses: ['Tamron', 'Samyang 12mm f/2.0 NCS CS', 'Nikkor 50mm f/1.8', 'Sony E 16-50mm f/3.5-5.6', 'Zeiss 35mm f/2'],
+                films: [
+                    'Fujicolor Superia 400',
+                    'Fujicolor C200',
+                    'Kodak Gold 200',
+                    'Kodak Portra 400',
+                    'Kodak Portra 160',
+                    'Kodak Portra 800',
+                    'Kodak UltraMax 400',
+                    'Kodak Tri-X 400',
+                    'Ilford HP5 Plus 400',
+                    'Ilford FP4 Plus 125',
+                    'CineStill 800T',
+                    'CineStill 400D',
+                    'Fomapan 400',
+                    'AgfaPhoto APX 400'
+                ]
+            };
+
+            function getGearRegistry() {
+                try {
+                    const saved = localStorage.getItem('kanito_gear_registry');
+                    if (!saved) return DEFAULT_GEAR;
+                    const parsed = JSON.parse(saved);
+                    return {
+                        photographers: Object.assign({}, DEFAULT_GEAR.photographers, parsed.photographers || {}),
+                        cameras: Array.from(new Set([...DEFAULT_GEAR.cameras, ...(parsed.cameras || [])])),
+                        lenses: Array.from(new Set([...DEFAULT_GEAR.lenses, ...(parsed.lenses || [])])),
+                        films: Array.from(new Set([...DEFAULT_GEAR.films, ...(parsed.films || [])]))
+                    };
+                } catch (e) {
+                    return DEFAULT_GEAR;
+                }
+            }
+
+            function saveGearMapping(photographer, medium, camera, lens, film) {
+                const reg = getGearRegistry();
+                if (camera && !reg.cameras.includes(camera)) reg.cameras.push(camera);
+                if (lens && !reg.lenses.includes(lens)) reg.lenses.push(lens);
+                if (film && !reg.films.includes(film)) reg.films.push(film);
+                if (photographer) {
+                    reg.photographers[photographer] = {
+                        medium: medium || 'digital',
+                        camera: camera || '',
+                        lens: lens || '',
+                        film: film || ''
+                    };
+                }
+                try {
+                    localStorage.setItem('kanito_gear_registry', JSON.stringify(reg));
+                } catch (e) { }
+                updateGearDatalists();
+            }
+
+            function updateGearDatalists() {
+                const reg = getGearRegistry();
+                if (cameraList) {
+                    cameraList.innerHTML = reg.cameras.map(c => `<option value="${c}">`).join('');
+                }
+                if (lensList) {
+                    lensList.innerHTML = reg.lenses.map(l => `<option value="${l}">`).join('');
+                }
+                if (filmStockList) {
+                    filmStockList.innerHTML = reg.films.map(f => `<option value="${f}">`).join('');
+                }
+            }
+
             function updateDatalists() {
                 const reg = getPhotographerRegistry();
                 const names = Object.keys(reg).sort();
@@ -1053,6 +1184,7 @@
                 if (instagramList) {
                     instagramList.innerHTML = igs.map(i => `<option value="${i}">`).join('');
                 }
+                updateGearDatalists();
             }
 
             updateDatalists();
@@ -1064,7 +1196,33 @@
                     inputInstagram.value = reg[val];
                     inputInstagram.dataset.autofilled = 'true';
                 }
+
+                // Gear auto-fill for selected photographer if fields are empty or auto-filled
+                const gearReg = getGearRegistry();
+                if (gearReg.photographers && gearReg.photographers[val]) {
+                    const savedGear = gearReg.photographers[val];
+                    if (savedGear.medium) {
+                        inputMedium.value = savedGear.medium;
+                        colFilmStock.style.display = (savedGear.medium === 'analog') ? 'block' : 'none';
+                    }
+                    if (savedGear.camera && (!inputCamera.value || inputCamera.dataset.autofilled === 'true')) {
+                        inputCamera.value = savedGear.camera;
+                        inputCamera.dataset.autofilled = 'true';
+                    }
+                    if (savedGear.lens && (!inputLens.value || inputLens.dataset.autofilled === 'true')) {
+                        inputLens.value = savedGear.lens;
+                        inputLens.dataset.autofilled = 'true';
+                    }
+                    if (savedGear.film && (!inputFilm.value || inputFilm.dataset.autofilled === 'true')) {
+                        inputFilm.value = savedGear.film;
+                        inputFilm.dataset.autofilled = 'true';
+                    }
+                }
             });
+
+            inputCamera.addEventListener('input', () => { inputCamera.dataset.autofilled = 'false'; });
+            inputLens.addEventListener('input', () => { inputLens.dataset.autofilled = 'false'; });
+            inputFilm.addEventListener('input', () => { inputFilm.dataset.autofilled = 'false'; });
 
             inputInstagram.addEventListener('input', () => {
                 inputInstagram.dataset.autofilled = 'false';
@@ -1237,6 +1395,8 @@
 
                     let fileCamera = '', fileLens = '', fileFocal = '', fileAperture = '', fileShutter = '', fileIso = '';
                     let fileLat = null, fileLng = null;
+                    let detectedScanner = null;
+                    let detectedFilm = null;
                     try {
                         const exif = await exifr.parse(file, { tiff: true, exif: true, gps: true }) || {};
                         if (exif.Make || exif.Model) fileCamera = `${exif.Make || ''} ${exif.Model || ''}`.trim();
@@ -1248,6 +1408,28 @@
                         if (exif.latitude != null && exif.longitude != null && !isNaN(exif.latitude) && !isNaN(exif.longitude)) {
                             fileLat = Number(exif.latitude);
                             fileLng = Number(exif.longitude);
+                        }
+
+                        // Check for scanner false-positive
+                        const SCANNER_REGEX = /(noritsu|ez\s*controller|frontier|sp-?\d{3,4}|pakon|coolscan|flextight|epson\s*v\d{3}|perfection|opticfilm|qsf)/i;
+                        if (SCANNER_REGEX.test(fileCamera)) {
+                            detectedScanner = fileCamera;
+                            fileCamera = ''; // Do NOT set scanner as camera!
+                        }
+
+                        // Check for film stock in ISO or comments
+                        const combinedCheck = `${fileIso} ${(exif.UserComment || '')} ${(exif.ImageDescription || '')}`;
+                        if (/superia\s*400/i.test(combinedCheck)) detectedFilm = 'Fujicolor Superia 400';
+                        else if (/gold\s*200/i.test(combinedCheck)) detectedFilm = 'Kodak Gold 200';
+                        else if (/portra\s*400/i.test(combinedCheck)) detectedFilm = 'Kodak Portra 400';
+                        else if (/portra\s*160/i.test(combinedCheck)) detectedFilm = 'Kodak Portra 160';
+                        else if (/hp5/i.test(combinedCheck)) detectedFilm = 'Ilford HP5 Plus 400';
+                        else if (/fuji\s*400/i.test(combinedCheck)) detectedFilm = 'Fujicolor Superia 400';
+
+                        // Sanitize ISO number
+                        if (fileIso) {
+                            const numMatch = fileIso.match(/\d{2,5}/);
+                            if (numMatch) fileIso = numMatch[0];
                         }
                     } catch (e) { }
 
@@ -1278,7 +1460,32 @@
                     // If form was empty, auto-fill metadata from first file
                     if (wasEmpty && i === 0 && !editingPhotoId) {
                         inputTitle.value = file.name.replace(/\.[^/.]+$/, '').toUpperCase();
-                        if (fileCamera) inputCamera.value = fileCamera;
+
+                        if (detectedScanner) {
+                            inputMedium.value = 'analog';
+                            colFilmStock.style.display = 'block';
+                            if (detectedFilm) inputFilm.value = detectedFilm;
+                            if (scannerNotice) {
+                                scannerNotice.style.display = 'block';
+                                scannerNotice.innerHTML = `ℹ️ <strong>Labor-Scanner erkannt (${detectedScanner}):</strong> Scanner wurde aus dem Kamerafeld entfernt und Medium auf "Analog Film" gesetzt. Falls gespeichert, wurden Kamera &amp; Objektiv aus deinem Profil gewählt.`;
+                            }
+                            if (!inputPhotographer.value) {
+                                inputPhotographer.value = 'Samuel Hörz';
+                                inputInstagram.value = '@samuel.hoerz';
+                            }
+                            const photogVal = inputPhotographer.value.trim();
+                            const gearReg = getGearRegistry();
+                            if (gearReg.photographers && gearReg.photographers[photogVal]) {
+                                const saved = gearReg.photographers[photogVal];
+                                if (saved.camera) inputCamera.value = saved.camera;
+                                if (saved.lens) inputLens.value = saved.lens;
+                                if (saved.film && !inputFilm.value) inputFilm.value = saved.film;
+                            }
+                        } else {
+                            if (scannerNotice) scannerNotice.style.display = 'none';
+                            if (fileCamera) inputCamera.value = fileCamera;
+                        }
+
                         if (fileLens) inputLens.value = fileLens;
                         if (fileFocal) inputFocal.value = fileFocal;
                         if (fileAperture) inputAperture.value = fileAperture;
@@ -1604,6 +1811,12 @@
                 inputFrame.value = photo.frame || 'default';
                 inputFrameWidth.value = photo.frame_width != null ? photo.frame_width : '';
 
+                const isAnalog = photo.medium === 'analog' || Boolean(photo.film);
+                inputMedium.value = isAnalog ? 'analog' : 'digital';
+                colFilmStock.style.display = isAnalog ? 'block' : 'none';
+                inputFilm.value = photo.film || '';
+                if (scannerNotice) scannerNotice.style.display = 'none';
+
                 inputCamera.value = photo.camera || '';
                 inputLens.value = photo.lens || '';
                 inputFocal.value = photo.focal_length || '';
@@ -1665,6 +1878,10 @@
                 inputLocName.value = '';
                 inputLat.value = '';
                 inputLng.value = '';
+                inputMedium.value = 'digital';
+                colFilmStock.style.display = 'none';
+                inputFilm.value = '';
+                if (scannerNotice) scannerNotice.style.display = 'none';
                 inputCamera.value = '';
                 inputLens.value = '';
                 inputFocal.value = '';
@@ -1813,6 +2030,8 @@
                             longitude: hasLoc ? parseFloat(inputLng.value) : null,
                             frame: frameChoice,
                             frame_width: frameW,
+                            medium: inputMedium.value,
+                            ...(inputMedium.value === 'analog' && inputFilm.value.trim() ? { film: inputFilm.value.trim() } : {}),
                             camera: inputCamera.value.trim(),
                             lens: inputLens.value.trim(),
                             focal_length: inputFocal.value.trim(),
@@ -1828,6 +2047,13 @@
 
                         if (rawPhotos[targetIdx].photographer) {
                             savePhotographerMapping(rawPhotos[targetIdx].photographer, rawPhotos[targetIdx].instagram);
+                            saveGearMapping(
+                                rawPhotos[targetIdx].photographer,
+                                inputMedium.value,
+                                inputCamera.value.trim(),
+                                inputLens.value.trim(),
+                                inputFilm.value.trim()
+                            );
                         }
                     } else {
                         const newId = hero.filename.replace(/\.bin$/, '');
@@ -1843,6 +2069,8 @@
                             longitude: hasLoc ? parseFloat(inputLng.value) : null,
                             frame: frameChoice,
                             frame_width: frameW,
+                            medium: inputMedium.value,
+                            ...(inputMedium.value === 'analog' && inputFilm.value.trim() ? { film: inputFilm.value.trim() } : {}),
                             year: new Date().getFullYear().toString(),
                             date: new Date().toISOString().split('T')[0],
                             camera: inputCamera.value.trim(),
@@ -1856,11 +2084,19 @@
                             height: hero.height,
                             aspect_ratio: hero.aspect_ratio,
                             images: finalImages,
+                            views: 0,
                             likes: 0
                         };
 
                         if (newEntry.photographer) {
                             savePhotographerMapping(newEntry.photographer, newEntry.instagram);
+                            saveGearMapping(
+                                newEntry.photographer,
+                                inputMedium.value,
+                                inputCamera.value.trim(),
+                                inputLens.value.trim(),
+                                inputFilm.value.trim()
+                            );
                         }
 
                         rawPhotos.unshift(newEntry);
@@ -2112,6 +2348,36 @@
                 }
             });
 
+            // --- AUTO-SORT BY SMART RANKING INDEX ---
+            if (autoSortRankingBtn) {
+                autoSortRankingBtn.addEventListener('click', () => {
+                    function getPhotoScore(p) {
+                        const likes = Number(p.likes || 0);
+                        const views = Number(p.views || 0);
+                        let photoTime = Date.now();
+                        if (p.date) {
+                            const parsed = Date.parse(p.date);
+                            if (!isNaN(parsed)) photoTime = parsed;
+                        } else if (p.year) {
+                            const parsed = Date.parse(p.year + '-01-01');
+                            if (!isNaN(parsed)) photoTime = parsed;
+                        }
+                        const ageInDays = Math.max(0, (Date.now() - photoTime) / (1000 * 60 * 60 * 24));
+                        const freshnessBonus = 60 * Math.exp(-ageInDays / 28);
+                        const engagement = (likes * 7) + (views * 1);
+                        const ageFactor = Math.pow((ageInDays + 14) / 14, 0.55);
+                        return freshnessBonus + (engagement / ageFactor);
+                    }
+
+                    currentCatalog.sort((a, b) => getPhotoScore(b) - getPhotoScore(a));
+                    orderChanged = true;
+                    saveOrderBtn.style.display = 'inline-flex';
+                    saveOrderBtn.textContent = '💾 Save Order';
+                    renderCatalogTable();
+                    alert('Katalog wurde erfolgreich nach dem Relevanz-Index (Freshness-Decay + Likes & Views) sortiert!\n\nKlicke jetzt auf "💾 Save Order", um die neue Reihenfolge auf GitHub zu veröffentlichen.');
+                });
+            }
+
             async function loadCatalog() {
                 const tbody = document.getElementById('catalog-rows');
                 tbody.innerHTML = '<tr><td colspan="7" style="color:var(--muted);">Loading catalog...</td></tr>';
@@ -2132,12 +2398,23 @@
                     settingDefaultFrame.value = currentSettings.default_frame || 'none';
                     settingFrameWidth.value = currentSettings.frame_width || 16;
 
-                    // Enrich photographer registry
+                    // Enrich photographer and gear registry from catalog
                     currentCatalog.forEach(p => {
-                        if (p.photographer && p.instagram) {
-                            const reg = getPhotographerRegistry();
-                            if (!reg[p.photographer]) {
-                                savePhotographerMapping(p.photographer, p.instagram);
+                        if (p.photographer) {
+                            if (p.instagram) {
+                                const reg = getPhotographerRegistry();
+                                if (!reg[p.photographer]) {
+                                    savePhotographerMapping(p.photographer, p.instagram);
+                                }
+                            }
+                            if (p.camera || p.lens || p.film) {
+                                saveGearMapping(
+                                    p.photographer,
+                                    p.medium || (p.film ? 'analog' : 'digital'),
+                                    p.camera,
+                                    p.lens,
+                                    p.film
+                                );
                             }
                         }
                     });
