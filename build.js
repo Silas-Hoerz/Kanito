@@ -235,7 +235,7 @@ async function build() {
     const YEAR = new Date().getFullYear().toString();
 
     let PHOTOS = [];
-    let GALLERY_SETTINGS = { show_likes: true };
+    let GALLERY_SETTINGS = { show_likes: true, show_like_counts: true, show_views: true };
     try {
         const rawJson = JSON.parse(await readCleanText('photos.json'));
         if (Array.isArray(rawJson)) {
@@ -920,14 +920,40 @@ async function build() {
         // Pre-sort photos by smart ranking index for static render
         PHOTOS.sort((a, b) => calculateRankingScore(b) - calculateRankingScore(a));
 
+        function getMetricsDisplay(photo, settings) {
+            let showLikes = settings.show_likes !== false;
+            let showLikeCounts = settings.show_like_counts !== false;
+            let showViews = settings.show_views !== false;
+
+            if (photo.show_likes === 'both' || photo.show_likes === true) {
+                showLikes = true;
+                showLikeCounts = true;
+            } else if (photo.show_likes === 'nocount') {
+                showLikes = true;
+                showLikeCounts = false;
+            } else if (photo.show_likes === 'hide' || photo.show_likes === false) {
+                showLikes = false;
+                showLikeCounts = false;
+            }
+
+            if (photo.show_views === 'show' || photo.show_views === true) {
+                showViews = true;
+            } else if (photo.show_views === 'hide' || photo.show_views === false) {
+                showViews = false;
+            }
+
+            return { showLikes, showLikeCounts, showViews };
+        }
+
         let galleryCardsHtml = '';
         const igSvg = `<svg class="ig-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
         for (const p of PHOTOS) {
             const igBadge = p.instagram ? ` <a href="https://instagram.com/${p.instagram.replace(/^@/, '')}" target="_blank" rel="noopener noreferrer" class="photo-ig-badge" onclick="event.stopPropagation();">${igSvg}<span>${p.instagram}</span></a>` : '';
-            const likeBtnHtml = (GALLERY_SETTINGS.show_likes !== false) ? `
+            const metrics = getMetricsDisplay(p, GALLERY_SETTINGS);
+            const likeBtnHtml = metrics.showLikes ? `
                             <button type="button" class="photo-card-like-btn" data-id="${p.id}" data-base-likes="${p.likes || 0}" aria-label="Like ${p.title}">
                                 <svg class="heart-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                                <span class="like-count">${p.likes || 0}</span>
+                                <span class="like-count"${metrics.showLikeCounts ? '' : ' style="display:none;"'}>${p.likes || 0}</span>
                             </button>
             ` : '';
 
@@ -958,7 +984,7 @@ async function build() {
             const isAnalog = p.medium === 'analog' || Boolean(p.film);
             const mediumTag = isAnalog ? `<div class="photo-medium-badge-card">${p.film || 'Analog Film'}</div>` : '';
             const viewsCount = Number(p.views || 0);
-            const viewsTagHtml = `<span class="card-views-tag" title="${viewsCount} Views">👁️ <span class="view-num">${viewsCount}</span></span>`;
+            const viewsTagHtml = `<span class="card-views-tag"${metrics.showViews ? '' : ' style="display:none;"'} title="${viewsCount} Views">👁️ <span class="view-num">${viewsCount}</span></span>`;
             const scoreVal = calculateRankingScore(p);
 
             galleryCardsHtml += `
@@ -1023,6 +1049,8 @@ async function build() {
             .replace('{{GALLERY_ITEMS}}', () => galleryCardsHtml)
             .replace('{{PHOTOS_JSON}}', () => JSON.stringify(PHOTOS))
             .replace('{{SHOW_LIKES}}', GALLERY_SETTINGS.show_likes !== false ? 'true' : 'false')
+            .replace('{{SHOW_LIKE_COUNTS}}', GALLERY_SETTINGS.show_like_counts !== false ? 'true' : 'false')
+            .replace('{{SHOW_VIEWS}}', GALLERY_SETTINGS.show_views !== false ? 'true' : 'false')
             .replace('{{SETTINGS_JSON}}', () => JSON.stringify(GALLERY_SETTINGS));
 
         await fs.mkdir('dist/photos', { recursive: true });

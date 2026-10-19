@@ -1723,11 +1723,37 @@
             } catch (e) {
                 console.error('Failed to parse photos catalog data:', e);
             }
-            let gallerySettings = { show_likes: true, default_frame: 'none', frame_width: 16 };
+            let gallerySettings = { show_likes: true, show_like_counts: true, show_views: true, default_frame: 'none', frame_width: 16 };
             try {
                 const rawSettings = document.getElementById('gallery-settings-data').textContent.trim();
                 if (rawSettings) gallerySettings = Object.assign(gallerySettings, JSON.parse(rawSettings));
             } catch (e) { }
+
+            function getPhotoMetricsConfig(photo) {
+                let showLikes = gallerySettings.show_likes !== false;
+                let showLikeCounts = gallerySettings.show_like_counts !== false;
+                let showViews = gallerySettings.show_views !== false;
+
+                if (photo) {
+                    if (photo.show_likes === 'both' || photo.show_likes === true) {
+                        showLikes = true;
+                        showLikeCounts = true;
+                    } else if (photo.show_likes === 'nocount') {
+                        showLikes = true;
+                        showLikeCounts = false;
+                    } else if (photo.show_likes === 'hide' || photo.show_likes === false) {
+                        showLikes = false;
+                        showLikeCounts = false;
+                    }
+
+                    if (photo.show_views === 'show' || photo.show_views === true) {
+                        showViews = true;
+                    } else if (photo.show_views === 'hide' || photo.show_views === false) {
+                        showViews = false;
+                    }
+                }
+                return { showLikes, showLikeCounts, showViews };
+            }
             let activeIndex = 0;
 
             // --- PROGRESSIVE / UNLIMITED SCROLL LAZY CANVAS LOADER ---
@@ -1871,19 +1897,17 @@
             async function fetchGlobalStats() {
                 await Promise.allSettled(photosCatalog.map(async (photo) => {
                     const cleanId = photo.id.replace(/[^a-zA-Z0-9_-]/g, '_');
-                    // Likes
-                    if ('{{SHOW_LIKES}}' !== 'false') {
-                        try {
-                            const resLikes = await fetch(`https://countapi.mileshilliard.com/api/v1/get/kanito_likes_${cleanId}`);
-                            if (resLikes.ok) {
-                                const data = await resLikes.json();
-                                if (data && typeof data.value === 'number') {
-                                    photo.likes = Math.max(Number(photo.likes || 0), data.value);
-                                }
+                    // Likes (always tracked in background for scoring & analytics)
+                    try {
+                        const resLikes = await fetch(`https://countapi.mileshilliard.com/api/v1/get/kanito_likes_${cleanId}`);
+                        if (resLikes.ok) {
+                            const data = await resLikes.json();
+                            if (data && typeof data.value === 'number') {
+                                photo.likes = Math.max(Number(photo.likes || 0), data.value);
                             }
-                        } catch (e) { }
-                    }
-                    // Views
+                        }
+                    } catch (e) { }
+                    // Views (always tracked in background for scoring & analytics)
                     try {
                         const resViews = await fetch(`https://countapi.mileshilliard.com/api/v1/get/kanito_views_${cleanId}`);
                         if (resViews.ok) {
@@ -1964,6 +1988,7 @@
                 const photo = photosCatalog.find(p => p.id === id);
                 if (!photo) return;
                 const currentLikes = Number(photo.likes || 0);
+                const metrics = getPhotoMetricsConfig(photo);
 
                 // Update card on gallery grid
                 const card = document.querySelector(`.photo-item[data-id="${id}"]`);
@@ -1973,18 +1998,31 @@
                     const cardBtn = card.querySelector('.photo-card-like-btn');
                     const countSpan = card.querySelector('.like-count');
                     if (cardBtn) {
+                        cardBtn.style.display = metrics.showLikes ? 'inline-flex' : 'none';
                         if (isNowLiked) cardBtn.classList.add('liked');
                         else cardBtn.classList.remove('liked');
                     }
-                    if (countSpan) countSpan.textContent = currentLikes;
+                    if (countSpan) {
+                        countSpan.textContent = currentLikes;
+                        countSpan.style.display = metrics.showLikeCounts ? 'inline' : 'none';
+                    }
                 }
 
                 // Update modal if open for this photo
                 if (modal.classList.contains('active') && photosCatalog[activeIndex] && photosCatalog[activeIndex].id === id) {
-                    if (isNowLiked) modalLikeBtn.classList.add('liked');
-                    else modalLikeBtn.classList.remove('liked');
+                    if (modalLikeBtn) {
+                        modalLikeBtn.style.display = metrics.showLikes ? 'inline-flex' : 'none';
+                        if (isNowLiked) modalLikeBtn.classList.add('liked');
+                        else modalLikeBtn.classList.remove('liked');
+                    }
                     if (modalLikeText) modalLikeText.textContent = isNowLiked ? 'Liked' : 'Like';
-                    if (modalLikeCount) modalLikeCount.textContent = currentLikes;
+                    if (modalLikeCount) {
+                        modalLikeCount.textContent = currentLikes;
+                        modalLikeCount.style.display = metrics.showLikeCounts ? 'inline-block' : 'none';
+                    }
+                    if (modalLikeContainer) {
+                        modalLikeContainer.style.display = (metrics.showLikes || metrics.showViews) ? 'inline-flex' : 'none';
+                    }
                 }
             }
 
@@ -1992,16 +2030,27 @@
                 const photo = photosCatalog.find(p => p.id === id);
                 if (!photo) return;
                 const viewsCount = Number(photo.views || 0);
+                const metrics = getPhotoMetricsConfig(photo);
+
                 const card = document.querySelector(`.photo-item[data-id="${id}"]`);
                 if (card) {
                     card.dataset.views = viewsCount;
                     card.dataset.score = calculatePhotoScore(photo);
+                    const cardViewsTag = card.querySelector('.card-views-tag');
+                    if (cardViewsTag) {
+                        cardViewsTag.style.display = metrics.showViews ? 'inline-flex' : 'none';
+                    }
                     const viewNum = card.querySelector('.card-views-tag .view-num');
                     if (viewNum) viewNum.textContent = viewsCount;
                 }
                 if (modal.classList.contains('active') && photosCatalog[activeIndex] && photosCatalog[activeIndex].id === id) {
+                    const modalViewsBadge = document.getElementById('modal-views-badge');
+                    if (modalViewsBadge) modalViewsBadge.style.display = metrics.showViews ? 'inline-flex' : 'none';
                     const modalViewsCount = document.getElementById('modal-views-count');
                     if (modalViewsCount) modalViewsCount.textContent = viewsCount;
+                    if (modalLikeContainer) {
+                        modalLikeContainer.style.display = (metrics.showLikes || metrics.showViews) ? 'inline-flex' : 'none';
+                    }
                 }
             }
 
@@ -2010,12 +2059,19 @@
                 document.querySelectorAll('.photo-card-like-btn').forEach(btn => {
                     const id = btn.dataset.id;
                     const photo = photosCatalog.find(p => p.id === id);
+                    const metrics = getPhotoMetricsConfig(photo);
                     const currentLikes = photo ? Number(photo.likes || 0) : Number(btn.dataset.baseLikes || 0);
                     const isLiked = liked.includes(id);
+
+                    btn.style.display = metrics.showLikes ? 'inline-flex' : 'none';
                     if (isLiked) btn.classList.add('liked');
                     else btn.classList.remove('liked');
+
                     const countSpan = btn.querySelector('.like-count');
-                    if (countSpan) countSpan.textContent = currentLikes;
+                    if (countSpan) {
+                        countSpan.textContent = currentLikes;
+                        countSpan.style.display = metrics.showLikeCounts ? 'inline' : 'none';
+                    }
                 });
             }
 
@@ -2279,15 +2335,26 @@
 
                 // Sync views state in modal and track view
                 trackPhotoView(photo.id);
+                const metrics = getPhotoMetricsConfig(photo);
+                const modalViewsBadge = document.getElementById('modal-views-badge');
+                if (modalViewsBadge) {
+                    modalViewsBadge.style.display = metrics.showViews ? 'inline-flex' : 'none';
+                }
                 const modalViewsCount = document.getElementById('modal-views-count');
                 if (modalViewsCount) {
                     modalViewsCount.textContent = Number(photo.views || 0);
                 }
 
-                // Global setting check for like visibility
-                const showLikes = '{{SHOW_LIKES}}' !== 'false';
+                // Metric visibility for likes
+                if (modalLikeBtn) {
+                    modalLikeBtn.style.display = metrics.showLikes ? 'inline-flex' : 'none';
+                }
+                if (modalLikeCount) {
+                    modalLikeCount.textContent = Number(photo.likes || 0);
+                    modalLikeCount.style.display = metrics.showLikeCounts ? 'inline-block' : 'none';
+                }
                 if (modalLikeContainer) {
-                    modalLikeContainer.style.display = showLikes ? 'inline-flex' : 'none';
+                    modalLikeContainer.style.display = (metrics.showLikes || metrics.showViews) ? 'inline-flex' : 'none';
                 }
 
                 // Frame handling
