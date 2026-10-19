@@ -921,6 +921,7 @@
         }
 
         @keyframes bouncePrompt {
+
             0%,
             100% {
                 transform: translateY(0);
@@ -1003,7 +1004,7 @@
             pointer-events: none;
         }
 
-        .stage-zoom-container.is-zoomed ~ .stack-arrow-btn,
+        .stage-zoom-container.is-zoomed~.stack-arrow-btn,
         #detail-modal.is-idle .stack-arrow-btn,
         #detail-modal.ui-hidden .stack-arrow-btn {
             opacity: 0 !important;
@@ -1493,7 +1494,6 @@
 
             <article class="modal-details-card">
                 <div class="detail-header-block">
-                    <span class="detail-series-label">Monochrome Fine Art Architecture</span>
                     <h1 class="detail-title" id="detail-title">TITLE</h1>
                     <div class="detail-meta-row">
                         <div class="detail-author-group">
@@ -1541,7 +1541,7 @@
                     </div>
                     <div class="exif-grid">
                         <div class="exif-item" id="exif-film-item" style="display:none;">
-                            <span class="exif-label">FILM STOCK</span>
+                            <span class="exif-label">FILM</span>
                             <span class="exif-val" id="exif-film">—</span>
                         </div>
                         <div class="exif-item">
@@ -2173,10 +2173,10 @@
                 if (mediumBadge) {
                     if (isAnalog) {
                         mediumBadge.className = 'exif-medium-badge is-analog';
-                        mediumBadge.textContent = '🎞️ ANALOG FILM';
+                        mediumBadge.textContent = 'Analog';
                     } else {
                         mediumBadge.className = 'exif-medium-badge';
-                        mediumBadge.textContent = '📷 DIGITAL';
+                        mediumBadge.textContent = 'Digital';
                     }
                 }
 

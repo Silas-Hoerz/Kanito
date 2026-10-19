@@ -893,7 +893,7 @@
                                 </select>
                             </div>
                             <div class="col" id="col-film-stock" style="display:none;">
-                                <label>Film Stock</label>
+                                <label>Film</label>
                                 <input type="text" id="input-film" list="film-stock-list"
                                     placeholder="e.g. Kodak Gold 200, Fujicolor Superia 400..." autocomplete="off">
                                 <datalist id="film-stock-list"></datalist>
@@ -941,7 +941,7 @@
                         <button type="button" id="auto-sort-ranking-btn"
                             style="font-size:11px; padding:0.4rem 0.85rem; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.25); color:#ffffff; cursor:pointer;"
                             title="Sort catalog automatically by freshness decay + views & likes">
-                            ⚡ Nach Relevanz-Index sortieren
+                            Sort by Relevance
                         </button>
                         <button type="button" class="primary" id="save-order-btn"
                             style="display:none; font-size:11px; padding:0.4rem 0.85rem;">
@@ -1115,7 +1115,7 @@
                 updateDatalists();
             }
 
-            // --- GEAR MEMORY & PRESETS (Cameras, Lenses, Film Stocks per Photographer) ---
+            // --- GEAR MEMORY & PRESETS (Cameras, Lenses, Film per Photographer) ---
             const DEFAULT_GEAR = {
                 photographers: {
                     'Samuel Hörz': {
@@ -1443,7 +1443,7 @@
                             fileCamera = ''; // Do NOT set scanner as camera!
                         }
 
-                        // Check for film stock in ISO or comments
+                        // Check for film in ISO or comments
                         const combinedCheck = `${fileIso} ${(exif.UserComment || '')} ${(exif.ImageDescription || '')}`;
                         if (/superia\s*400/i.test(combinedCheck)) detectedFilm = 'Fujicolor Superia 400';
                         else if (/gold\s*200/i.test(combinedCheck)) detectedFilm = 'Kodak Gold 200';
