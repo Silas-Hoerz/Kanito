@@ -583,6 +583,7 @@
             align-items: center;
             padding: 2rem 1.5rem 1.5rem;
             position: relative;
+            overflow: hidden;
         }
 
         .stage-canvas-box {
@@ -592,6 +593,30 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        .stage-zoom-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center center;
+            will-change: transform;
+            cursor: zoom-in;
+            user-select: none;
+            -webkit-user-drag: none;
+            touch-action: none;
+        }
+
+        .stage-zoom-container.is-zoomed {
+            cursor: grab;
+        }
+
+        .stage-zoom-container.is-dragging {
+            cursor: grabbing !important;
         }
 
         #modal-canvas {
@@ -605,6 +630,75 @@
             user-select: none;
             -webkit-user-drag: none;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.95);
+            transition: opacity 0.2s ease;
+        }
+
+        #modal-shield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            background: transparent;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Floating Zoom Control Bar */
+        .stage-zoom-controls {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            z-index: 9;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: rgba(10, 10, 14, 0.75);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 20px;
+            padding: 3px 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+            user-select: none;
+        }
+
+        .stage-zoom-btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            min-width: 28px;
+            min-height: 28px;
+        }
+
+        .stage-zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .stage-zoom-btn:active {
+            transform: scale(0.92);
+        }
+
+        .stage-zoom-level {
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            color: rgba(255, 255, 255, 0.85);
+            min-width: 46px;
+            cursor: pointer;
         }
 
         .modal-scroll-prompt {
@@ -736,13 +830,8 @@
             box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
         }
 
-        #modal-canvas {
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-
         #modal-canvas.is-changing {
             opacity: 0.25;
-            transform: scale(0.995);
         }
 
         /* Curated Details Section Below the Photo */
@@ -1123,11 +1212,18 @@
         <div class="modal-scroll-wrap" id="modal-scroll-wrap">
             <section class="modal-hero-stage">
                 <div class="stage-canvas-box" id="stage-canvas-box">
-                    <canvas id="modal-canvas"></canvas>
-                    <div class="photo-shield" id="modal-shield"></div>
+                    <div class="stage-zoom-container" id="stage-zoom-container">
+                        <canvas id="modal-canvas"></canvas>
+                        <div class="photo-shield" id="modal-shield"></div>
+                    </div>
                     <button type="button" class="stack-arrow-btn stack-arrow-prev" id="stack-arrow-prev" aria-label="Vorheriges Foto im Stapel" style="display:none;">‹</button>
                     <button type="button" class="stack-arrow-btn stack-arrow-next" id="stack-arrow-next" aria-label="Nächstes Foto im Stapel" style="display:none;">›</button>
                     <div class="stage-stack-badge" id="stage-stack-badge" style="display:none;">1 / 1</div>
+                    <div class="stage-zoom-controls" id="stage-zoom-controls" aria-label="Zoom controls">
+                        <button type="button" class="stage-zoom-btn" id="zoom-out-btn" aria-label="Zoom out" title="Zoom out (−)">−</button>
+                        <button type="button" class="stage-zoom-btn stage-zoom-level" id="zoom-reset-btn" aria-label="Reset zoom" title="Reset zoom (100%)">100%</button>
+                        <button type="button" class="stage-zoom-btn" id="zoom-in-btn" aria-label="Zoom in" title="Zoom in (+)">+</button>
+                    </div>
                 </div>
                 <div class="stack-dots-bar" id="stack-dots-bar" style="display:none;" role="tablist" aria-label="Fotos im Stapel"></div>
                 <div class="modal-scroll-prompt" id="modal-scroll-prompt" role="button" tabindex="0" aria-label="Scroll down for photo details">
@@ -1687,6 +1783,7 @@
                 const stack = getPhotoStack(photo);
                 if (newIndex < 0 || newIndex >= stack.length) return;
                 activeStackIndex = newIndex;
+                resetZoom(false);
                 renderCurrentStackImage(false);
             }
 
@@ -1694,6 +1791,7 @@
                 if (index < 0 || index >= photosCatalog.length) return;
                 activeIndex = index;
                 activeStackIndex = targetStackIndex;
+                resetZoom(false);
                 const photo = photosCatalog[activeIndex];
                 const stack = getPhotoStack(photo);
 
@@ -1823,6 +1921,7 @@
             function closeModal() {
                 modal.classList.remove('active');
                 document.body.style.overflow = '';
+                resetZoom(false);
                 try {
                     history.replaceState(null, '', window.location.pathname + window.location.search);
                 } catch (e) { }
@@ -1870,43 +1969,352 @@
                 });
             }
 
-            // Touch swipe gesture support for mobile photo & stack navigation
-            let touchStartX = 0;
-            let touchStartY = 0;
+            // --- FULLSCREEN ZOOM & PAN ENGINE (DESKTOP + MOBILE) ---
+            let currentScale = 1;
+            let panX = 0;
+            let panY = 0;
             const stageBoxEl = document.getElementById('stage-canvas-box') || document.querySelector('.modal-hero-stage');
+            const zoomWrapEl = document.getElementById('stage-zoom-container');
+            const zoomInBtn = document.getElementById('zoom-in-btn');
+            const zoomOutBtn = document.getElementById('zoom-out-btn');
+            const zoomResetBtn = document.getElementById('zoom-reset-btn');
+
+            function clampPan() {
+                const zoomWrap = document.getElementById('stage-zoom-container');
+                const stageBox = document.getElementById('stage-canvas-box');
+                if (!zoomWrap || !stageBox) return;
+
+                if (currentScale <= 1.01) {
+                    panX = 0;
+                    panY = 0;
+                    return;
+                }
+
+                const baseW = zoomWrap.offsetWidth || modalCanvas.offsetWidth || 800;
+                const baseH = zoomWrap.offsetHeight || modalCanvas.offsetHeight || 600;
+
+                const stageRect = stageBox.getBoundingClientRect();
+                const stageW = stageRect.width || window.innerWidth;
+                const stageH = stageRect.height || (window.innerHeight - 56);
+
+                const scaledW = baseW * currentScale;
+                const scaledH = baseH * currentScale;
+
+                const maxPanX = Math.max((scaledW - stageW) / 2 + 80, (baseW * (currentScale - 1)) / 2);
+                const maxPanY = Math.max((scaledH - stageH) / 2 + 80, (baseH * (currentScale - 1)) / 2);
+
+                panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
+                panY = Math.max(-maxPanY, Math.min(maxPanY, panY));
+            }
+
+            function updateTransform(smooth = false) {
+                const zoomWrap = document.getElementById('stage-zoom-container');
+                const zoomLevelEl = document.getElementById('zoom-reset-btn');
+                if (!zoomWrap) return;
+
+                if (smooth) {
+                    zoomWrap.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+                } else {
+                    zoomWrap.style.transition = 'none';
+                }
+
+                if (currentScale <= 1.01) {
+                    currentScale = 1;
+                    panX = 0;
+                    panY = 0;
+                    zoomWrap.style.transform = '';
+                    zoomWrap.classList.remove('is-zoomed');
+                    if (zoomLevelEl) zoomLevelEl.textContent = '100%';
+                } else {
+                    zoomWrap.style.transform = `translate3d(${panX.toFixed(1)}px, ${panY.toFixed(1)}px, 0) scale(${currentScale.toFixed(3)})`;
+                    zoomWrap.classList.add('is-zoomed');
+                    if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(currentScale * 100)}%`;
+                }
+            }
+
+            function applyZoomAt(clientX, clientY, targetScale, smooth = false) {
+                const minScale = 1;
+                const maxScale = 4.5;
+                const newScale = Math.min(Math.max(targetScale, minScale), maxScale);
+
+                const zoomWrap = document.getElementById('stage-zoom-container');
+                if (!zoomWrap) return;
+                const rect = zoomWrap.getBoundingClientRect();
+
+                if (newScale <= 1.01) {
+                    currentScale = 1;
+                    panX = 0;
+                    panY = 0;
+                    updateTransform(smooth);
+                    return;
+                }
+
+                const centerX = rect.left + rect.width / 2 - panX;
+                const centerY = rect.top + rect.height / 2 - panY;
+
+                const localX = (clientX - centerX) / currentScale;
+                const localY = (clientY - centerY) / currentScale;
+
+                panX = clientX - (centerX + localX * newScale);
+                panY = clientY - (centerY + localY * newScale);
+                currentScale = newScale;
+
+                clampPan();
+                updateTransform(smooth);
+            }
+
+            function resetZoom(smooth = false) {
+                currentScale = 1;
+                panX = 0;
+                panY = 0;
+                updateTransform(smooth);
+            }
+
+            // Desktop Mouse Drag to Pan
+            let isMouseDragging = false;
+            let mouseStartX = 0;
+            let mouseStartY = 0;
+            let mouseStartPanX = 0;
+            let mouseStartPanY = 0;
+
             if (stageBoxEl) {
+                stageBoxEl.addEventListener('mousedown', (e) => {
+                    if (e.button !== 0) return;
+                    if (e.target.closest('.stack-arrow-btn') || e.target.closest('.stage-zoom-controls')) return;
+
+                    if (currentScale > 1.05) {
+                        isMouseDragging = true;
+                        mouseStartX = e.clientX;
+                        mouseStartY = e.clientY;
+                        mouseStartPanX = panX;
+                        mouseStartPanY = panY;
+                        const zoomWrap = document.getElementById('stage-zoom-container');
+                        if (zoomWrap) zoomWrap.classList.add('is-dragging');
+                        e.preventDefault();
+                    }
+                });
+
+                window.addEventListener('mousemove', (e) => {
+                    if (!isMouseDragging) return;
+                    panX = mouseStartPanX + (e.clientX - mouseStartX);
+                    panY = mouseStartPanY + (e.clientY - mouseStartY);
+                    clampPan();
+                    updateTransform(false);
+                });
+
+                window.addEventListener('mouseup', () => {
+                    if (isMouseDragging) {
+                        isMouseDragging = false;
+                        const zoomWrap = document.getElementById('stage-zoom-container');
+                        if (zoomWrap) zoomWrap.classList.remove('is-dragging');
+                    }
+                });
+
+                // Desktop Double click to toggle zoom
+                stageBoxEl.addEventListener('dblclick', (e) => {
+                    if (e.target.closest('.stack-arrow-btn') || e.target.closest('.stage-zoom-controls')) return;
+                    e.preventDefault();
+                    if (currentScale > 1.1) {
+                        resetZoom(true);
+                    } else {
+                        applyZoomAt(e.clientX, e.clientY, 2.5, true);
+                    }
+                });
+
+                // Desktop Wheel / Trackpad pinch zoom & Pan
+                stageBoxEl.addEventListener('wheel', (e) => {
+                    if (e.target.closest('.stack-arrow-btn') || e.target.closest('.stage-zoom-controls')) return;
+
+                    if (e.ctrlKey) {
+                        // Trackpad pinch OR Ctrl + Mouse Wheel
+                        e.preventDefault();
+                        const factor = e.deltaY < 0 ? 1.12 : 0.89;
+                        applyZoomAt(e.clientX, e.clientY, currentScale * factor, false);
+                    } else if (currentScale > 1.05) {
+                        // When zoomed in, wheel pans the image so user doesn't accidentally scroll away
+                        e.preventDefault();
+                        panX -= e.deltaX;
+                        panY -= e.deltaY;
+                        clampPan();
+                        updateTransform(false);
+                    }
+                }, { passive: false });
+
+                // Touch handling for Mobile (Pinch-to-zoom + 1-finger pan + clean swipe navigation)
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchStartTime = 0;
+                let hadMultiTouch = false;
+                let pinchStartDist = 0;
+                let pinchStartScale = 1;
+                let pinchMidX = 0;
+                let pinchMidY = 0;
+                let isPanningTouch = false;
+                let lastTouchX = 0;
+                let lastTouchY = 0;
+                let lastTapTime = 0;
+
                 stageBoxEl.addEventListener('touchstart', (e) => {
-                    if (e.touches.length === 1) {
+                    if (e.target.closest('.stack-arrow-btn') || e.target.closest('.stage-zoom-controls')) return;
+
+                    if (e.touches.length === 2) {
+                        hadMultiTouch = true;
+                        isPanningTouch = false;
+                        pinchStartDist = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+                        pinchStartScale = currentScale;
+                        pinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                        pinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                        e.preventDefault();
+                    } else if (e.touches.length === 1) {
                         touchStartX = e.touches[0].clientX;
                         touchStartY = e.touches[0].clientY;
+                        lastTouchX = touchStartX;
+                        lastTouchY = touchStartY;
+                        touchStartTime = Date.now();
+
+                        if (currentScale > 1.05) {
+                            isPanningTouch = true;
+                        } else {
+                            isPanningTouch = false;
+                            hadMultiTouch = false;
+                        }
                     }
-                }, { passive: true });
+                }, { passive: false });
+
+                stageBoxEl.addEventListener('touchmove', (e) => {
+                    if (e.touches.length === 2) {
+                        hadMultiTouch = true;
+                        e.preventDefault();
+                        const dist = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+                        if (pinchStartDist > 0) {
+                            const factor = dist / pinchStartDist;
+                            const targetScale = pinchStartScale * factor;
+                            applyZoomAt(pinchMidX, pinchMidY, targetScale, false);
+                        }
+                    } else if (e.touches.length === 1) {
+                        if (isPanningTouch && currentScale > 1.05) {
+                            e.preventDefault();
+                            const curX = e.touches[0].clientX;
+                            const curY = e.touches[0].clientY;
+                            panX += (curX - lastTouchX);
+                            panY += (curY - lastTouchY);
+                            lastTouchX = curX;
+                            lastTouchY = curY;
+                            clampPan();
+                            updateTransform(false);
+                        }
+                    }
+                }, { passive: false });
 
                 stageBoxEl.addEventListener('touchend', (e) => {
-                    if (e.changedTouches.length === 1) {
-                        const deltaX = e.changedTouches[0].clientX - touchStartX;
-                        const deltaY = e.changedTouches[0].clientY - touchStartY;
-                        if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
-                            const photo = photosCatalog[activeIndex];
-                            const stack = getPhotoStack(photo);
-                            if (deltaX < 0) {
-                                // Swiped left -> next photo in stack or next post
-                                if (stack.length > 1 && activeStackIndex < stack.length - 1) {
-                                    setStackIndex(activeStackIndex + 1);
-                                } else {
-                                    stageNextBtn.click();
+                    if (e.touches.length === 0) {
+                        if (currentScale < 1) {
+                            resetZoom(true);
+                        } else if (currentScale > 4.5) {
+                            currentScale = 4.5;
+                            clampPan();
+                            updateTransform(true);
+                        }
+
+                        const now = Date.now();
+                        const touchDuration = now - touchStartTime;
+
+                        // Double tap detection
+                        if (!hadMultiTouch && e.changedTouches.length === 1) {
+                            const tapX = e.changedTouches[0].clientX;
+                            const tapY = e.changedTouches[0].clientY;
+                            const distFromStart = Math.hypot(tapX - touchStartX, tapY - touchStartY);
+
+                            if (distFromStart < 15 && touchDuration < 300) {
+                                if (now - lastTapTime < 320) {
+                                    e.preventDefault();
+                                    if (currentScale > 1.1) {
+                                        resetZoom(true);
+                                    } else {
+                                        applyZoomAt(tapX, tapY, 2.5, true);
+                                    }
+                                    lastTapTime = 0;
+                                    return;
                                 }
-                            } else {
-                                // Swiped right -> prev photo in stack or prev post
-                                if (stack.length > 1 && activeStackIndex > 0) {
-                                    setStackIndex(activeStackIndex - 1);
+                                lastTapTime = now;
+                            }
+                        }
+
+                        // 1-finger horizontal swipe navigation ONLY if:
+                        // 1) Never had multi-touch in this gesture
+                        // 2) Scale is not zoomed (<= 1.05)
+                        // 3) Swipe was fast & clear horizontal
+                        if (!hadMultiTouch && currentScale <= 1.05 && e.changedTouches.length === 1) {
+                            const deltaX = e.changedTouches[0].clientX - touchStartX;
+                            const deltaY = e.changedTouches[0].clientY - touchStartY;
+                            if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3 && touchDuration < 600) {
+                                const photo = photosCatalog[activeIndex];
+                                const stack = getPhotoStack(photo);
+                                if (deltaX < 0) {
+                                    if (stack.length > 1 && activeStackIndex < stack.length - 1) {
+                                        setStackIndex(activeStackIndex + 1);
+                                    } else {
+                                        stageNextBtn.click();
+                                    }
                                 } else {
-                                    stagePrevBtn.click();
+                                    if (stack.length > 1 && activeStackIndex > 0) {
+                                        setStackIndex(activeStackIndex - 1);
+                                    } else {
+                                        stagePrevBtn.click();
+                                    }
                                 }
                             }
                         }
+
+                        isPanningTouch = false;
+                        pinchStartDist = 0;
+                        hadMultiTouch = false;
+                    } else if (e.touches.length === 1) {
+                        lastTouchX = e.touches[0].clientX;
+                        lastTouchY = e.touches[0].clientY;
+                        if (currentScale > 1.05) {
+                            isPanningTouch = true;
+                        }
                     }
-                }, { passive: true });
+                }, { passive: false });
+            }
+
+            // Zoom Toolbar Buttons
+            if (zoomInBtn) {
+                zoomInBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const stageBox = document.getElementById('stage-canvas-box');
+                    const rect = stageBox ? stageBox.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0, height: 0 };
+                    applyZoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, currentScale + 0.6, true);
+                });
+            }
+
+            if (zoomOutBtn) {
+                zoomOutBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const stageBox = document.getElementById('stage-canvas-box');
+                    const rect = stageBox ? stageBox.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0, height: 0 };
+                    applyZoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, currentScale - 0.6, true);
+                });
+            }
+
+            if (zoomResetBtn) {
+                zoomResetBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (currentScale > 1.05) {
+                        resetZoom(true);
+                    } else {
+                        const stageBox = document.getElementById('stage-canvas-box');
+                        const rect = stageBox ? stageBox.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0, height: 0 };
+                        applyZoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, 2.2, true);
+                    }
+                });
             }
 
             window.addEventListener('keydown', (e) => {

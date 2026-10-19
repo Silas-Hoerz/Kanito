@@ -757,8 +757,8 @@
                 </div>
 
                 <div class="file-drop" id="file-drop">
-                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" multiple style="display:none;">
-                    <div id="drop-label">📁 Drag &amp; drop photo(s) here or click to browse (upload multiple files to build a stack)</div>
+                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/tiff,.tif,.tiff" multiple style="display:none;">
+                    <div id="drop-label">📁 Drag &amp; drop photo(s) here or click to browse (supports JPG, PNG, WebP, TIFF)</div>
                 </div>
 
                 <!-- Interactive Stack Manager -->
@@ -929,6 +929,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
 
     <script>
         (function () {
@@ -1195,14 +1196,44 @@
             }
 
             async function handleFiles(files) {
-                const imageFiles = files.filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp)$/i.test(f.name));
-                if (imageFiles.length === 0) return alert('Please select valid image files (JPEG, PNG, WebP).');
+                const imageFiles = files.filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|tiff?)$/i.test(f.name));
+                if (imageFiles.length === 0) return alert('Please select valid image files (JPEG, PNG, WebP, TIFF).');
 
                 const wasEmpty = currentStackItems.length === 0;
 
                 for (let i = 0; i < imageFiles.length; i++) {
                     const file = imageFiles[i];
-                    const blobUrl = URL.createObjectURL(file);
+                    let blobUrl = '';
+                    let convertedCanvas = null;
+
+                    const isTiff = /\.(tiff?)$/i.test(file.name) || file.type === 'image/tiff';
+                    if (isTiff) {
+                        try {
+                            const ab = await file.arrayBuffer();
+                            const ifds = UTIF.decode(ab);
+                            if (!ifds || ifds.length === 0) throw new Error('Could not parse TIFF structure');
+                            UTIF.decodeImage(ab, ifds[0]);
+                            const rgba = UTIF.toRGBA8(ifds[0]);
+                            const tW = ifds[0].width;
+                            const tH = ifds[0].height;
+                            const tCanvas = document.createElement('canvas');
+                            tCanvas.width = tW;
+                            tCanvas.height = tH;
+                            const tCtx = tCanvas.getContext('2d');
+                            const imgData = tCtx.createImageData(tW, tH);
+                            imgData.data.set(rgba);
+                            tCtx.putImageData(imgData, 0, 0);
+                            convertedCanvas = tCanvas;
+                            const tBlob = await new Promise(r => tCanvas.toBlob(r, 'image/jpeg', 0.92));
+                            blobUrl = URL.createObjectURL(tBlob);
+                        } catch (err) {
+                            console.error('TIFF processing error:', err);
+                            alert(`Failed to decode TIFF "${file.name}": ` + err.message);
+                            continue;
+                        }
+                    } else {
+                        blobUrl = URL.createObjectURL(file);
+                    }
 
                     let fileCamera = '', fileLens = '', fileFocal = '', fileAperture = '', fileShutter = '', fileIso = '';
                     let fileLat = null, fileLng = null;
@@ -1224,6 +1255,7 @@
                         id: 'new-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 7),
                         type: 'new',
                         file: file,
+                        convertedCanvas: convertedCanvas,
                         filename: null,
                         width: null,
                         height: null,
@@ -1659,16 +1691,20 @@
                     // 1. Process & Upload any newly added files
                     for (let i = 0; i < newItems.length; i++) {
                         const item = newItems[i];
-                        setStatus(`⏳ ${i + 1}/${newItems.length}: Scaling and encrypting "${item.name}"...`);
+                        setStatus(`⏳ ${i + 1}/${newItems.length}: Scaling, optimizing and encrypting "${item.name}"...`);
 
-                        const img = new Image();
-                        img.src = item.previewUrl;
-                        await new Promise(r => img.onload = r);
+                        let source = item.convertedCanvas;
+                        if (!source) {
+                            const img = new Image();
+                            img.src = item.previewUrl;
+                            await new Promise(r => img.onload = r);
+                            source = img;
+                        }
 
                         const canvas = document.createElement('canvas');
-                        const maxDim = 2560;
-                        let w = img.naturalWidth;
-                        let h = img.naturalHeight;
+                        const maxDim = 2560; // 2.5K high resolution for crisp zoom on desktop & mobile
+                        let w = source.naturalWidth || source.width;
+                        let h = source.naturalHeight || source.height;
                         if (w > maxDim || h > maxDim) {
                             if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
                             else { w = Math.round((w * maxDim) / h); h = maxDim; }
@@ -1676,9 +1712,12 @@
                         canvas.width = w;
                         canvas.height = h;
                         const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(source, 0, 0, w, h);
 
-                        const blob = await new Promise(r => canvas.toBlob(r, 'image/webp', 0.92));
+                        // Visually lossless WebP compression at 0.90
+                        const blob = await new Promise(r => canvas.toBlob(r, 'image/webp', 0.90));
                         const ab = await blob.arrayBuffer();
                         const scrambled = scramble(ab);
                         const base64 = toBase64(scrambled);
