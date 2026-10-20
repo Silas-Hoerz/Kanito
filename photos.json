@@ -567,8 +567,10 @@
           "width": 1716,
           "height": 2560,
           "aspect_ratio": 0.6703,
-          "medium": "analog",
-          "film": "Kodak Gold 200"
+          "camera": "Nikon F601",
+          "lens": "Tamron",
+          "focal_length": "50",
+          "iso": "200"
         }
       ],
       "likes": 0,
