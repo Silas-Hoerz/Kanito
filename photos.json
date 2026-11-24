@@ -8,6 +8,49 @@
   },
   "photos": [
     {
+      "id": "photo-mwv8pwrw-snv5",
+      "title": "120152540011",
+      "photographer": "Silas Hörz",
+      "instagram": "",
+      "description": "White Lion",
+      "location_name": "",
+      "has_location": false,
+      "latitude": null,
+      "longitude": null,
+      "frame": "none",
+      "frame_width": null,
+      "medium": "analog",
+      "film": "Kodak Gold 200",
+      "year": "2026",
+      "date": "2026-11-24",
+      "camera": "Nikon F601",
+      "lens": "Tamron",
+      "focal_length": "90mm Macro",
+      "aperture": "",
+      "shutter": "",
+      "iso": "200",
+      "filename": "photo-mwv8pwrw-snv5.bin",
+      "width": 2560,
+      "height": 1697,
+      "aspect_ratio": 1.5085,
+      "images": [
+        {
+          "filename": "photo-mwv8pwrw-snv5.bin",
+          "width": 2560,
+          "height": 1697,
+          "aspect_ratio": 1.5085
+        },
+        {
+          "filename": "photo-mwv8pyyq-gpvl.bin",
+          "width": 2560,
+          "height": 1697,
+          "aspect_ratio": 1.5085
+        }
+      ],
+      "views": 0,
+      "likes": 0
+    },
+    {
       "id": "photo-mwv2qz46-3z9r",
       "title": "Moon",
       "photographer": "Silas",
